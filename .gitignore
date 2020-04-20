@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 .env
-
+.githelp
 # production
 /build
 
