@@ -1,0 +1,27 @@
+{
+  "name": "ututor_backend",
+  "version": "1.0.0",
+  "description": "Backend project for uTutor.knd",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JinSSJ3/uTutor_backend.git"
+  },
+  "author": "KND team (Jin, Tys, Jenn, Luis, Renzo, Yeri, Daniel, Gabriel)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JinSSJ3/uTutor_backend/issues"
+  },
+  "homepage": "https://github.com/JinSSJ3/uTutor_backend#readme",
+  "dependencies": {
+    "concurrently": "^5.1.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.3"
+  }
+}
