@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 app.get('/conection', (req,res)=>{
-    res("Conection established! ");
+    res("KND start of transmition...! ");
 });
 
 app.get('/api/students', (req,res)=>{

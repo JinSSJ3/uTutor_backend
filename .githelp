@@ -1,0 +1,4 @@
+## Change email work-University-work.... and so on
+
+git config user.email 
+git config user.email "a20122128@pucp.pe"
