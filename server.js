@@ -35,5 +35,5 @@ app.get('/api/students', (req,res)=>{
     
 });
 
-const port = Number(process.env.port);
+const port = 5000;
 app.listen(port, ()=> console.log(`Server runing on port ${port}`));
