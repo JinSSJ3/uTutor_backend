@@ -1,5 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const sequelize = require('./src/models/database');
+const student = require('./src/models/student');
 dotenv.config();
 
 /* sample draft server 
@@ -7,13 +9,21 @@ dotenv.config();
 * Date: 20/04/2020
 **/
 
-const app = express();
 
-app.get('/conection', (req,res)=>{
+app = express();
+
+app.use(express.json());
+
+// Settings
+app.set("port", process.env.PORT || 3000)
+
+app.use(require('./src/routes/studentRoutes'))
+
+/*app.get('/conection', (req,res)=>{
     res("Conection established! ");
-});
+});*/
 
-app.get('/api/students', (req,res)=>{
+/*app.get('/api/students', (req,res)=>{
     const students = [
         {
             id: 1, name: "Jin", term:8, courses:[
@@ -33,7 +43,7 @@ app.get('/api/students', (req,res)=>{
     ]
     res.json(students);
     
-});
+});*/
 
-const port = 5000;
-app.listen(port, ()=> console.log(`Server runing on port ${port}`));
+
+app.listen(app.get('port'), ()=> console.log(`Server runing on port ${app.get('port')}`));
