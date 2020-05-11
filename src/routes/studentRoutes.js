@@ -11,6 +11,8 @@ router.get("/",(req, res)=>{
 router.get("/api/student", studentController.list);
 router.get("/insert", studentController.insert);
 
+router.post("/api/student", studentController.register);
+
 
 
 module.exports = router;
