@@ -15,9 +15,10 @@ app = express();
 app.use(express.json());
 
 // Settings
-app.set("port", process.env.PORT || 80)
+app.set("port", process.env.PORT || 80);
 
-app.use(require('./src/routes/studentRoutes'))
+app.use(require('./src/routes/studentRoutes'));
+
 
 /*app.get('/conection', (req,res)=>{
     res("Conection established! ");

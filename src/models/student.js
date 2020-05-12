@@ -13,7 +13,12 @@ let student = sequelize.define(nametable,{
     user: Sequelize.STRING,
     password: Sequelize.STRING,
     name: Sequelize.STRING,
-    
+    lastName: Sequelize.STRING,
+    mail:Sequelize.STRING,
+    code: Sequelize.STRING,
+    name: Sequelize.STRING,
+    //tag: Sequelize.STRING,
+    state: Sequelize.TINYINT,
     },
     {
     timestamps :false,
