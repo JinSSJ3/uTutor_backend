@@ -7,7 +7,7 @@ sequelize.sync();
 
 
 
-controllers.list = async (req, res) => {    
+controllers.list = async (req, res) => { // fetch all all studenst from DB
     try{
         const students = await student.findAll();
         res.status(201).json({students:students});         
@@ -21,7 +21,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
     try{
         const {id} = req.params;
         const data = await student.findAll({
-            where: {id: id}
+            where: {ID_ALUMNO: id}
         })
         res.status(201).json({data:data});        
     }
@@ -41,16 +41,20 @@ controllers.register = async (req, res) => {
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
-    const {name, lastName, code,/* tag,*/mail, phone } = req.body.student; 
+    const {names, lastnames, studentCode, email, phoneNumber, address, username, password} = req.body.student; 
     console.log("GOT: ", req.body.student);//solo para asegurarme de que el objeto llego al backend
     try {
         const newStudent = await student.create({
-            name: name,
-            lastName: lastName,
-            code: code,
-            phone: phone,
-            mail: mail,
-           // tag: tag
+            USUARIO: username,
+            CONTRASENHA: password,
+            NOMBRES: names,
+            APELLIDOS: lastnames,
+            CORREO: email,
+            CODIGO: studentCode,
+            TELEFONO: phoneNumber,
+            DIRECCION: address,
+            IMAGEN: null,
+            ESTADO: 1,
         });        
         res.status(201).json({student: newStudent});
     } catch (error) {

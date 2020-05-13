@@ -1,24 +1,25 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
 
-let nametable = 'Student';
+let nametable = 'ALUMNO';
 
 let student = sequelize.define(nametable,{
 
-    id:{
+    ID_ALUMNO:{
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
-    user: Sequelize.STRING,
-    password: Sequelize.STRING,
-    name: Sequelize.STRING,
-    lastName: Sequelize.STRING,
-    mail:Sequelize.STRING,
-    code: Sequelize.STRING,
-    name: Sequelize.STRING,
-    //tag: Sequelize.STRING,
-    state: Sequelize.TINYINT,
+    USUARIO: Sequelize.STRING,
+    CONTRASENHA: Sequelize.STRING,
+    NOMBRES: Sequelize.STRING,
+    APELLIDOS: Sequelize.STRING,
+    CORREO:Sequelize.STRING,
+    CODIGO: Sequelize.STRING,
+    TELEFONO: Sequelize.STRING,
+    DIRECCION: Sequelize.STRING,
+    IMAGEN: Sequelize.BLOB,
+    ESTADO: Sequelize.INTEGER,
     },
     {
     timestamps :false,
