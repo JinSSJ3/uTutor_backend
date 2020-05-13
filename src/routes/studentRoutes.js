@@ -13,6 +13,8 @@ router.get("/api/student", studentController.list);
 
 router.post("/api/student", studentController.register);
 
+router.get("/api/student/:id", studentController.get);
+
 app.use(morgan('dev'));
 
 

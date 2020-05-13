@@ -13,9 +13,23 @@ controllers.list = async (req, res) => {
         res.status(201).json({students:students});         
     }    
     catch (error) {
-        res.json({error: error.message})    
+        res.json({error: error.message});    
     }
 };
+
+controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
+    try{
+        const {id} = req.params;
+        const data = await student.findAll({
+            where: {id: id}
+        })
+        res.status(201).json({data:data});        
+    }
+    catch(error){
+        res.json({error: error.message});
+    }
+
+}
 
 
 /**
