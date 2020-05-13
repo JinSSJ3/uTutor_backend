@@ -1,13 +1,20 @@
 var Sequelize = require('sequelize');
+require('dotenv').config();
 
-const sequelize = new Sequelize(
-    {username: "KNDadmin",
-    password: "teamotys123",
-    database: "KNDdb",
-    host: "knd-instdb.cywuoagpzvfc.us-east-1.rds.amazonaws.com",
-    port: "3306",
-    dialect: 'mysql'
+console.log(process.env.USR)
+console.log(process.env.DATABASE)
+console.log(process.env.PORTDB)
+console.log(process.env.PSSW)
+
+
+const sequelize = new Sequelize( 
+    {username: process.env.USR,
+    password: process.env.PSSW,
+    database: process.env.DATABASE,
+    host: process.env.HOST, 
+    port: Number(process.env.PORTDB),
+    dialect: "mysql"
     }
 );
 
-module.exports = sequelize;
+module.exports = sequelize; 
