@@ -13,7 +13,6 @@ controllers.list = async (req, res) => { // fetch all all tutors from DB
         const tutores = await tutor.findAll({
             include: {
                 model: usuario,
-                required: true
                } 
         });
         res.status(201).json({tutores:tutores});         
