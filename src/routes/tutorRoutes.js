@@ -3,11 +3,7 @@ const morgan = require('morgan');
 const router = express.Router();
 
 router.use(express.json());
-<<<<<<< HEAD:src/routes/alumnoRoutes.js
-const studentController = require('../controllers/alumnoController');
-=======
 const tutorController = require('../controllers/tutorController');
->>>>>>> Gabs:src/routes/tutorRoutes.js
 
 
 router.get("/",(req, res)=>{

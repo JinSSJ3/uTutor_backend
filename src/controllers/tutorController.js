@@ -1,7 +1,6 @@
 const controllers = {}
 
 let sequelize = require('../models/database');
-let student = require('../models/usuario');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 
