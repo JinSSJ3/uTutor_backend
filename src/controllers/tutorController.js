@@ -1,12 +1,9 @@
 const controllers = {}
 
 let sequelize = require('../models/database');
-<<<<<<< HEAD:src/controllers/usuarioController.js
 let student = require('../models/usuario');
-=======
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
->>>>>>> Gabs:src/controllers/tutorController.js
 
 sequelize.sync();
 
