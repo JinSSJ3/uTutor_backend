@@ -66,7 +66,7 @@ controllers.register = async (req, res) => {
                 ID_TUTOR: result.ID_USUARIO
             })
         });
-        res.status(201).json({usuario: newUser});
+        res.status(201).json({tutor: newUser});
         
     } catch (error) {
         res.json({error: error.message})
