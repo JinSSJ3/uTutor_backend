@@ -9,7 +9,10 @@ let tutor = sequelize.define(nametable,{
     ID_TUTOR:{
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        references: {
+            model: "USUARIO",
+            key: "ID_USUARIO"
+          }
     },
 
     },
