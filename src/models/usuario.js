@@ -1,29 +1,29 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
 
-let nametable = 'ALUMNO';
+let nametable = 'USUARIO';
 
-let student = sequelize.define(nametable,{
+let usuario = sequelize.define(nametable,{
 
-    ID_ALUMNO:{
+    ID_USUARIO:{
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
     USUARIO: Sequelize.STRING,
     CONTRASENHA: Sequelize.STRING,
-    NOMBRES: Sequelize.STRING,
+    NOMBRE: Sequelize.STRING,
     APELLIDOS: Sequelize.STRING,
     CORREO:Sequelize.STRING,
     CODIGO: Sequelize.STRING,
     TELEFONO: Sequelize.STRING,
     DIRECCION: Sequelize.STRING,
     IMAGEN: Sequelize.BLOB,
-    ESTADO: Sequelize.INTEGER,
+    //ESTADO: Sequelize.INTEGER,
     },
     {
     timestamps :false,
     freezeTableName: true
 });
 
-module.exports = student;
+module.exports = usuario;

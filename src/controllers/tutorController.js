@@ -1,27 +1,34 @@
 const controllers = {}
 
 let sequelize = require('../models/database');
-let student = require('../models/student');
+let tutor = require('../models/tutor');
+let usuario = require('../models/usuario');
 
 sequelize.sync();
 
 
 
-controllers.list = async (req, res) => { // fetch all all studenst from DB
+controllers.list = async (req, res) => { // fetch all all tutors from DB
     try{
-        const students = await student.findAll();
-        res.status(201).json({students:students});         
+        const tutores = await tutor.findAll({
+            include: {
+                model: usuario,
+                required: true
+               } 
+        });
+        res.status(201).json({tutores:tutores});         
     }    
     catch (error) {
         res.json({error: error.message});    
     }
 };
 
-controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
+
+controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     try{
         const {id} = req.params;
-        const data = await student.findAll({
-            where: {ID_ALUMNO: id}
+        const data = await tutor.findAll({
+            where: {ID_TUTOR: id}
         })
         res.status(201).json({data:data});        
     }
@@ -32,19 +39,21 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
 }
 
 
-/**
+ /*
  * @returns El nuevo student creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
  */
+/*
 controllers.register = async (req, res) => {  
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
+/*
     const {names, lastnames, studentCode, email, phoneNumber, address, username, password} = req.body.student; 
-    console.log("GOT: ", req.body.student);//solo para asegurarme de que el objeto llego al backend
+    console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
     try {
-        const newStudent = await student.create({
+        const newTutor = await tutor.create({
             USUARIO: username,
             CONTRASENHA: password,
             NOMBRES: names,
@@ -56,13 +65,13 @@ controllers.register = async (req, res) => {
             IMAGEN: null,
             ESTADO: 1,
         });        
-        res.status(201).json({student: newStudent});
+        res.status(201).json({tutor: newTutor});
     } catch (error) {
         res.json({error: error.message})
     }
     
 };   
-    
+     */
 
 
 module.exports = controllers;
