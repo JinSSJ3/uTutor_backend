@@ -18,6 +18,7 @@ app.use(express.json());
 app.set("port", process.env.PORT);
 
 app.use(require('./src/routes/tutorRoutes'));
+app.use(require('./src/routes/usuarioRoutes'));
 
 
 /*app.get('/conection', (req,res)=>{
