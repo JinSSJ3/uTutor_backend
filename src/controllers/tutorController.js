@@ -48,7 +48,7 @@ controllers.register = async (req, res) => {
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
 
-    const {name, lastnames, code, email, phoneNumber, address, username, password} = req.body.student; 
+    const {name, lastnames, code, email, phoneNumber, address, username, password, imagen} = req.body.tutor; 
     console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
     try {
         const newUser = await usuario.create({
@@ -60,7 +60,7 @@ controllers.register = async (req, res) => {
             CODIGO: code,
             TELEFONO: phoneNumber,
             DIRECCION: address,
-            IMAGEN: null
+            IMAGEN: imagen
         }).then(result => {
             const newTutor = tutor.create({
                 ID_TUTOR: result.ID_USUARIO
