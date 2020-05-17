@@ -1,7 +1,7 @@
 const controllers = {}
 
 let sequelize = require('../models/database');
-let student = require('../models/student');
+let student = require('../models/usuario');
 
 sequelize.sync();
 

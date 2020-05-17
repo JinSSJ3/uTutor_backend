@@ -1,7 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const sequelize = require('./src/models/database');
-const student = require('./src/models/student');
+const usuario = require('./src/models/usuario');
+const alumno = require('./src/models/alumno');
 dotenv.config();
 
 /* sample draft server 
@@ -17,7 +18,7 @@ app.use(express.json());
 // Settings
 app.set("port", process.env.PORT);
 
-app.use(require('./src/routes/studentRoutes'));
+app.use(require('./src/routes/alumnoRoutes'));
 
 
 /*app.get('/conection', (req,res)=>{

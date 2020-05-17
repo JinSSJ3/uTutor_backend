@@ -1,11 +1,6 @@
 var Sequelize = require('sequelize');
 require('dotenv').config();
 
-console.log(process.env.USR)
-console.log(process.env.DATABASE)
-console.log(process.env.PORTDB)
-console.log(process.env.PSSW)
-
 
 const sequelize = new Sequelize( 
     {username: process.env.USR,

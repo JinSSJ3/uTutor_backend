@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const router = express.Router();
 
 router.use(express.json());
-const studentController = require('../controllers/studentController');
+const studentController = require('../controllers/alumnoController');
 
 
 router.get("/",(req, res)=>{
