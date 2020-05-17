@@ -23,10 +23,11 @@ controllers.list = async (req, res) => { // fetch all all studenst from DB
 controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
     try{
         const {id} = req.params;
-        const data = await student.findAll({
-            where: {ID_ALUMNO: id}
+        const data = await alumno.findAll({
+            where: {ID_ALUMNO: id},
+            include: [usuario]
         })
-        res.status(201).json({data:data});        
+        res.status(201).json({alumno:data});        
     }
     catch(error){
         res.json({error: error.message});
@@ -44,22 +45,26 @@ controllers.register = async (req, res) => {
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
-    const {names, lastnames, studentCode, email, phoneNumber, address, username, password} = req.body.student; 
-    console.log("GOT: ", req.body.student);//solo para asegurarme de que el objeto llego al backend
+    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN} = req.body.alumno; 
+    console.log("GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
-        const newStudent = await student.create({
-            USUARIO: username,
-            CONTRASENHA: password,
-            NOMBRES: names,
-            APELLIDOS: lastnames,
-            CORREO: email,
-            CODIGO: studentCode,
-            TELEFONO: phoneNumber,
-            DIRECCION: address,
-            IMAGEN: null,
-            ESTADO: 1,
-        });        
-        res.status(201).json({student: newStudent});
+        const nuevoAlumno = await usuario.create({
+            USUARIO: USUARIO,
+            CONTRASENHA: CONTRASENHA,
+            NOMBRE: NOMBRE,
+            APELLIDOS: APELLIDOS,
+            CORREO: CORREO,
+            CODIGO: CODIGO,
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION,
+            IMAGEN: IMAGEN
+        })
+        .then(result => {
+            const nuevo = alumno.create({
+                ID_ALUMNO: result.ID_USUARIO
+            })
+        });          
+        res.status(201).json({alumno: nuevoAlumno});
     } catch (error) {
         res.json({error: error.message})
     }
