@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
 let usuario = require("./usuario")
+const bcrypt = require("bcrypt");
 
 let nametable = 'ALUMNO';
 
@@ -14,8 +15,8 @@ let alumno = sequelize.define(nametable,{
             key: "ID_USUARIO"
           }
     }        
-    },
-    {
+},
+{
     timestamps :false,
     freezeTableName: true
 });
