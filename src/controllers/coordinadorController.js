@@ -1,48 +1,40 @@
 const controllers = {}
-
+const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
-let usuario = require('../models/usuario');
-let alumno = require('../models/alumno');
+let coordinador = require('../models/usuario');
 let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
 
+const Op = Sequelize.op;
 
 
 
-
-controllers.list = async (req, res) => { // fetch all all studenst from DB
+controllers.list = async (req, res) => { // lista a todos los coordinadores
     try{
-        const alumnos = await rolXUsuario.findAll({
+        const coordinadores = await rolXUsuario.findAll({           
             include: [{
-                model:rol,
-                where: {DESCRIPCION: "Alumno"}
+                model: rol,
+                where: {DESCRIPCION: "Coordinador"}
             },{
-                model: usuario
-            }],
-            where: {ESTADO: 1}
+                model:coordinador
+            }],            
+            where:{ESTADO: 1} // activo
         });
-        res.status(201).json({alumnos:alumnos});         
+        res.status(201).json({coordinadores:coordinadores});         
     }    
     catch (error) {
         res.json({error: error.message});    
     }
 };
 
-controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
+controllers.get = async (req, res) =>{ // devuelve los datos de un coordinador 
     try{
         const {id} = req.params;
-        const data = await usuario.findOne({
-            where: {ID_USUARIO: id},
-            include: [rol]
-        })
-        /*const data = await usuario.findOne({  validar contrasena
+        const data = await coordinador.findOne({
+            include: [rol],
             where: {ID_USUARIO: id}
-        })
-        .then(async result => { 
-            console.log(await result.validPassword("contra"));
-        })*/
-        
-        res.status(201).json({alumno:data});        
+        })       
+        res.status(201).json({coordinador:data});        
     }
     catch(error){
         res.json({error: error.message});
@@ -51,19 +43,19 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
 
 
 /**
- * @returns El nuevo student creado en formato Json()
+ * @returns El nuevo coordinador creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
  */
 controllers.register = async (req, res) => {  
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
-     * que se envio un "student" en el cuerpo ("body") del request ("req")
+     * que se envio un "coordinador" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN} = req.body.alumno; 
+    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN} = req.body.coordinador; 
     //console.log("GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
-        const nuevoAlumno = await usuario.create({
+        const nuevoCoordinador = await coordinador.create({
             USUARIO: USUARIO,
             CONTRASENHA: CONTRASENHA,
             NOMBRE: NOMBRE,
@@ -75,13 +67,9 @@ controllers.register = async (req, res) => {
             IMAGEN: IMAGEN
         }, {transaction: transaccion})
         .then(async result => {
-            const nuevo = await alumno.create({
-                ID_ALUMNO: result.ID_USUARIO
-            }, {transaction: transaccion})                     
-           
             const idRol = await rol.findOne({
                 attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Alumno"}
+                where: {DESCRIPCION: "Coordinador"}
             }, {transaction: transaccion})
 
             const rolDeUsuario = await rolXUsuario.create({
@@ -91,9 +79,8 @@ controllers.register = async (req, res) => {
             
         });          
         await transaccion.commit();
-        res.status(201).json({alumno: nuevoAlumno});
+        res.status(201).json({coordinador: nuevoCoordinador});
     } catch (error) {
-        //console.log("err0");
         await transaccion.rollback();
         res.json({error: error.message})
     }

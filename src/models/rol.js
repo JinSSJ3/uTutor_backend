@@ -18,4 +18,6 @@ let rol = sequelize.define(nametable,{
 });
 
 
+
+
 module.exports = rol;

@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
 let usuario = require("./usuario")
-const bcrypt = require("bcrypt");
 
 let nametable = 'ALUMNO';
 

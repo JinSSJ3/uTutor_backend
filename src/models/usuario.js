@@ -37,4 +37,5 @@ usuario.prototype.validPassword = async function(password) {
     return bcrypt.compare(password, this.CONTRASENHA);
 }
 
+
 module.exports = usuario;

@@ -7,9 +7,10 @@ let nametable = 'ROL_X_USUARIO';
 
 let rolXUsuario = sequelize.define(nametable,{
 
-    ID_USUARIO:{
+  /*  ID_USUARIO:{
         type: Sequelize.INTEGER,
         primaryKey: true,
+        foreignKey:true,
         references: {
             model: "USUARIO",
             key: "ID_USUARIO"
@@ -18,18 +19,21 @@ let rolXUsuario = sequelize.define(nametable,{
     ID_ROL: {
         type: Sequelize.INTEGER,
         primaryKey: true,
+        foreignKey:true,
         references: {
             model: "ROL",
             key: "ID_ROL"
         }       
-    }
+    }*/
 },
 {
     timestamps :false,
     freezeTableName: true
 });
 
-rolXUsuario.belongsTo(usuario, {foreignKey:{name:"ID_USUARIO"}});
-rolXUsuario.belongsTo(rol, {foreignKey:{name:"ID_ROL"}});
+usuario.belongsToMany(rol, {through: rolXUsuario, foreignKey: "ID_USUARIO", otherKey: "ID_ROL"})
+rol.belongsToMany(usuario, {through: rolXUsuario, foreignKey: "ID_ROL", otherKey: "ID_USUARIO"})
+rolXUsuario.belongsTo(usuario,{foreignKey: "ID_USUARIO"});
+rolXUsuario.belongsTo(rol,{foreignKey: "ID_ROL"});
 
 module.exports = rolXUsuario;
