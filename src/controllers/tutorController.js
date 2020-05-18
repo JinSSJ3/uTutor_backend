@@ -3,7 +3,7 @@ const controllers = {}
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
-let rolUsuario = require('../models/rolXUsuario');
+let rolXUsuario = require('../models/rolXUsuario');
 let rol = require('../models/rol');
 
 sequelize.sync();
@@ -63,14 +63,18 @@ controllers.register = async (req, res) => {
             TELEFONO: phoneNumber,
             DIRECCION: address,
             IMAGEN: imagen
-        }).then(result => {
-            const newTutor = tutor.create({
+        }).then(async result  => {
+            const newTutor = await tutor.create({
                 ID_TUTOR: result.ID_USUARIO
             })
-            const newRolUsuario = rolUsuario.create({
+            const idRol = await rol.findOne({
+                attributes:["ID_ROL"],
+                where: {DESCRIPCION: "Tutor"}
+            })
+            const newRolUsuario = await rolXUsuario.create({
                 ID_USUARIO: result.ID_USUARIO,
                 ESTADO: '1',
-                ID_ROL: '3'
+                ID_ROL: idRol.ID_ROL
             })
         });
         res.status(201).json({tutor: newUser});

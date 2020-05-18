@@ -5,7 +5,7 @@ let usuario = require('../models/usuario');
 
 let nametable = 'ROL_X_USUARIO';
 
-let rolUsuario = sequelize.define(nametable,{
+let rolXUsuario = sequelize.define(nametable,{
 
     ID_USUARIO:{
         type: Sequelize.INTEGER,
@@ -30,7 +30,7 @@ let rolUsuario = sequelize.define(nametable,{
     freezeTableName: true
 });
 
-rolUsuario.belongsTo(usuario, {foreignKey:{name:"ID_USUARIO"}});
-rolUsuario.belongsTo(rol, {foreignKey:{name:"ID_ROL"}});
+rolXUsuario.belongsTo(usuario, {foreignKey:{name:"ID_USUARIO"}});
+rolXUsuario.belongsTo(rol, {foreignKey:{name:"ID_ROL"}});
 
-module.exports = rolUsuario;
+module.exports = rolXUsuario;
