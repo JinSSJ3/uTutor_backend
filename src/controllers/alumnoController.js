@@ -5,6 +5,7 @@ let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
 let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
+let usuarioXPrograma = require("../models/usuarioXPrograma");
 
 
 
@@ -60,7 +61,7 @@ controllers.register = async (req, res) => {
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN} = req.body.alumno; 
+    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA} = req.body.alumno; 
     //console.log("GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevoAlumno = await usuario.create({
@@ -87,7 +88,14 @@ controllers.register = async (req, res) => {
             const rolDeUsuario = await rolXUsuario.create({
                 ID_USUARIO: result.ID_USUARIO,
                 ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion})
+            }, {transaction: transaccion})         
+
+            PROGRAMA.forEach(async element => {
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: result.ID_USUARIO,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            })
             
         });          
         await transaccion.commit();

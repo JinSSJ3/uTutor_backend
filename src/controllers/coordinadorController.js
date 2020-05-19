@@ -4,12 +4,12 @@ let sequelize = require('../models/database');
 let coordinador = require('../models/usuario');
 let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
-
-const Op = Sequelize.op;
-
+let usuarioXPrograma = require("../models/usuarioXPrograma");
 
 
-controllers.list = async (req, res) => { // lista a todos los coordinadores
+
+
+controllers.listar = async (req, res) => { // lista a todos los coordinadores
     try{
         const coordinadores = await rolXUsuario.findAll({           
             include: [{
@@ -17,6 +17,28 @@ controllers.list = async (req, res) => { // lista a todos los coordinadores
                 where: {DESCRIPCION: "Coordinador"}
             },{
                 model:coordinador
+            }],            
+            where:{ESTADO: 1} // activo
+        });
+        res.status(201).json({coordinadores:coordinadores});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorPrograma = async (req, res) => { // lista a todos los coordinadores por programa
+    try{
+        const coordinadores = await rolXUsuario.findAll({           
+            include: [{
+                model: rol,
+                where: {DESCRIPCION: "Coordinador"}
+            },{
+                model:coordinador,
+                include: {
+                    model: usuarioXPrograma,
+                    where: ID_ROL = Sequelize.col("ROL.ID_ROL")
+                }
             }],            
             where:{ESTADO: 1} // activo
         });
@@ -46,13 +68,13 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un coordinador
  * @returns El nuevo coordinador creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
  */
-controllers.register = async (req, res) => {  
+controllers.registrar = async (req, res) => {  
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "coordinador" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN} = req.body.coordinador; 
+    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA} = req.body.coordinador; 
     //console.log("GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevoCoordinador = await coordinador.create({
@@ -64,7 +86,7 @@ controllers.register = async (req, res) => {
             CODIGO: CODIGO,
             TELEFONO: TELEFONO,
             DIRECCION: DIRECCION,
-            IMAGEN: IMAGEN
+            IMAGEN: IMAGEN            
         }, {transaction: transaccion})
         .then(async result => {
             const idRol = await rol.findOne({
@@ -77,6 +99,12 @@ controllers.register = async (req, res) => {
                 ID_ROL: idRol.ID_ROL
             }, {transaction: transaccion})
             
+            PROGRAMA.forEach(async element => {
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: result.ID_USUARIO,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            })      
         });          
         await transaccion.commit();
         res.status(201).json({coordinador: nuevoCoordinador});

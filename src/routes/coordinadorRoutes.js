@@ -9,9 +9,11 @@ const coordinadorController = require('../controllers/coordinadorController');
 router.get("/",(req, res)=>{
     res.end(`express running on the server ${app.get("port")}`);
 })
-router.get("/api/coordinador", coordinadorController.list);
+router.get("/api/coordinador", coordinadorController.listar);
 
-router.post("/api/coordinador", coordinadorController.register);
+//router.get("/api/coordinador/lista/:id", coordinadorController.listarPorPrograma);
+
+router.post("/api/coordinador", coordinadorController.registrar);
 
 router.get("/api/coordinador/:id", coordinadorController.get);
 
