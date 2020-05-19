@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
+const bcrypt = require("bcrypt");
 
 let nametable = 'USUARIO';
 
@@ -18,11 +19,23 @@ let usuario = sequelize.define(nametable,{
     CODIGO: Sequelize.STRING,
     TELEFONO: Sequelize.STRING,
     DIRECCION: Sequelize.STRING,
-    IMAGEN: Sequelize.BLOB,    
+    IMAGEN: Sequelize.BLOB    
     },
     {
     timestamps :false,
-    freezeTableName: true
+    freezeTableName: true,
+    hooks:{
+        beforeCreate: async (user, options) => {
+            const salt = await bcrypt.genSalt(10); 
+            user.CONTRASENHA = await bcrypt.hash(user.CONTRASENHA, salt);
+        }
+    }   
 });
+
+usuario.prototype.validPassword = async function(password) {
+    console.log(password,"   ", this.CONTRASENHA);
+    return bcrypt.compare(password, this.CONTRASENHA);
+}
+
 
 module.exports = usuario;

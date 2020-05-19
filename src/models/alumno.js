@@ -14,8 +14,8 @@ let alumno = sequelize.define(nametable,{
             key: "ID_USUARIO"
           }
     }        
-    },
-    {
+},
+{
     timestamps :false,
     freezeTableName: true
 });

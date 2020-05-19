@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const sequelize = require('./src/models/database');
 const usuario = require('./src/models/usuario');
 const alumno = require('./src/models/alumno');
+const tutor = require('./src/models/tutor');
 dotenv.config();
 
 /* sample draft server 
@@ -19,7 +20,9 @@ app.use(express.json());
 app.set("port", process.env.PORT);
 
 app.use(require('./src/routes/alumnoRoutes'));
-
+app.use(require('./src/routes/tutorRoutes'));
+app.use(require('./src/routes/coordinadorRoutes'));
+app.use(require('./src/routes/procesoTutoriaRoutes'));
 
 /*app.get('/conection', (req,res)=>{
     res("Conection established! ");
