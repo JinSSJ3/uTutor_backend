@@ -46,10 +46,37 @@ controllers.register = async (req, res) => {
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
-
     const {horaIni, horaFin, fecha, idTutor} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
+    
     try {
+        const { Op } = require("sequelize");
+        const valid = await disponibilidad.findAll({
+            where:{
+                [Op.or]: [
+                    {ID_TUTOR: idTutor,
+                        FECHA: fecha,
+                        HORA_FIN: {
+                            [Op.lte]: horaFin,
+                            [Op.gte]: horaIni
+                        }
+                    },
+                    {ID_TUTOR: idTutor,
+                        FECHA: fecha,
+                        HORA_INICIO: {
+                            [Op.lte]: horaFin,
+                            [Op.gte]: horaIni
+                        }
+                    }
+                ]
+              }
+        })
+        console.log(valid.length);
+        if(valid.length != 0){
+            let message = "La hora ya está ocupada";
+            res.status(400).json({error: message});
+            return;
+        }
         const newDisp = await disponibilidad.create({
             HORA_INICIO: horaIni,
             HORA_FIN: horaFin,
