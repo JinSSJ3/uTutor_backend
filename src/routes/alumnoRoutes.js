@@ -11,6 +11,10 @@ router.get("/",(req, res)=>{
 })
 router.get("/api/alumno", alumnoController.list);
 
+//router.get("/api/alumno/lista/:programa", alumnoController.listarPorPrograma);
+
+router.get("/api/alumno/lista/:tutor/:tutoria", alumnoController.listarPorTutoria);
+
 router.post("/api/alumno", alumnoController.register);
 
 router.get("/api/alumno/:id", alumnoController.get);

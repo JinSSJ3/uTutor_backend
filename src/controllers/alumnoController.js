@@ -6,6 +6,7 @@ let alumno = require('../models/alumno');
 let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
 let usuarioXPrograma = require("../models/usuarioXPrograma");
+let asignacionTutoria = require("../models/asignacionTutoria")
 
 
 
@@ -28,6 +29,49 @@ controllers.list = async (req, res) => { // fetch all all studenst from DB
         res.json({error: error.message});    
     }
 };
+
+controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
+    try{
+        const alumnos = await asignacionTutoria.findAll({
+            include: {
+                model: alumno,
+                include: [usuario]
+            },
+            where: {
+                ESTADO: 1,
+                ID_TUTOR: req.params.tutor,
+                ID_PROCESO_TUTORIA: req.params.tutoria
+            }
+        });
+        res.status(201).json({alumnos:alumnos});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorPrograma = async (req, res) => { // Lista a los alumnos de un programa determinado
+    try{
+        const alumnos = await rolXUsuario.findAll({
+            include: [{
+                model:rol,
+                where: {DESCRIPCION: "Alumno"}
+            },{
+                model: usuario,
+                include: {
+                    model: usuarioXPrograma,
+                    where: {ID_PROGRAMA: req.params.id}
+                }
+            }],
+            where: {ESTADO: 1}
+        });
+        res.status(201).json({alumnos:alumnos});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 
 controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
     try{
