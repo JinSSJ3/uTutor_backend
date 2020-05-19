@@ -62,7 +62,7 @@ controllers.register = async (req, res) => {
      *  */ 
     const transaccion = await sequelize.transaction();
     const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA} = req.body.alumno; 
-    //console.log("GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
+    console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevoAlumno = await usuario.create({
             USUARIO: USUARIO,
