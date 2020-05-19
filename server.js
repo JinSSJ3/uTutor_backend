@@ -22,7 +22,7 @@ app.set("port", process.env.PORT);
 app.use(require('./src/routes/alumnoRoutes'));
 app.use(require('./src/routes/tutorRoutes'));
 app.use(require('./src/routes/coordinadorRoutes'));
-
+app.use(require('./src/routes/procesoTutoriaRoutes'));
 
 /*app.get('/conection', (req,res)=>{
     res("Conection established! ");
