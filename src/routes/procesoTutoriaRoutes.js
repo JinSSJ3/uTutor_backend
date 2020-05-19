@@ -15,6 +15,8 @@ router.get("/api/tutoria/lista/:id", tutoriaController.listarPorPrograma);
 
 router.post("/api/tutoria", tutoriaController.registrar);
 
+router.post("/api/tutoria/modificar", tutoriaController.modificar);
+
 router.get("/api/tutoria/:id", tutoriaController.get);
 
 app.use(morgan('dev'));
