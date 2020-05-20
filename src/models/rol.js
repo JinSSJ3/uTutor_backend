@@ -8,6 +8,7 @@ let rol = sequelize.define(nametable,{
     ID_ROL:{
         type: Sequelize.INTEGER,
         primaryKey: true,
+        autoIncrement: true
     },
     DESCRIPCION: Sequelize.STRING
     },
