@@ -1,8 +1,6 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
-const etiqueta = require('./etiqueta');
 const usuario = require('./usuario');
-const procesoTutoria = require('./usuario');
 
 
 let nametable = 'USUARIO_X_PROGRAMA';
