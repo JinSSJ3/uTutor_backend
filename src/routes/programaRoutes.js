@@ -11,6 +11,8 @@ router.get("/", (req, res)=>{
 
 router.get("/api/programa", programaController.listar);
 
+router.get("/api/facultad", programaController.listarFacultad);
+
 router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
 
 router.post("/api/facultad", programaController.registrarFacultad);

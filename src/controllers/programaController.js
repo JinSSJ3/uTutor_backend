@@ -21,6 +21,20 @@ controllers.listar = async (req, res) => {
     }
 };
 
+
+controllers.listarFacultad = async (req, res) => {
+    try {
+        const facultades = await programa.findAll(
+            {
+                where: {ID_FACULTAD: null}
+            }
+        );
+        res.status(201).json({ facultad: facultades });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 controllers.listarPorFacultad = async (req, res) => {
     try {
         const programas = await programa.findAll(
