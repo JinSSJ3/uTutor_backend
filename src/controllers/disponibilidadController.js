@@ -46,6 +46,7 @@ controllers.register = async (req, res) => {
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
+    const transaccion = await sequelize.transaction();
     const {horaIni, horaFin, fecha, idTutor} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     
@@ -83,10 +84,12 @@ controllers.register = async (req, res) => {
             FECHA: fecha,
             ESTADO: 1,
             ID_TUTOR: idTutor
-        });
+        }, {transaction: transaccion});
+        await transaccion.commit();
         res.status(201).json({newDisp: newDisp});
         
     } catch (error) {
+        await transaccion.rollback();
         res.json({error: error.message})
     }
     

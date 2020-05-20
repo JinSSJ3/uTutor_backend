@@ -49,7 +49,7 @@ controllers.register = async (req, res) => {
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
-
+    const transaccion = await sequelize.transaction();
     const {name, lastnames, code, email, phoneNumber, address, username, password, imagen} = req.body.tutor; 
     console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
     try {
@@ -63,10 +63,10 @@ controllers.register = async (req, res) => {
             TELEFONO: phoneNumber,
             DIRECCION: address,
             IMAGEN: imagen
-        }).then(async result  => {
+        }, {transaction: transaccion}).then(async result  => {
             const newTutor = await tutor.create({
                 ID_TUTOR: result.ID_USUARIO
-            })
+            }, {transaction: transaccion})
             const idRol = await rol.findOne({
                 attributes:["ID_ROL"],
                 where: {DESCRIPCION: "Tutor"}
@@ -75,11 +75,13 @@ controllers.register = async (req, res) => {
                 ID_USUARIO: result.ID_USUARIO,
                 ESTADO: '1',
                 ID_ROL: idRol.ID_ROL
-            })
+            }, {transaction: transaccion})
         });
+        await transaccion.commit();
         res.status(201).json({tutor: newUser});
         
     } catch (error) {
+        await transaccion.rollback();
         res.json({error: error.message})
     }
     
