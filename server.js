@@ -18,6 +18,7 @@ app.use(express.json());
 app.set("port", process.env.PORT);
 
 app.use(require('./src/routes/studentRoutes'));
+app.use(require('./src/routes/programaRoutes'))
 
 
 /*app.get('/conection', (req,res)=>{
