@@ -1,9 +1,5 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const sequelize = require('./src/models/database');
-const usuario = require('./src/models/usuario');
-const alumno = require('./src/models/alumno');
-const tutor = require('./src/models/tutor');
 dotenv.config();
 
 /* sample draft server 
@@ -23,6 +19,8 @@ app.use(require('./src/routes/alumnoRoutes'));
 app.use(require('./src/routes/tutorRoutes'));
 app.use(require('./src/routes/coordinadorRoutes'));
 app.use(require('./src/routes/procesoTutoriaRoutes'));
+app.use(require('./src/routes/disponibilidadRoutes'));
+
 
 /*app.get('/conection', (req,res)=>{
     res("Conection established! ");

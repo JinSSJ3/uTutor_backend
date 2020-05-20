@@ -29,13 +29,11 @@ let usuario = sequelize.define(nametable,{
             const salt = await bcrypt.genSalt(10); 
             user.CONTRASENHA = await bcrypt.hash(user.CONTRASENHA, salt);
         }
-    }   
+    }
 });
 
 usuario.prototype.validPassword = async function(password) {
-    console.log(password,"   ", this.CONTRASENHA);
     return bcrypt.compare(password, this.CONTRASENHA);
 }
-
 
 module.exports = usuario;
