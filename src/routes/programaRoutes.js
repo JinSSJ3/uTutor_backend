@@ -15,6 +15,8 @@ router.get("/api/facultad", programaController.listarFacultad);
 
 router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
 
+router.get("/api/programa/coordinador/:id", programaController.listarPorCoordinador);
+
 router.post("/api/facultad", programaController.registrarFacultad);
 
 router.post("/api/programa", programaController.registrarPrograma);

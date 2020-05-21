@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
 const usuario = require('./usuario');
-
+const programa = require('./programa');
 
 let nametable = 'USUARIO_X_PROGRAMA';
 
@@ -27,9 +27,9 @@ let usuarioXPrograma = sequelize.define(nametable,
     freezeTableName: true,       
 });
 
-//usuario.belongsToMany(programa, {through: usuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA"})
-//programa.belongsToMany(usuario, {through: usuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO"})
-//usuarioXPrograma.belongsTo(programa,{foreignKey: "ID_PROGRAMA"});
+usuario.belongsToMany(programa, {through: usuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA"})
+programa.belongsToMany(usuario, {through: usuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO"})
+usuarioXPrograma.belongsTo(programa,{foreignKey: "ID_PROGRAMA"});
 usuarioXPrograma.belongsTo(usuario,{foreignKey: "ID_USUARIO"});
 
 module.exports = usuarioXPrograma;

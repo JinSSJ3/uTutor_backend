@@ -1,10 +1,33 @@
 const controllers = {}
-
+const Sequelize = require('sequelize')
 let sequelize = require('../models/database');
 let programa = require('../models/programa');
+let usuarioXPrograma = require('../models/usuarioXPrograma');
 //let institucion = require('../models/institucion')
 
-controllers.listar = async (req, res) => {
+Op = Sequelize.Op;
+
+controllers.listar = async (req, res) => { //listar todos los programas
+    try {
+        const programas = await programa.findAll(
+            {
+                //include: [institucion]
+                include: {
+                    model: programa,
+                    as: 'FACULTAD'
+                },
+                where: {ID_FACULTAD: {[Op.ne]: null}}
+            }
+            
+        );
+        res.status(201).json({ programa: programas });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
+
+controllers.listarProgramasYFacultades = async (req, res) => { 
     try {
         const programas = await programa.findAll(
             {
@@ -21,21 +44,7 @@ controllers.listar = async (req, res) => {
     }
 };
 
-
-controllers.listarFacultad = async (req, res) => {
-    try {
-        const facultades = await programa.findAll(
-            {
-                where: {ID_FACULTAD: null}
-            }
-        );
-        res.status(201).json({ facultad: facultades });
-    } catch (error) {
-        res.json({ error: error.message });
-    }
-};
-
-controllers.listarPorFacultad = async (req, res) => {
+controllers.listarPorFacultad = async (req, res) => {// listar programas por facultad
     try {
         const programas = await programa.findAll(
             {
@@ -54,6 +63,39 @@ controllers.listarPorFacultad = async (req, res) => {
         res.json({ error: error.message });
     }
 };
+
+controllers.listarPorCoordinador = async (req, res) => { // lista facultades y programas por coordinador
+    try {
+        const programas = await usuarioXPrograma.findAll(
+            {
+                //include: [institucion]
+                include: {
+                    model: programa
+                },
+                where: {
+                    ID_USUARIO: req.params.id
+                }
+            }
+        );
+        res.status(201).json({ programa: programas });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+controllers.listarFacultad = async (req, res) => {
+    try {
+        const facultades = await programa.findAll(
+            {
+                where: {ID_FACULTAD: null}
+            }
+        );
+        res.status(201).json({ facultad: facultades });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
+
 
 /**
  * @returns El nuevo programa (facultad) creado en formato Json()
