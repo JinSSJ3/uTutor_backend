@@ -58,15 +58,28 @@ controllers.register = async (req, res) => {
                     {ID_TUTOR: idTutor,
                         FECHA: fecha,
                         HORA_FIN: {
-                            [Op.lte]: horaFin,
-                            [Op.gte]: horaIni
+                            [Op.gte]: horaFin,
+                        },
+                        HORA_INICIO: {
+                            [Op.lt]: horaFin,
                         }
                     },
                     {ID_TUTOR: idTutor,
                         FECHA: fecha,
                         HORA_INICIO: {
+                            [Op.lte]: horaIni,
+                        },
+                        HORA_FIN: {
+                            [Op.gt]: horaIni,
+                        }
+                    },
+                    {ID_TUTOR: idTutor,
+                        FECHA: fecha,
+                        HORA_INICIO: {
+                            [Op.gte]: horaIni,
+                        },
+                        HORA_FIN: {
                             [Op.lte]: horaFin,
-                            [Op.gte]: horaIni
                         }
                     }
                 ]

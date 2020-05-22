@@ -50,19 +50,19 @@ controllers.register = async (req, res) => {
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {name, lastnames, code, email, phoneNumber, address, username, password, imagen} = req.body.tutor; 
+    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA} = req.body.tutor; 
     console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
     try {
         const newUser = await usuario.create({
-            USUARIO: username,
-            CONTRASENHA: password,
-            NOMBRE: name,
-            APELLIDOS: lastnames,
-            CORREO: email,
-            CODIGO: code,
-            TELEFONO: phoneNumber,
-            DIRECCION: address,
-            IMAGEN: imagen
+            USUARIO: USUARIO,
+            CONTRASENHA: CONTRASENHA,
+            NOMBRE: NOMBRE,
+            APELLIDOS: APELLIDOS,
+            CORREO: CORREO,
+            CODIGO: CODIGO,
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION,
+            IMAGEN: IMAGEN
         }, {transaction: transaccion}).then(async result  => {
             const newTutor = await tutor.create({
                 ID_TUTOR: result.ID_USUARIO
@@ -76,6 +76,13 @@ controllers.register = async (req, res) => {
                 ESTADO: '1',
                 ID_ROL: idRol.ID_ROL
             }, {transaction: transaccion})
+
+            PROGRAMA.forEach(async element => {
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: result.ID_USUARIO,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            })
         });
         await transaccion.commit();
         res.status(201).json({tutor: newUser});
