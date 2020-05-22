@@ -20,7 +20,8 @@ app.use(require('./src/routes/tutorRoutes'));
 app.use(require('./src/routes/coordinadorRoutes'));
 app.use(require('./src/routes/procesoTutoriaRoutes'));
 app.use(require('./src/routes/disponibilidadRoutes'));
-app.use(require('./src/routes/programaRoutes'))
+app.use(require('./src/routes/programaRoutes'));
+app.use(require('./src/routes/sesionRoutes'));
 
 /*app.get('/conection', (req,res)=>{
     res("Conection established! ");

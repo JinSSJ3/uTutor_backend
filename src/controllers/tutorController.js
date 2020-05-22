@@ -28,7 +28,7 @@ controllers.list = async (req, res) => { // fetch all all tutors from DB
 controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     try{
         const {id} = req.params;
-        const data = await tutor.findAll({
+        const data = await tutor.findOne({
             where: {ID_TUTOR: id},
             include: {
                 model: usuario
