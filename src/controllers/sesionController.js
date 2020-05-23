@@ -49,6 +49,97 @@ controllers.registerUnexpectedSession = async (req, res) => {
     const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, RESULTADO, COMPROMISOS, AREAS_APOYO, ALUMNOS} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
+        const { Op } = require("sequelize");
+        //Revisa que el tutor no tenga otra sesión a esa hora
+        const valid = await sesion.findAll({
+            where:{
+                [Op.or]: [
+                    {ID_TUTOR: ID_TUTOR,
+                        FECHA: FECHA,
+                        HORA_FIN: {
+                            [Op.gte]: HORA_FIN,
+                        },
+                        HORA_INICIO: {
+                            [Op.lt]: HORA_FIN,
+                        }
+                    },
+                    {ID_TUTOR: ID_TUTOR,
+                        FECHA: FECHA,
+                        HORA_INICIO: {
+                            [Op.lte]: HORA_INICIO,
+                        },
+                        HORA_FIN: {
+                            [Op.gt]: HORA_INICIO,
+                        }
+                    },
+                    {ID_TUTOR: ID_TUTOR,
+                        FECHA: FECHA,
+                        HORA_INICIO: {
+                            [Op.gte]: HORA_INICIO,
+                        },
+                        HORA_FIN: {
+                            [Op.lte]: HORA_FIN,
+                        }
+                    }
+                ]
+              }
+        })
+        if(valid.length != 0){
+            let message = "La hora ya está ocupada";
+            res.status(400).json({message: message});
+            return;
+        }
+        // Revisa que el alumno no tenga otra sesión a esa hora
+        ALUMNOS.forEach(async alumId => {
+            const findAlum = await alumnoXSesion.findAll({
+                where:{
+                    ID_ALUMNO: alumId,
+                }
+            }, {transaction: transaccion}).then(async result  => {
+                console.log("################" + result);
+                const valid2 = await sesion.findAll({
+                    where:{
+                        ID_SESION: result.ID_SESION,
+                        [Op.or]: [
+                            {
+                                FECHA: FECHA,
+                                HORA_FIN: {
+                                    [Op.gte]: HORA_FIN,
+                                },
+                                HORA_INICIO: {
+                                    [Op.lt]: HORA_FIN,
+                                }
+                            },
+                            {
+                                FECHA: FECHA,
+                                HORA_INICIO: {
+                                    [Op.lte]: HORA_INICIO,
+                                },
+                                HORA_FIN: {
+                                    [Op.gt]: HORA_INICIO,
+                                }
+                            },
+                            {
+                                FECHA: FECHA,
+                                HORA_INICIO: {
+                                    [Op.gte]: HORA_INICIO,
+                                },
+                                HORA_FIN: {
+                                    [Op.lte]: HORA_FIN,
+                                }
+                            }
+                        ]
+                      }
+                })
+                console.log(valid2.length);
+                if(valid2.length != 0){
+                    let message = "El alumno ya tuvo una cita a esa hora";
+                    res.status(400).json({message: message});
+                    return;
+                }
+            })
+        })
+
         const newSesion = await sesion.create({
             ID_TUTOR: ID_TUTOR,
             ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
@@ -85,16 +176,10 @@ controllers.registerUnexpectedSession = async (req, res) => {
             })
         });
         await transaccion.commit();
-        res.status(201).json({tutor: newUser});
-        
+        res.status(201).json({newSesion: newSesion});
     } catch (error) {
-        try{
             await transaccion.rollback();
             res.json({error: error.message})
-        }
-        catch(error){
-            res.json({error: error.message})
-        }    
     } 
 };   
      
