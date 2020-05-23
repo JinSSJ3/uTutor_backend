@@ -131,7 +131,7 @@ controllers.registerUnexpectedSession = async (req, res) => {
                           }
                     })
                     if(valid2.length != 0){
-                        let message = "La hora ya está ocupada";
+                        let message = "El alumno ya tiene una sesión a esa hora";
                         res.status(400).json({message: message});
                         return;
                     }
