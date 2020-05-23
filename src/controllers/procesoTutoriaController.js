@@ -4,6 +4,7 @@ let sequelize = require('../models/database');
 let tutoria = require('../models/procesoTutoria');
 let etiquetaXTutoria = require('../models/etiquetaXTutoria');
 let etiqueta = require('../models/etiqueta');
+let programa = require('../models/programa');
 
 
 controllers.listar = async (req, res) => { 
@@ -41,7 +42,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de una tutoria
         const {id} = req.params;
         const data = await tutoria.findOne({
             where: {ID_PROCESO_TUTORIA: id},
-            include: [etiqueta]
+            include: [etiqueta,programa]
         })
         res.status(201).json({tutoria:data});        
     }
@@ -61,7 +62,7 @@ controllers.registrar = async (req, res) => {
      * que se envio una "tutoria" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, IMAGEN} = req.body.tutoria; 
+    const {NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, DURACION} = req.body.tutoria; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevaTutoria = await tutoria.create({
@@ -73,7 +74,7 @@ controllers.registrar = async (req, res) => {
             TUTOR_ASIGNADO: TUTOR_ASIGNADO,
             PERMANENTE: PERMANENTE,
             ID_PROGRAMA: PROGRAMA,
-            IMAGEN: IMAGEN
+            DURACION: DURACION
         }, {transaction: transaccion})
         .then(async result =>{          
             for(element of ETIQUETA){
@@ -96,7 +97,7 @@ controllers.registrar = async (req, res) => {
 controllers.modificar = async (req, res) => {  
     
     const transaccion = await sequelize.transaction();
-    const {ID, NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, IMAGEN} = req.body.tutoria; 
+    const {ID, NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, DURACION} = req.body.tutoria; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         const tutoriaModificada = await tutoria.update({
@@ -108,7 +109,7 @@ controllers.modificar = async (req, res) => {
             TUTOR_ASIGNADO: TUTOR_ASIGNADO,
             PERMANENTE: PERMANENTE,
             ID_PROGRAMA: PROGRAMA,
-            IMAGEN: IMAGEN
+            DURACION: DURACION
         }, {
             where: {ID_PROCESO_TUTORIA: ID}
         }, {transaction: transaccion})
