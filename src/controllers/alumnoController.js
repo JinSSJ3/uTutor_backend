@@ -7,19 +7,21 @@ let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
 let usuarioXPrograma = require("../models/usuarioXPrograma");
 let asignacionTutoria = require("../models/asignacionTutoria")
+let etiquetaXAlumno = require("../models/etiquetaXAlumno")
 
 
 
 
 
-controllers.list = async (req, res) => { // fetch all all studenst from DB
+controllers.listar = async (req, res) => { // fetch all all studenst from DB
     try{
         const alumnos = await rolXUsuario.findAll({
             include: [{
                 model:rol,
                 where: {DESCRIPCION: "Alumno"}
             },{
-                model: usuario
+                model: usuario,
+                required: true
             }],
             where: {ESTADO: 1}
         });
@@ -35,7 +37,11 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
         const alumnos = await asignacionTutoria.findAll({
             include: {
                 model: alumno,
-                include: [usuario]
+                include: {
+                    model: usuario,
+                    required: true
+                },
+                required: true
             },
             where: {
                 ESTADO: 1,
@@ -60,8 +66,9 @@ controllers.listarPorPrograma = async (req, res) => { // Lista a los alumnos de 
                 model: usuario,
                 include: {
                     model: usuarioXPrograma,
-                    where: {ID_PROGRAMA: req.params.id}
-                }
+                    where: {ID_PROGRAMA: req.params.programa},                    
+                },
+                required: true
             }],
             where: {ESTADO: 1}
         });
@@ -94,18 +101,31 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
     }
 }
 
+controllers.buscarPorCodigo = async (req, res) =>{ // devuelve los datos de un alumno segun su codigo
+    try{
+        const data = await usuario.findOne({
+            where: {CODIGO: req.params.codigo},
+            include: [rol]
+        })
+        
+        res.status(201).json({alumno:data});        
+    }
+    catch(error){
+        res.json({error: error.message});
+    }
+}
 
 /**
  * @returns El nuevo student creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
  */
-controllers.register = async (req, res) => {  
+controllers.registrar = async (req, res) => {  
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA} = req.body.alumno; 
+    const {NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA, ETIQUETA} = req.body.alumno; 
     console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevoAlumno = await usuario.create({
@@ -134,18 +154,100 @@ controllers.register = async (req, res) => {
                 ID_ROL: idRol.ID_ROL
             }, {transaction: transaccion})         
 
-            PROGRAMA.forEach(async element => {
+           
+            for(element of PROGRAMA){
                 const programaDeUsuario = await usuarioXPrograma.create({
                     ID_USUARIO: result.ID_USUARIO,
                     ID_PROGRAMA: element
                 }, {transaction: transaccion})
-            })
+            }
+
+            for(element of ETIQUETA){
+                const etiquetaDeAlumno = await etiquetaXAlumno.create({
+                    ID_ALUMNO: result.ID_USUARIO,
+                    ID_ETIQUETA: element
+                }, {transaction: transaccion})
+            }
+            await transaccion.commit();
+            res.status(201).json({alumno: result});            
+        });
+    } catch (error) {        
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }    
+
+};
+
+controllers.modificar = async (req, res) => {  
+   
+    const transaccion = await sequelize.transaction();
+    const {ID, NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, IMAGEN, PROGRAMA, ETIQUETA} = req.body.alumno; 
+    console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
+    try {
+        const nuevoAlumno = await usuario.update({
+            USUARIO: USUARIO,
+            NOMBRE: NOMBRE,
+            APELLIDOS: APELLIDOS,
+            CORREO: CORREO,
+            CODIGO: CODIGO,
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION,
+            IMAGEN: IMAGEN
+        },{
+            where: {ID_USUARIO: ID}
+        }, {transaction: transaccion})
+        .then(async result => {                   
+            await etiquetaXAlumno.destroy({
+                where:{ID_ALUMNO: ID}
+            }, {transaction: transaccion})
             
-        });          
-        await transaccion.commit();
-        res.status(201).json({alumno: nuevoAlumno});
+            await usuarioXPrograma.destroy({
+                where:{ID_USUARIO: ID}            
+            }, {transaction: transaccion})
+
+            for(element of PROGRAMA){
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: ID,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            }
+
+            for(element of ETIQUETA){
+                const etiquetaDeAlumno = await etiquetaXAlumno.create({
+                    ID_ALUMNO: ID,
+                    ID_ETIQUETA: element
+                }, {transaction: transaccion})
+            }
+            await transaccion.commit();
+            res.status(201).json({alumno: req.body.alumno}); 
+            
+        }); 
     } catch (error) {
-        //console.log("err0");
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+};
+
+controllers.eliminar = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();    
+    try {
+        const idRol = await rol.findOne({
+            attributes:["ID_ROL"],
+            where: {DESCRIPCION: "Alumno"}
+        }, {transaction: transaccion})
+
+        const coordinadorModificado = await rolXUsuario.update({
+            ESTADO: 0            
+        },{
+            where: {
+                ID_USUARIO: req.params.id,
+                ID_ROL: idRol.ID_ROL
+            }
+        }, {transaction: transaccion})   
+        await transaccion.commit()    
+        res.status(201).json({status: "success"}) 
+    } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
     }

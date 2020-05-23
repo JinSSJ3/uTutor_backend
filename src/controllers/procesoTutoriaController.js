@@ -75,18 +75,17 @@ controllers.registrar = async (req, res) => {
             ID_PROGRAMA: PROGRAMA,
             IMAGEN: IMAGEN
         }, {transaction: transaccion})
-        .then(async result =>{
-            ETIQUETA.forEach(async element => {
+        .then(async result =>{          
+            for(element of ETIQUETA){
                 const nuevaEtiquetaXTutoria = await etiquetaXTutoria.create({
                     ID_ETIQUETA: element,
                     ID_PROCESO_TUTORIA: result.ID_PROCESO_TUTORIA
                 }, {transaction: transaccion})
-            });            
-        })     
-        await transaccion.commit();
-        res.status(201).json({tutoria: nuevaTutoria});   
+            }
+            await transaccion.commit();
+            res.status(201).json({tutoria: result});  
+        })
     }catch (error) {
-        //console.log("err0");
         await transaccion.rollback();
         res.json({error: error.message})
     }
@@ -114,26 +113,42 @@ controllers.modificar = async (req, res) => {
             where: {ID_PROCESO_TUTORIA: ID}
         }, {transaction: transaccion})
         .then(async result =>{
-            etiquetaXTutoria.destroy({
+            await etiquetaXTutoria.destroy({
                 where: {ID_PROCESO_TUTORIA: ID}
             }, {transaction: transaccion})
-
-            ETIQUETA.forEach(async element => {
+            
+            for(element of ETIQUETA){
                 const nuevaEtiquetaXTutoria = await etiquetaXTutoria.create({
                     ID_ETIQUETA: element,
-                    ID_PROCESO_TUTORIA: result.ID_PROCESO_TUTORIA
+                    ID_PROCESO_TUTORIA: ID
                 }, {transaction: transaccion})
-            });            
-        })     
-        await transaccion.commit();
-        res.status(201).json({tutoria: tutoriaModificada});   
+            }
+            await transaccion.commit();
+            res.status(201).json({tutoria: req.body.tutoria});             
+        })
     }catch (error) {
-        //console.log("err0");
         await transaccion.rollback();
         res.json({error: error.message})
     }
     
 };
 
+controllers.eliminar = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();   
+    try {
+        const tutoriaEliminada = await tutoria.update({
+            ESTADO: 0
+        }, {
+            where: {ID_PROCESO_TUTORIA: req.params.id}
+        }, {transaction: transaccion})       
+        await transaccion.commit();
+        res.status(201).json({resultado: "success"}); 
+    }catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
 
 module.exports = controllers;
