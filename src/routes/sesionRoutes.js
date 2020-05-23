@@ -11,7 +11,9 @@ router.get("/",(req, res)=>{
 })
 router.get("/api/sesion/:idtutor", sesionController.list);
 
-router.post("/api/sesion", sesionController.registerUnexpectedSession);
+router.post("/api/registrarSesion", sesionController.registerUnexpectedSession);
+
+router.post("/api/registrarCita", sesionController.registerAppointment);
 
 router.get("/api/sesion/:id", sesionController.get);
 

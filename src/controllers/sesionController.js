@@ -40,6 +40,7 @@ controllers.get = async (req, res) =>{ // devuelve una sesion
 };
 
 
+// Esto registra una sesión realizada sin previa cita, lo hace el tutor.
 controllers.registerUnexpectedSession = async (req, res) => {  
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
@@ -49,12 +50,28 @@ controllers.registerUnexpectedSession = async (req, res) => {
     const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, RESULTADO, COMPROMISOS, AREAS_APOYO, ALUMNOS} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        let yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;
+
+        if (FECHA > today){
+            let message = "La fecha seleccionada es inválida";
+            res.status(400).json({message: message});
+            return;
+        }
+
         const { Op } = require("sequelize");
         //Revisa que el tutor no tenga otra sesión a esa hora
         const valid = await sesion.findAll({
             where:{
                 ID_TUTOR: ID_TUTOR,
                 FECHA: FECHA,
+                ESTADO: {
+                    [Op.not]: "02-cancelada"
+                },
                 [Op.or]: [
                     {
                         HORA_FIN: {
@@ -90,7 +107,6 @@ controllers.registerUnexpectedSession = async (req, res) => {
         }
         // Revisa que el alumno no tenga otra sesión a esa hora
         ALUMNOS.forEach(async alumId => {
-            console.log("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
             const findAlumSesiones = await alumnoXSesion.findAll({
                 where:{
                     ID_ALUMNO: alumId,
@@ -150,7 +166,7 @@ controllers.registerUnexpectedSession = async (req, res) => {
             HORA_INICIO: HORA_INICIO,
             HORA_FIN: HORA_FIN,
             RESULTADO: RESULTADO,
-            ESTADO: "Inesperada"
+            ESTADO: "01-realizada_sin_cita"
         }, {transaction: transaccion}).then(async result  => {
 
             COMPROMISOS.forEach(async comp => {
@@ -181,7 +197,110 @@ controllers.registerUnexpectedSession = async (req, res) => {
             await transaccion.rollback();
             res.json({error: error.message})
     } 
+};
+
+
+//Esto registra en la base de datos una cita que solicita un alumno.
+controllers.registerAppointment = async (req, res) => {  
+    /**
+     * Aqui deberia haber una validacion (un middleware) para validar
+     * que se envio un "student" en el cuerpo ("body") del request ("req")
+     *  */ 
+    const transaccion = await sequelize.transaction();
+    const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS} = req.body.sesion; 
+    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+    try {
+
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        let yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;
+
+        if (FECHA < today){
+            let message = "La fecha seleccionada es inválida";
+            res.status(400).json({message: message});
+            return;
+        }
+
+        const { Op } = require("sequelize");
+        
+        // Revisa que el alumno no tenga otra sesión a esa hora
+        ALUMNOS.forEach(async alumId => {
+            const findAlumSesiones = await alumnoXSesion.findAll({
+                where:{
+                    ID_ALUMNO: alumId,
+                }
+            }, {transaction: transaccion})
+            if(findAlumSesiones.length != 0){
+                for(let i=0; i< findAlumSesiones.length; i++){
+                    const valid3 = await sesion.findAll({
+                        where:{
+                            ID_SESION: findAlumSesiones[i].ID_SESION,
+                            FECHA: FECHA,
+                            [Op.or]: [
+                                {  
+                                    HORA_FIN: {
+                                        [Op.gte]: HORA_FIN,
+                                    },
+                                    HORA_INICIO: {
+                                        [Op.lt]: HORA_FIN,
+                                    }
+                                },
+                                {   
+                                    HORA_INICIO: {
+                                        [Op.lte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.gt]: HORA_INICIO,
+                                    }
+                                },
+                                {   
+                                    HORA_INICIO: {
+                                        [Op.gte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.lte]: HORA_FIN,
+                                    }
+                                }
+                            ]
+                          }
+                    })
+                    if(valid3.length != 0){
+                        let message = "Ya hay una cita pactada a esa hora";
+                        res.status(400).json({message: message});
+                        return;
+                    }
+                }  
+            }       
+        });
+          
+        const newSesion = await sesion.create({
+            ID_TUTOR: ID_TUTOR,
+            ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
+            LUGAR: LUGAR,
+            MOTIVO: MOTIVO,
+            DESCRIPCION: DESCRIPCION,
+            FECHA: FECHA,
+            HORA_INICIO: HORA_INICIO,
+            HORA_FIN: HORA_FIN,
+            ESTADO: "04-futura"
+        }, {transaction: transaccion}).then(async result  => {
+            ALUMNOS.forEach(async alumn => {
+                const newAlumnoSesion = await alumnoXSesion.create({
+                    ID_SESION: result.ID_SESION,
+                    ID_ALUMNO: alumn
+                }, {transaction: transaccion})
+            })
+        });
+        await transaccion.commit();
+        res.status(201).json({newSesion: newSesion});
+    } catch (error) {
+            await transaccion.rollback();
+            res.json({error: error.message})
+    } 
 };   
-     
+
 
 module.exports = controllers;

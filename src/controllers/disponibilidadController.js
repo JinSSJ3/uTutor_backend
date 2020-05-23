@@ -54,9 +54,10 @@ controllers.register = async (req, res) => {
         const { Op } = require("sequelize");
         const valid = await disponibilidad.findAll({
             where:{
+                ID_TUTOR: idTutor,
+                FECHA: fecha,
                 [Op.or]: [
-                    {ID_TUTOR: idTutor,
-                        FECHA: fecha,
+                    {
                         HORA_FIN: {
                             [Op.gte]: horaFin,
                         },
@@ -64,8 +65,7 @@ controllers.register = async (req, res) => {
                             [Op.lt]: horaFin,
                         }
                     },
-                    {ID_TUTOR: idTutor,
-                        FECHA: fecha,
+                    {
                         HORA_INICIO: {
                             [Op.lte]: horaIni,
                         },
@@ -73,8 +73,7 @@ controllers.register = async (req, res) => {
                             [Op.gt]: horaIni,
                         }
                     },
-                    {ID_TUTOR: idTutor,
-                        FECHA: fecha,
+                    {
                         HORA_INICIO: {
                             [Op.gte]: horaIni,
                         },
@@ -85,7 +84,6 @@ controllers.register = async (req, res) => {
                 ]
               }
         })
-        console.log(valid.length);
         if(valid.length != 0){
             let message = "La hora ya está ocupada";
             res.status(400).json({error: message});
