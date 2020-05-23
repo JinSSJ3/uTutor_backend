@@ -53,9 +53,10 @@ controllers.registerUnexpectedSession = async (req, res) => {
         //Revisa que el tutor no tenga otra sesión a esa hora
         const valid = await sesion.findAll({
             where:{
+                ID_TUTOR: ID_TUTOR,
+                FECHA: FECHA,
                 [Op.or]: [
-                    {ID_TUTOR: ID_TUTOR,
-                        FECHA: FECHA,
+                    {
                         HORA_FIN: {
                             [Op.gte]: HORA_FIN,
                         },
@@ -63,8 +64,7 @@ controllers.registerUnexpectedSession = async (req, res) => {
                             [Op.lt]: HORA_FIN,
                         }
                     },
-                    {ID_TUTOR: ID_TUTOR,
-                        FECHA: FECHA,
+                    {
                         HORA_INICIO: {
                             [Op.lte]: HORA_INICIO,
                         },
@@ -72,8 +72,7 @@ controllers.registerUnexpectedSession = async (req, res) => {
                             [Op.gt]: HORA_INICIO,
                         }
                     },
-                    {ID_TUTOR: ID_TUTOR,
-                        FECHA: FECHA,
+                    {
                         HORA_INICIO: {
                             [Op.gte]: HORA_INICIO,
                         },
@@ -91,55 +90,56 @@ controllers.registerUnexpectedSession = async (req, res) => {
         }
         // Revisa que el alumno no tenga otra sesión a esa hora
         ALUMNOS.forEach(async alumId => {
-            const findAlum = await alumnoXSesion.findAll({
+            console.log("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+            const findAlumSesiones = await alumnoXSesion.findAll({
                 where:{
                     ID_ALUMNO: alumId,
                 }
-            }, {transaction: transaccion}).then(async result  => {
-                console.log("################" + result);
-                const valid2 = await sesion.findAll({
-                    where:{
-                        ID_SESION: result.ID_SESION,
-                        [Op.or]: [
-                            {
-                                FECHA: FECHA,
-                                HORA_FIN: {
-                                    [Op.gte]: HORA_FIN,
+            }, {transaction: transaccion})
+            if(findAlumSesiones.length != 0){
+                for(let i=0; i< findAlumSesiones.length; i++){
+                    const valid2 = await sesion.findAll({
+                        where:{
+                            ID_SESION: findAlumSesiones[i].ID_SESION,
+                            FECHA: FECHA,
+                            [Op.or]: [
+                                {  
+                                    HORA_FIN: {
+                                        [Op.gte]: HORA_FIN,
+                                    },
+                                    HORA_INICIO: {
+                                        [Op.lt]: HORA_FIN,
+                                    }
                                 },
-                                HORA_INICIO: {
-                                    [Op.lt]: HORA_FIN,
-                                }
-                            },
-                            {
-                                FECHA: FECHA,
-                                HORA_INICIO: {
-                                    [Op.lte]: HORA_INICIO,
+                                {   
+                                    HORA_INICIO: {
+                                        [Op.lte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.gt]: HORA_INICIO,
+                                    }
                                 },
-                                HORA_FIN: {
-                                    [Op.gt]: HORA_INICIO,
+                                {   
+                                    HORA_INICIO: {
+                                        [Op.gte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.lte]: HORA_FIN,
+                                    }
                                 }
-                            },
-                            {
-                                FECHA: FECHA,
-                                HORA_INICIO: {
-                                    [Op.gte]: HORA_INICIO,
-                                },
-                                HORA_FIN: {
-                                    [Op.lte]: HORA_FIN,
-                                }
-                            }
-                        ]
-                      }
-                })
-                console.log(valid2.length);
-                if(valid2.length != 0){
-                    let message = "El alumno ya tuvo una cita a esa hora";
-                    res.status(400).json({message: message});
-                    return;
-                }
-            })
-        })
+                            ]
+                          }
+                    })
+                    if(valid2.length != 0){
+                        let message = "La hora ya está ocupada";
+                        res.status(400).json({message: message});
+                        return;
+                    }
+                }  
+            }       
+        });
 
+                
         const newSesion = await sesion.create({
             ID_TUTOR: ID_TUTOR,
             ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
