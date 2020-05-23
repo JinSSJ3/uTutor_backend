@@ -15,6 +15,8 @@ router.post("/api/registrarSesion", sesionController.registerUnexpectedSession);
 
 router.post("/api/registrarCita", sesionController.registerAppointment);
 
+router.post("/api/registrarResultadoCita", sesionController.registerResult);
+
 router.get("/api/sesion/:id", sesionController.get);
 
 app.use(morgan('dev'));
