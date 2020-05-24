@@ -1,5 +1,5 @@
 const controllers = {}
-
+const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
 let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
@@ -11,7 +11,7 @@ let etiquetaXAlumno = require("../models/etiquetaXAlumno")
 
 
 
-
+const Op = Sequelize.Op;
 
 controllers.listar = async (req, res) => { // fetch all all studenst from DB
     try{
@@ -39,6 +39,33 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
                 model: alumno,
                 include: {
                     model: usuario,
+                    required: true
+                },
+                required: true
+            },
+            where: {
+                ESTADO: 1,
+                ID_TUTOR: req.params.tutor,
+                ID_PROCESO_TUTORIA: req.params.tutoria
+            }
+        });
+        res.status(201).json({alumnos:alumnos});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+
+controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
+    try{
+        const alumnos = await asignacionTutoria.findAll({
+            include: {
+                model: alumno,
+                include: {
+                    model: usuario,
+                    where: {[Op.or]: [{NOMBRE: {[Op.like]: '%' + req.params.nombre+ '%'}},
+                                    {APELLIDOS:{[Op.like]: '%' + req.params.nombre+ '%'}}]},
                     required: true
                 },
                 required: true

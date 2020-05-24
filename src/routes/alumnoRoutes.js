@@ -12,6 +12,8 @@ router.get("/api/alumno", alumnoController.listar);
 
 router.get("/api/alumno/buscar/:codigo", alumnoController.buscarPorCodigo);
 
+router.get("/api/alumno/buscar/:tutor/:tutoria/:nombre", alumnoController.BuscarPorNombreTutoria);
+
 router.get("/api/alumno/lista/:programa", alumnoController.listarPorPrograma);
 
 router.get("/api/alumno/lista/:tutor/:tutoria", alumnoController.listarPorTutoria);
