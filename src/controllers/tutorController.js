@@ -92,7 +92,49 @@ controllers.register = async (req, res) => {
         res.json({error: error.message})
     }
     
-};   
+};
+
+controllers.modificar = async (req, res) => {  
+    const transaccion = await sequelize.transaction();
+    const {ID_TUTOR,NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, IMAGEN, PROGRAMA} = req.body.tutor; 
+    console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
+    
+    try {
+        const modifTutor = await usuario.update({
+            USUARIO: USUARIO,
+            NOMBRE: NOMBRE,
+            APELLIDOS: APELLIDOS,
+            CORREO: CORREO,
+            CODIGO: CODIGO,
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION,
+            IMAGEN: IMAGEN
+        },{
+            where: {ID_USUARIO: ID_TUTOR}
+        }, {transaction: transaccion})
+        .then(async result => {                   
+            
+            await usuarioXPrograma.destroy({
+                where:{ID_USUARIO: ID}            
+            }, {transaction: transaccion})
+
+            for(element of PROGRAMA){
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: ID,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            }
+
+            await transaccion.commit();
+            res.status(201).json({alumno: req.body.alumno}); 
+            
+        }); 
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
      
 
 
