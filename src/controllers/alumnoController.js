@@ -9,7 +9,7 @@ let usuarioXPrograma = require("../models/usuarioXPrograma");
 let asignacionTutoria = require("../models/asignacionTutoria")
 let etiquetaXAlumno = require("../models/etiquetaXAlumno")
 let programa = require("../models/programa")
-
+let asignacionTutoriaXAlumno = require("../models/asignacionTutoriaXAlumno")
 
 
 const Op = Sequelize.Op;
@@ -36,20 +36,22 @@ controllers.listar = async (req, res) => { // fetch all all studenst from DB
 
 controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
     try{
-        const alumnos = await asignacionTutoria.findAll({
+        const alumnos = await asignacionTutoriaXAlumno.findAll({
             include: {
                 model: alumno,
-                include: {
+                include: [{
                     model: usuario,
                     include: [programa],
                     required: true
-                },
+                },{
+                    model:asignacionTutoria,
+                    where: {
+                        ESTADO: 1,
+                        ID_TUTOR: req.params.tutor,
+                        ID_PROCESO_TUTORIA: req.params.tutoria
+                    }
+                }],
                 required: true
-            },
-            where: {
-                ESTADO: 1,
-                ID_TUTOR: req.params.tutor,
-                ID_PROCESO_TUTORIA: req.params.tutoria
             }
         });
         res.status(201).json({alumnos:alumnos});         
@@ -62,22 +64,24 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
 
 controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
     try{
-        const alumnos = await asignacionTutoria.findAll({
+        const alumnos = await asignacionTutoriaXAlumno.findAll({
             include: {
                 model: alumno,
-                include: {
+                include: [{
                     model: usuario,
                     include: [programa],
                     where: {[Op.or]: [{NOMBRE: {[Op.like]: '%' + req.params.nombre+ '%'}},
                                     {APELLIDOS:{[Op.like]: '%' + req.params.nombre+ '%'}}]},
                     required: true
-                },
+                },{
+                    model:asignacionTutoria,
+                    where: {
+                        ESTADO: 1,
+                        ID_TUTOR: req.params.tutor,
+                        ID_PROCESO_TUTORIA: req.params.tutoria
+                    }
+                }],
                 required: true
-            },
-            where: {
-                ESTADO: 1,
-                ID_TUTOR: req.params.tutor,
-                ID_PROCESO_TUTORIA: req.params.tutoria
             }
         });
         res.status(201).json({alumnos:alumnos});         
