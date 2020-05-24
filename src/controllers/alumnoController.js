@@ -8,6 +8,7 @@ let rol = require("../models/rol");
 let usuarioXPrograma = require("../models/usuarioXPrograma");
 let asignacionTutoria = require("../models/asignacionTutoria")
 let etiquetaXAlumno = require("../models/etiquetaXAlumno")
+let programa = require("../models/programa")
 
 
 
@@ -21,6 +22,7 @@ controllers.listar = async (req, res) => { // fetch all all studenst from DB
                 where: {DESCRIPCION: "Alumno"}
             },{
                 model: usuario,
+                include: [programa],
                 required: true
             }],
             where: {ESTADO: 1}
@@ -39,6 +41,7 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
                 model: alumno,
                 include: {
                     model: usuario,
+                    include: [programa],
                     required: true
                 },
                 required: true
@@ -64,6 +67,7 @@ controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumno
                 model: alumno,
                 include: {
                     model: usuario,
+                    include: [programa],
                     where: {[Op.or]: [{NOMBRE: {[Op.like]: '%' + req.params.nombre+ '%'}},
                                     {APELLIDOS:{[Op.like]: '%' + req.params.nombre+ '%'}}]},
                     required: true
@@ -112,7 +116,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
         const {id} = req.params;
         const data = await usuario.findOne({
             where: {ID_USUARIO: id},
-            include: [rol]
+            include: [rol,programa]
         })
         /*const data = await usuario.findOne({  validar contrasena
             where: {ID_USUARIO: id}
@@ -132,7 +136,7 @@ controllers.buscarPorCodigo = async (req, res) =>{ // devuelve los datos de un a
     try{
         const data = await usuario.findOne({
             where: {CODIGO: req.params.codigo},
-            include: [rol]
+            include: [rol,programa]
         })
         
         res.status(201).json({alumno:data});        

@@ -10,7 +10,7 @@ let programa = require('../models/programa');
 controllers.listar = async (req, res) => { 
     try{
         const tutorias = await tutoria.findAll({
-            include: [etiqueta],
+            include: [etiqueta, programa],
             where: {ESTADO: 1}
         });
         res.status(201).json({tutoria:tutorias});         
