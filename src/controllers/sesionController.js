@@ -10,14 +10,11 @@ let areaApoyoXSesion = require('../models/areaApoyoXSesion');
 sequelize.sync();
 
 
-controllers.list = async (req, res) => { // lista sesiones de un tutor
+controllers.listar = async (req, res) => { // lista sesiones de un tutor
     try{
         const {idtutor} = req.params;
         const data = await sesion.findAll({
             where: {ID_TUTOR: idtutor},
-            include: {
-                model: tutor,
-               } 
         });
         res.status(201).json({data:data});         
     }    
@@ -28,9 +25,9 @@ controllers.list = async (req, res) => { // lista sesiones de un tutor
 
 controllers.get = async (req, res) =>{ // devuelve una sesion
     try{
-        const {id} = req.params;
+        const {idSesion} = req.params;
         const data = await sesion.findOne({
-            where: {ID_SESION: id},
+            where: {ID_SESION: idSesion},
         })
         res.status(201).json({data:data});        
     }
@@ -41,11 +38,7 @@ controllers.get = async (req, res) =>{ // devuelve una sesion
 
 
 // Esto registra una sesión realizada sin previa cita, lo hace el tutor.
-controllers.registerUnexpectedSession = async (req, res) => {  
-    /**
-     * Aqui deberia haber una validacion (un middleware) para validar
-     * que se envio un "student" en el cuerpo ("body") del request ("req")
-     *  */ 
+controllers.registrarSesionInesperada = async (req, res) => {  
     const transaccion = await sequelize.transaction();
     const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, RESULTADO, COMPROMISOS, AREAS_APOYO, ALUMNOS} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
@@ -192,7 +185,7 @@ controllers.registerUnexpectedSession = async (req, res) => {
             })
         });
         await transaccion.commit();
-        res.status(201).json({newSesion: newSesion});
+        res.status(201).json({sesion: newSesion});
     } catch (error) {
             await transaccion.rollback();
             res.json({error: error.message})
@@ -201,11 +194,7 @@ controllers.registerUnexpectedSession = async (req, res) => {
 
 
 //Esto registra en la base de datos una cita que solicita un alumno.
-controllers.registerAppointment = async (req, res) => {  
-    /**
-     * Aqui deberia haber una validacion (un middleware) para validar
-     * que se envio un "student" en el cuerpo ("body") del request ("req")
-     *  */ 
+controllers.registrarCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
     const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, ALUMNO} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
@@ -268,7 +257,6 @@ controllers.registerAppointment = async (req, res) => {
                         ]
                         }
                 })
-                console.log("fgdrgdfgdfgdf"+valid3.ID_SESION);
                 if(valid3.length != 0){
                     let message = "Ya hay una cita pactada a esa hora";
                     res.status(400).json({message: message});
@@ -296,7 +284,7 @@ controllers.registerAppointment = async (req, res) => {
 
         });
         await transaccion.commit();
-        res.status(201).json({newSesion: newSesion});
+        res.status(201).json({sesion: newSesion});
     } catch (error) {
             await transaccion.rollback();
             res.json({error: error.message})
@@ -304,24 +292,18 @@ controllers.registerAppointment = async (req, res) => {
 };   
 
 //Registrar los resultados de una sesión que se llevó a cabo exitosamente
-controllers.registerResult = async (req, res) => {  
-    /**
-     * Aqui deberia haber una validacion (un middleware) para validar
-     * que se envio un "student" en el cuerpo ("body") del request ("req")
-     *  */ 
+controllers.registrarAsistencia = async (req, res) => {  
     const transaccion = await sequelize.transaction();
     const {ID_SESION, RESULTADO, COMPROMISOS, AREAS_APOYO} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
-    try {console.log("aaaaaaaaaaaa"+RESULTADO);
+    try {
         const miSesion = await sesion.findOne({
             where:{
                 ID_SESION: ID_SESION,
             }
         }, {transaction: transaccion})
-        console.log("aaaaaaaaaaaa"+miSesion.RESULTADO);
         miSesion.RESULTADO = RESULTADO;
         miSesion.ESTADO = "00-realizada_cita";
-        console.log("aaaaaaaaaaaa"+miSesion.RESULTADO);
         await miSesion.save({transaction: transaccion});
 
         COMPROMISOS.forEach(async comp => {
@@ -339,7 +321,7 @@ controllers.registerResult = async (req, res) => {
             }, {transaction: transaccion})
         })
         await transaccion.commit();
-        res.status(201).json({miSesion: miSesion});
+        res.status(201).json({sesion: miSesion});
     } catch (error) {
         console.log(error);
         await transaccion.rollback();
@@ -347,5 +329,27 @@ controllers.registerResult = async (req, res) => {
     }
 }
 
+//Registra que una sesión no se realizo por la inasistencia del alumno citado
+controllers.registrarInasistencia = async (req, res) => {  
+    const transaccion = await sequelize.transaction();
+    const {ID_SESION} = req.body.sesion; 
+    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+    try {
+        const miSesion = await sesion.findOne({
+            where:{
+                ID_SESION: ID_SESION,
+            }
+        }, {transaction: transaccion})
+        miSesion.RESULTADO;
+        miSesion.ESTADO = "05-no_asistencia";
+        await miSesion.save({transaction: transaccion});
+
+        await transaccion.commit();
+        res.status(201).json({sesion: miSesion});
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+}
 
 module.exports = controllers;

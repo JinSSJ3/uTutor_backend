@@ -15,7 +15,8 @@ router.post("/api/tutor", tutorController.register);
 
 router.get("/api/tutor/:id", tutorController.get);
 
-app.use(morgan('dev'));
+router.post("/api/tutor/modificar", tutorController.modificar);
 
+app.use(morgan('dev'));
 
 module.exports = router;
