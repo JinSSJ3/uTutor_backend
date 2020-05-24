@@ -115,12 +115,12 @@ controllers.modificar = async (req, res) => {
         .then(async result => {                   
             
             await usuarioXPrograma.destroy({
-                where:{ID_USUARIO: ID}            
+                where:{ID_USUARIO: ID_TUTOR}            
             }, {transaction: transaccion})
 
             for(element of PROGRAMA){
                 const programaDeUsuario = await usuarioXPrograma.create({
-                    ID_USUARIO: ID,
+                    ID_USUARIO: ID_TUTOR,
                     ID_PROGRAMA: element
                 }, {transaction: transaccion})
             }

@@ -113,7 +113,7 @@ controllers.eliminar = async (req, res) => {
             where: {ID_DISPONIBILIDAD: req.params.idDisp}
         }, {transaction: transaccion})       
         await transaccion.commit();
-        res.status(201).json({resultado: dispEliminada}); 
+        res.status(201).json({resultado: "Disponibilidad eliminada"}); 
     }catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
