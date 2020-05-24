@@ -17,7 +17,7 @@ router.get("/api/disponibilidad/:idtutor/:id", disponibilidadController.get);
 
 router.post("/api/disponibilidad/modificar", disponibilidadController.modificar);
 
-router.post("/api/disponibilidad/eliminar/:id", disponibilidadController.eliminar);
+router.post("/api/disponibilidad/eliminar/:idDisp", disponibilidadController.eliminar);
 
 app.use(morgan('dev'));
 
