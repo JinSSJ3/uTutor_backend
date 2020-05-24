@@ -1,5 +1,4 @@
 const express = require('express');
-const morgan = require('morgan');
 const router = express.Router();
 
 router.use(express.json());
@@ -21,7 +20,7 @@ router.post("/api/tutoria/eliminar/:id", tutoriaController.eliminar);
 
 router.get("/api/tutoria/:id", tutoriaController.get);
 
-app.use(morgan('dev'));
+
 
 
 module.exports = router;
