@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
+let programa = require("./programa");
 
 let nametable = 'PROCESO_TUTORIA';
 
@@ -21,7 +22,7 @@ let procesoTutoria = sequelize.define(nametable,{
     GRUPAL: Sequelize.TINYINT,
     TUTOR_ASIGNADO: Sequelize.TINYINT,
     PERMANENTE: Sequelize.TINYINT,
-    IMAGEN: Sequelize.BLOB,
+    DURACION: Sequelize.INTEGER,    
     ESTADO: Sequelize.TINYINT    
     },
     {
@@ -29,6 +30,6 @@ let procesoTutoria = sequelize.define(nametable,{
     freezeTableName: true,       
 });
 
-//procesoTutoria.belongsTo(programa, {foreignKey:{name:"ID_PROGRAMA"}});
+procesoTutoria.belongsTo(programa, {foreignKey:{name:"ID_PROGRAMA"}});
 
 module.exports = procesoTutoria;

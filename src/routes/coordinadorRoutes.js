@@ -1,5 +1,4 @@
 const express = require('express');
-const morgan = require('morgan');
 const router = express.Router();
 
 router.use(express.json());
@@ -11,13 +10,17 @@ router.get("/",(req, res)=>{
 })
 router.get("/api/coordinador", coordinadorController.listar);
 
-//router.get("/api/coordinador/lista/:id", coordinadorController.listarPorPrograma);
-
-router.post("/api/coordinador", coordinadorController.registrar);
+router.get("/api/coordinador/lista/:id", coordinadorController.listarPorPrograma);
 
 router.get("/api/coordinador/:id", coordinadorController.get);
 
-app.use(morgan('dev'));
+router.get("/api/coordinador/buscar/:codigo", coordinadorController.buscarPorCodigo);
+
+router.post("/api/coordinador", coordinadorController.registrar);
+
+router.post("/api/coordinador/modificar", coordinadorController.modificar);
+
+router.post("/api/coordinador/eliminar/:id", coordinadorController.eliminar);
 
 
 module.exports = router;

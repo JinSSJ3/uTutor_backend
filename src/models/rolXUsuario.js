@@ -25,6 +25,7 @@ let rolXUsuario = sequelize.define(nametable,{
             key: "ID_ROL"
         }       
     }*/
+    ESTADO: Sequelize.TINYINT
 },
 {
     timestamps :false,

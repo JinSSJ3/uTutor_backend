@@ -4,6 +4,7 @@ let sequelize = require('../models/database');
 let tutoria = require('../models/procesoTutoria');
 let etiquetaXTutoria = require('../models/etiquetaXTutoria');
 let etiqueta = require('../models/etiqueta');
+let programa = require('../models/programa');
 
 
 controllers.listar = async (req, res) => { 
@@ -41,7 +42,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de una tutoria
         const {id} = req.params;
         const data = await tutoria.findOne({
             where: {ID_PROCESO_TUTORIA: id},
-            include: [etiqueta]
+            include: [etiqueta,programa]
         })
         res.status(201).json({tutoria:data});        
     }
@@ -61,7 +62,7 @@ controllers.registrar = async (req, res) => {
      * que se envio una "tutoria" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, IMAGEN} = req.body.tutoria; 
+    const {NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, DURACION} = req.body.tutoria; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevaTutoria = await tutoria.create({
@@ -73,20 +74,19 @@ controllers.registrar = async (req, res) => {
             TUTOR_ASIGNADO: TUTOR_ASIGNADO,
             PERMANENTE: PERMANENTE,
             ID_PROGRAMA: PROGRAMA,
-            IMAGEN: IMAGEN
+            DURACION: DURACION
         }, {transaction: transaccion})
-        .then(async result =>{
-            ETIQUETA.forEach(async element => {
+        .then(async result =>{          
+            for(element of ETIQUETA){
                 const nuevaEtiquetaXTutoria = await etiquetaXTutoria.create({
                     ID_ETIQUETA: element,
                     ID_PROCESO_TUTORIA: result.ID_PROCESO_TUTORIA
                 }, {transaction: transaccion})
-            });            
-        })     
-        await transaccion.commit();
-        res.status(201).json({tutoria: nuevaTutoria});   
+            }
+            await transaccion.commit();
+            res.status(201).json({tutoria: result});  
+        })
     }catch (error) {
-        //console.log("err0");
         await transaccion.rollback();
         res.json({error: error.message})
     }
@@ -97,7 +97,7 @@ controllers.registrar = async (req, res) => {
 controllers.modificar = async (req, res) => {  
     
     const transaccion = await sequelize.transaction();
-    const {ID, NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, IMAGEN} = req.body.tutoria; 
+    const {ID, NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, DURACION} = req.body.tutoria; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         const tutoriaModificada = await tutoria.update({
@@ -109,31 +109,47 @@ controllers.modificar = async (req, res) => {
             TUTOR_ASIGNADO: TUTOR_ASIGNADO,
             PERMANENTE: PERMANENTE,
             ID_PROGRAMA: PROGRAMA,
-            IMAGEN: IMAGEN
+            DURACION: DURACION
         }, {
             where: {ID_PROCESO_TUTORIA: ID}
         }, {transaction: transaccion})
         .then(async result =>{
-            etiquetaXTutoria.destroy({
+            await etiquetaXTutoria.destroy({
                 where: {ID_PROCESO_TUTORIA: ID}
             }, {transaction: transaccion})
-
-            ETIQUETA.forEach(async element => {
+            
+            for(element of ETIQUETA){
                 const nuevaEtiquetaXTutoria = await etiquetaXTutoria.create({
                     ID_ETIQUETA: element,
-                    ID_PROCESO_TUTORIA: result.ID_PROCESO_TUTORIA
+                    ID_PROCESO_TUTORIA: ID
                 }, {transaction: transaccion})
-            });            
-        })     
-        await transaccion.commit();
-        res.status(201).json({tutoria: tutoriaModificada});   
+            }
+            await transaccion.commit();
+            res.status(201).json({tutoria: req.body.tutoria});             
+        })
     }catch (error) {
-        //console.log("err0");
         await transaccion.rollback();
         res.json({error: error.message})
     }
     
 };
 
+controllers.eliminar = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();   
+    try {
+        const tutoriaEliminada = await tutoria.update({
+            ESTADO: 0
+        }, {
+            where: {ID_PROCESO_TUTORIA: req.params.id}
+        }, {transaction: transaccion})       
+        await transaccion.commit();
+        res.status(201).json({resultado: "success"}); 
+    }catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
 
 module.exports = controllers;

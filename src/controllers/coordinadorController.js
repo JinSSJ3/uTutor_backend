@@ -32,13 +32,14 @@ controllers.listarPorPrograma = async (req, res) => { // lista a todos los coord
         const coordinadores = await rolXUsuario.findAll({           
             include: [{
                 model: rol,
-                where: {DESCRIPCION: "Coordinador"}
+                where: {DESCRIPCION: "Coordinador"},
             },{
                 model:coordinador,
                 include: {
                     model: usuarioXPrograma,
-                    where: ID_ROL = Sequelize.col("ROL.ID_ROL")
-                }
+                    where: {ID_PROGRAMA: req.params.id}
+                },
+                required: true
             }],            
             where:{ESTADO: 1} // activo
         });
@@ -63,6 +64,18 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un coordinador
     }
 }
 
+controllers.buscarPorCodigo = async (req, res) =>{ // devuelve los datos de un alumno segun su codigo
+    try{
+        const data = await coordinador.findOne({
+            where: {CODIGO: req.params.codigo},
+            include: [rol]
+        })        
+        res.status(201).json({coordinador:data});        
+    }
+    catch(error){
+        res.json({error: error.message});
+    }
+}
 
 /**
  * @returns El nuevo coordinador creado en formato Json()
@@ -98,16 +111,83 @@ controllers.registrar = async (req, res) => {
                 ID_USUARIO: result.ID_USUARIO,
                 ID_ROL: idRol.ID_ROL
             }, {transaction: transaccion})
-            
-            PROGRAMA.forEach(async element => {
+                        
+            for(element of PROGRAMA){
                 const programaDeUsuario = await usuarioXPrograma.create({
                     ID_USUARIO: result.ID_USUARIO,
                     ID_PROGRAMA: element
                 }, {transaction: transaccion})
-            })      
-        });          
-        await transaccion.commit();
-        res.status(201).json({coordinador: nuevoCoordinador});
+            }                     
+            await transaccion.commit();
+            res.status(201).json({coordinador: result}); 
+        })
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }    
+};
+
+controllers.modificar = async (req, res) => {  
+    /**
+     * Aqui deberia haber una validacion (un middleware) para validar
+     * que se envio un "coordinador" en el cuerpo ("body") del request ("req")
+     *  */ 
+    const transaccion = await sequelize.transaction();
+    const {ID, NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, IMAGEN, PROGRAMA} = req.body.coordinador; 
+    //console.log("GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
+    try {
+        const coordinadorModificado = await coordinador.update({
+            USUARIO: USUARIO,
+            NOMBRE: NOMBRE,
+            APELLIDOS: APELLIDOS,
+            CORREO: CORREO,
+            CODIGO: CODIGO,
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION,
+            IMAGEN: IMAGEN            
+        },{
+            where: {ID_USUARIO: ID}
+        }, {transaction: transaccion})
+        .then(async result => {
+            await usuarioXPrograma.destroy({
+                where:{ID_USUARIO: ID}            
+            }, {transaction: transaccion})
+                        
+            for(element of PROGRAMA){
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: ID,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            }                     
+            await transaccion.commit();
+            res.status(201).json({coordinador: req.body.coordinador}); 
+        })
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
+
+controllers.eliminar = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();    
+    try {
+        const idRol = await rol.findOne({
+            attributes:["ID_ROL"],
+            where: {DESCRIPCION: "Coordinador"}
+        }, {transaction: transaccion})
+
+        const coordinadorModificado = await rolXUsuario.update({
+            ESTADO: 0            
+        },{
+            where: {
+                ID_USUARIO: req.params.id,
+                ID_ROL: idRol.ID_ROL
+            }
+        }, {transaction: transaccion})   
+        await transaccion.commit()    
+        res.status(201).json({status: "success"}) 
     } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})

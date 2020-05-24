@@ -17,6 +17,8 @@ router.post("/api/tutoria", tutoriaController.registrar);
 
 router.post("/api/tutoria/modificar", tutoriaController.modificar);
 
+router.post("/api/tutoria/eliminar/:id", tutoriaController.eliminar);
+
 router.get("/api/tutoria/:id", tutoriaController.get);
 
 app.use(morgan('dev'));
