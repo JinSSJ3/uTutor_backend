@@ -34,11 +34,8 @@ let asignacionTutoria = sequelize.define(nametable,
     freezeTableName: true,       
 });
 
-//usuario.belongsToMany(programa, {through: usuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA"})
-//programa.belongsToMany(usuario, {through: usuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO"})
-//usuarioXPrograma.belongsTo(programa,{foreignKey: "ID_PROGRAMA"});
-//asignacionTutoria.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
+
 asignacionTutoria.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
-asignacionTutoria.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA"});
+asignacionTutoria.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA", as: "PROCESO_TUTORIA"});
 
 module.exports = asignacionTutoria;
