@@ -5,6 +5,7 @@ let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 let rolXUsuario = require('../models/rolXUsuario');
 let rol = require('../models/rol');
+let usuarioXPrograma = require('../models/usuarioXPrograma');
 
 sequelize.sync();
 
@@ -28,11 +29,12 @@ controllers.list = async (req, res) => { // fetch all all tutors from DB
 controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     try{
         const {id} = req.params;
-        const data = await tutor.findOne({
-            where: {ID_TUTOR: id},
-            include: {
-                model: usuario
-               }
+        const data = await usuario.findOne({
+            where: {ID_USUARIO: id},
+            include: [{
+                model: usuarioXPrograma,
+                attributes: ['ID_PROGRAMA']
+            }]
         })
         res.status(201).json({data:data});        
     }
@@ -41,8 +43,6 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     }
 
 }
-
-
 
 controllers.register = async (req, res) => {  
     /**

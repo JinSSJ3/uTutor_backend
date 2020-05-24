@@ -27,9 +27,11 @@ let usuarioXPrograma = sequelize.define(nametable,
     freezeTableName: true,       
 });
 
-usuario.belongsToMany(programa, {through: usuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA"})
-programa.belongsToMany(usuario, {through: usuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO"})
+usuario.belongsToMany(programa, {through: usuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA"});
+programa.belongsToMany(usuario, {through: usuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO"});
 usuarioXPrograma.belongsTo(programa,{foreignKey: "ID_PROGRAMA"});
 usuarioXPrograma.belongsTo(usuario,{foreignKey: "ID_USUARIO"});
+usuario.hasMany(usuarioXPrograma, {foreignKey: "ID_USUARIO"});
+programa.hasMany(usuarioXPrograma, {foreignKey: "ID_PROGRAMA"});
 
 module.exports = usuarioXPrograma;
