@@ -9,15 +9,17 @@ const sesionController = require('../controllers/sesionController');
 router.get("/",(req, res)=>{
     res.end(`express running on the server ${app.get("port")}`);
 })
-router.get("/api/sesion/:idtutor", sesionController.list);
+router.get("/api/listaSesiones/:idtutor", sesionController.listar);
 
-router.post("/api/registrarSesion", sesionController.registerUnexpectedSession);
+router.post("/api/registrarSesion", sesionController.registrarSesionInesperada);
 
-router.post("/api/registrarCita", sesionController.registerAppointment);
+router.post("/api/registrarCita", sesionController.registrarCita);
 
-router.post("/api/registrarResultadoCita", sesionController.registerResult);
+router.post("/api/registrarResultadoCita", sesionController.registrarAsistencia);
 
-router.get("/api/sesion/:id", sesionController.get);
+router.get("/api/sesion/:idSesion", sesionController.get);
+
+router.post("/api/registrarInasistencia", sesionController.registrarInasistencia);
 
 app.use(morgan('dev'));
 

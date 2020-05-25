@@ -5,6 +5,7 @@ let coordinador = require('../models/usuario');
 let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
 let usuarioXPrograma = require("../models/usuarioXPrograma");
+let programa = require("../models/programa");
 
 
 
@@ -16,7 +17,8 @@ controllers.listar = async (req, res) => { // lista a todos los coordinadores
                 model: rol,
                 where: {DESCRIPCION: "Coordinador"}
             },{
-                model:coordinador
+                model: coordinador,
+                include: [programa]
             }],            
             where:{ESTADO: 1} // activo
         });
@@ -54,7 +56,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un coordinador
     try{
         const {id} = req.params;
         const data = await coordinador.findOne({
-            include: [rol],
+            include: [rol, programa],
             where: {ID_USUARIO: id}
         })       
         res.status(201).json({coordinador:data});        
@@ -68,7 +70,7 @@ controllers.buscarPorCodigo = async (req, res) =>{ // devuelve los datos de un a
     try{
         const data = await coordinador.findOne({
             where: {CODIGO: req.params.codigo},
-            include: [rol]
+            include: [rol, programa]
         })        
         res.status(201).json({coordinador:data});        
     }

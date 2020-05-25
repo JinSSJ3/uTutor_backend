@@ -1,5 +1,4 @@
 const express = require('express');
-const morgan = require('morgan');
 const router = express.Router();
 
 router.use(express.json());
@@ -13,6 +12,8 @@ router.get("/api/tutoria", tutoriaController.listar);
 
 router.get("/api/tutoria/lista/:id", tutoriaController.listarPorPrograma);
 
+router.get("/api/tutoria/lista/:idTutor/:idPrograma", tutoriaController.listarPorProgramaYTutor);
+
 router.post("/api/tutoria", tutoriaController.registrar);
 
 router.post("/api/tutoria/modificar", tutoriaController.modificar);
@@ -21,7 +22,7 @@ router.post("/api/tutoria/eliminar/:id", tutoriaController.eliminar);
 
 router.get("/api/tutoria/:id", tutoriaController.get);
 
-app.use(morgan('dev'));
+
 
 
 module.exports = router;

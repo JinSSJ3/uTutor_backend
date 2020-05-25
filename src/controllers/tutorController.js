@@ -5,6 +5,7 @@ let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 let rolXUsuario = require('../models/rolXUsuario');
 let rol = require('../models/rol');
+let usuarioXPrograma = require('../models/usuarioXPrograma');
 
 sequelize.sync();
 
@@ -28,11 +29,12 @@ controllers.list = async (req, res) => { // fetch all all tutors from DB
 controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     try{
         const {id} = req.params;
-        const data = await tutor.findOne({
-            where: {ID_TUTOR: id},
-            include: {
-                model: usuario
-               }
+        const data = await usuario.findOne({
+            where: {ID_USUARIO: id},
+            include: [{
+                model: usuarioXPrograma,
+                attributes: ['ID_PROGRAMA']
+            }]
         })
         res.status(201).json({data:data});        
     }
@@ -41,8 +43,6 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     }
 
 }
-
-
 
 controllers.register = async (req, res) => {  
     /**
@@ -92,7 +92,49 @@ controllers.register = async (req, res) => {
         res.json({error: error.message})
     }
     
-};   
+};
+
+controllers.modificar = async (req, res) => {  
+    const transaccion = await sequelize.transaction();
+    const {ID_TUTOR,NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, IMAGEN, PROGRAMA} = req.body.tutor; 
+    console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
+    
+    try {
+        const modifTutor = await usuario.update({
+            USUARIO: USUARIO,
+            NOMBRE: NOMBRE,
+            APELLIDOS: APELLIDOS,
+            CORREO: CORREO,
+            CODIGO: CODIGO,
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION,
+            IMAGEN: IMAGEN
+        },{
+            where: {ID_USUARIO: ID_TUTOR}
+        }, {transaction: transaccion})
+        .then(async result => {                   
+            
+            await usuarioXPrograma.destroy({
+                where:{ID_USUARIO: ID_TUTOR}            
+            }, {transaction: transaccion})
+
+            for(element of PROGRAMA){
+                const programaDeUsuario = await usuarioXPrograma.create({
+                    ID_USUARIO: ID_TUTOR,
+                    ID_PROGRAMA: element
+                }, {transaction: transaccion})
+            }
+
+            await transaccion.commit();
+            res.status(201).json({alumno: req.body.alumno}); 
+            
+        }); 
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
      
 
 

@@ -1,16 +1,17 @@
 const controllers = {}
-
+const Sequelize =  require("sequelize");
 let sequelize = require('../models/database');
 let tutoria = require('../models/procesoTutoria');
 let etiquetaXTutoria = require('../models/etiquetaXTutoria');
 let etiqueta = require('../models/etiqueta');
 let programa = require('../models/programa');
+let asignacionTutoria = require('../models/asignacionTutoria');
 
 
 controllers.listar = async (req, res) => { 
     try{
         const tutorias = await tutoria.findAll({
-            include: [etiqueta],
+            include: [etiqueta, programa],
             where: {ESTADO: 1}
         });
         res.status(201).json({tutoria:tutorias});         
@@ -36,6 +37,26 @@ controllers.listarPorPrograma = async (req, res) => {
     }
 };
 
+controllers.listarPorProgramaYTutor = async (req, res) => { 
+    try{
+        const tutorias = await asignacionTutoria.findAll({
+            include: {
+                model: tutoria,
+                as: "PROCESO_TUTORIA",
+                where: {ID_PROGRAMA:req.params.idPrograma}
+            },
+            where: {
+                ESTADO: 1,
+                ID_TUTOR: req.params.idTutor
+            },
+            attributes: [Sequelize.col("PROCESO_TUTORIA.*")]
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
 
 controllers.get = async (req, res) =>{ // devuelve los datos de una tutoria 
     try{

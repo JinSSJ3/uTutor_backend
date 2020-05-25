@@ -4,9 +4,6 @@ let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 
-sequelize.sync();
-
-
 
 controllers.list = async (req, res) => { // fetch all all tutors from DB
     try{

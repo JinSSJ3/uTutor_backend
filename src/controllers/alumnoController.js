@@ -8,7 +8,8 @@ let rol = require("../models/rol");
 let usuarioXPrograma = require("../models/usuarioXPrograma");
 let asignacionTutoria = require("../models/asignacionTutoria")
 let etiquetaXAlumno = require("../models/etiquetaXAlumno")
-
+let programa = require("../models/programa")
+let asignacionTutoriaXAlumno = require("../models/asignacionTutoriaXAlumno")
 
 
 const Op = Sequelize.Op;
@@ -21,6 +22,7 @@ controllers.listar = async (req, res) => { // fetch all all studenst from DB
                 where: {DESCRIPCION: "Alumno"}
             },{
                 model: usuario,
+                include: [programa],
                 required: true
             }],
             where: {ESTADO: 1}
@@ -34,19 +36,22 @@ controllers.listar = async (req, res) => { // fetch all all studenst from DB
 
 controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
     try{
-        const alumnos = await asignacionTutoria.findAll({
+        const alumnos = await asignacionTutoriaXAlumno.findAll({
             include: {
                 model: alumno,
-                include: {
+                include: [{
                     model: usuario,
+                    include: [programa],
                     required: true
-                },
+                },{
+                    model:asignacionTutoria,
+                    where: {
+                        ESTADO: 1,
+                        ID_TUTOR: req.params.tutor,
+                        ID_PROCESO_TUTORIA: req.params.tutoria
+                    }
+                }],
                 required: true
-            },
-            where: {
-                ESTADO: 1,
-                ID_TUTOR: req.params.tutor,
-                ID_PROCESO_TUTORIA: req.params.tutoria
             }
         });
         res.status(201).json({alumnos:alumnos});         
@@ -59,21 +64,24 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
 
 controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
     try{
-        const alumnos = await asignacionTutoria.findAll({
+        const alumnos = await asignacionTutoriaXAlumno.findAll({
             include: {
                 model: alumno,
-                include: {
+                include: [{
                     model: usuario,
+                    include: [programa],
                     where: {[Op.or]: [{NOMBRE: {[Op.like]: '%' + req.params.nombre+ '%'}},
                                     {APELLIDOS:{[Op.like]: '%' + req.params.nombre+ '%'}}]},
                     required: true
-                },
+                },{
+                    model:asignacionTutoria,
+                    where: {
+                        ESTADO: 1,
+                        ID_TUTOR: req.params.tutor,
+                        ID_PROCESO_TUTORIA: req.params.tutoria
+                    }
+                }],
                 required: true
-            },
-            where: {
-                ESTADO: 1,
-                ID_TUTOR: req.params.tutor,
-                ID_PROCESO_TUTORIA: req.params.tutoria
             }
         });
         res.status(201).json({alumnos:alumnos});         
@@ -112,7 +120,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
         const {id} = req.params;
         const data = await usuario.findOne({
             where: {ID_USUARIO: id},
-            include: [rol]
+            include: [rol,programa]
         })
         /*const data = await usuario.findOne({  validar contrasena
             where: {ID_USUARIO: id}
@@ -132,7 +140,7 @@ controllers.buscarPorCodigo = async (req, res) =>{ // devuelve los datos de un a
     try{
         const data = await usuario.findOne({
             where: {CODIGO: req.params.codigo},
-            include: [rol]
+            include: [rol,programa]
         })
         
         res.status(201).json({alumno:data});        
