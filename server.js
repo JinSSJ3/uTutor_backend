@@ -23,6 +23,7 @@ app.use(require('./src/routes/disponibilidadRoutes'));
 app.use(require('./src/routes/programaRoutes'));
 app.use(require('./src/routes/sesionRoutes'));
 app.use(require('./src/routes/etiquetaRoutes'));
+app.use(require('./src/routes/asignacionTutoriaRoutes'));
 
 /*app.get('/conection', (req,res)=>{
     res("Conection established! ");

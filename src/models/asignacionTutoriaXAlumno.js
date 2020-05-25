@@ -13,7 +13,7 @@ let asignacionTutoriaXAlumno = sequelize.define(nametable,{
 });
 
 alumno.belongsToMany(asignacionTutoria, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ALUMNO", otherKey: "ID_ASIGNACION"});
-asignacionTutoria.belongsToMany(alumno, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ASIGNACION", otherKey: "ID_ALUMNO"});
+asignacionTutoria.belongsToMany(alumno, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ASIGNACION", otherKey: "ID_ALUMNO", as: "ALUMNOS"});
 asignacionTutoriaXAlumno.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
 asignacionTutoriaXAlumno.belongsTo(asignacionTutoria,{foreignKey: "ID_ASIGNACION"});
 alumno.hasMany(asignacionTutoriaXAlumno, {foreignKey: "ID_ALUMNO"});
