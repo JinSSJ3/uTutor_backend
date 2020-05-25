@@ -15,11 +15,9 @@ router.post("/api/registrarSesion", sesionController.registrarSesionInesperada);
 
 router.post("/api/registrarCita", sesionController.registrarCita);
 
-router.post("/api/registrarResultadoCita", sesionController.registrarAsistencia);
+router.post("/api/registrarResultadoCita", sesionController.registrarResultados);
 
 router.get("/api/sesion/:idSesion", sesionController.get);
-
-router.post("/api/registrarInasistencia", sesionController.registrarInasistencia);
 
 app.use(morgan('dev'));
 

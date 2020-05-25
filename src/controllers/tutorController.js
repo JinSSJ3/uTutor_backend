@@ -6,6 +6,7 @@ let usuario = require('../models/usuario');
 let rolXUsuario = require('../models/rolXUsuario');
 let rol = require('../models/rol');
 let usuarioXPrograma = require('../models/usuarioXPrograma');
+let programa = require('../models/programa')
 
 sequelize.sync();
 
@@ -33,7 +34,11 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
             where: {ID_USUARIO: id},
             include: [{
                 model: usuarioXPrograma,
-                attributes: ['ID_PROGRAMA']
+                attributes: ['ID_PROGRAMA'],
+                include: [{
+                    model: programa,
+                    attributes: ['NOMBRE']
+                }]
             }]
         })
         res.status(201).json({data:data});        

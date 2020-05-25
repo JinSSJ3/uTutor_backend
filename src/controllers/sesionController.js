@@ -180,7 +180,8 @@ controllers.registrarSesionInesperada = async (req, res) => {
             ALUMNOS.forEach(async alumn => {
                 const newAlumnoSesion = await alumnoXSesion.create({
                     ID_SESION: result.ID_SESION,
-                    ID_ALUMNO: alumn
+                    ID_ALUMNO: alumn,
+                    ASISTENCIA_ALUMNO: 1
                 }, {transaction: transaccion})
             })
         });
@@ -291,10 +292,10 @@ controllers.registrarCita = async (req, res) => {
     } 
 };   
 
-//Registrar los resultados de una sesión que se llevó a cabo exitosamente
-controllers.registrarAsistencia = async (req, res) => {  
+//Registrar los resultados y asistencia de una sesión que se llevó a cabo exitosamente
+controllers.registrarResultados = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, RESULTADO, COMPROMISOS, AREAS_APOYO} = req.body.sesion; 
+    const {ID_SESION, RESULTADO, COMPROMISOS, AREAS_APOYO, ALUMNOS, ASISTENCIA} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
         const miSesion = await sesion.findOne({
@@ -320,33 +321,21 @@ controllers.registrarAsistencia = async (req, res) => {
                 ID_AREA_APOYO: area
             }, {transaction: transaccion})
         })
+        for(let i=0; i<ALUMNOS.length;i++){
+            const asist = await alumnoXSesion.findOne({
+                where:{
+                    ID_SESION: ID_SESION,
+                    ID_ALUMNO: ALUMNOS[i]
+                }
+            })
+            asist.ASISTENCIA_ALUMNO = ASISTENCIA[i];
+            await asist.save({transaction: transaccion});
+        }
+
         await transaccion.commit();
         res.status(201).json({sesion: miSesion});
     } catch (error) {
         console.log(error);
-        await transaccion.rollback();
-        res.json({error: error.message})
-    }
-}
-
-//Registra que una sesión no se realizo por la inasistencia del alumno citado
-controllers.registrarInasistencia = async (req, res) => {  
-    const transaccion = await sequelize.transaction();
-    const {ID_SESION} = req.body.sesion; 
-    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
-    try {
-        const miSesion = await sesion.findOne({
-            where:{
-                ID_SESION: ID_SESION,
-            }
-        }, {transaction: transaccion})
-        miSesion.RESULTADO;
-        miSesion.ESTADO = "05-no_asistencia";
-        await miSesion.save({transaction: transaccion});
-
-        await transaccion.commit();
-        res.status(201).json({sesion: miSesion});
-    } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
     }
