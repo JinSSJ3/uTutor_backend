@@ -11,11 +11,15 @@ router.get("/", (req, res)=>{
 
 router.get("/api/programa", programaController.listar);
 
+router.get("/api/programa&facultad", programaController.listarProgramasYFacultades);
+
 router.get("/api/facultad", programaController.listarFacultad);
 
 router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
 
-router.get("/api/programa/coordinador/:id", programaController.listarPorCoordinador);
+router.get("/api/programa&facultad/coordinador/:id", programaController.listarProgramasYFacultadesPorCoordinador);
+
+router.get("/api/programa/coordinador/:id", programaController.listarProgramasPorCoordinador);
 
 router.post("/api/facultad", programaController.registrarFacultad);
 

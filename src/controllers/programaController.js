@@ -64,7 +64,7 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
     }
 };
 
-controllers.listarPorCoordinador = async (req, res) => { // lista facultades y programas por coordinador
+controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // lista facultades y programas por coordinador
     try {
         const programas = await usuarioXPrograma.findAll(
             {
@@ -82,6 +82,34 @@ controllers.listarPorCoordinador = async (req, res) => { // lista facultades y p
         res.json({ error: error.message });
     }
 };
+
+controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo programas por coordinador
+    const idCoordinador = req.params.id
+    try {
+        const programas = await usuarioXPrograma.findAll(
+            {
+                //include: [institucion]
+                include: {
+                    model: programa,
+                    where: {
+                        ID_FACULTAD: {[Op.ne]: null}
+                    },
+                    include: {
+                        model: programa,
+                        as: 'FACULTAD',
+                    }
+                },
+                where: {
+                    ID_USUARIO: idCoordinador,
+                }
+            }
+        );
+        res.status(201).json({ programa: programas });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 controllers.listarFacultad = async (req, res) => {
     try {
         const facultades = await programa.findAll(
