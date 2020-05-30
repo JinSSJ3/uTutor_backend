@@ -31,7 +31,7 @@ controllers.listarPorTutoria = async (req, res) => {
 
 controllers.get = async (req, res) => { // devuelve los datos de una asignacion 
     try {
-        const idAsignacion = req.query.id;
+        const idAsignacion = req.params.id;
         const dataAsignacion = await asignacionTutoria.findOne({
             where:{
                 ID_ASIGNACION: idAsignacion,
@@ -49,6 +49,30 @@ controllers.get = async (req, res) => { // devuelve los datos de una asignacion
             ]
         })
         res.status(201).json({ asignacion: dataAsignacion });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
+controllers.lista = async (req, res) => { // devuelve los datos de todas las asignaciones
+    try {
+        const dataAsignacion = await asignacionTutoria.findAll({
+            where:{
+                ESTADO: 1
+            },
+            include: [tutor,
+                {
+                    model: alumno,
+                    as: "ALUMNOS"
+                },
+                {
+                    model: procesoTutoria,
+                    as: "PROCESO_TUTORIA"
+                }
+            ]
+        })
+        res.status(201).json({ asignaciones: dataAsignacion });
     }
     catch (error) {
         res.json({ error: error.message });
