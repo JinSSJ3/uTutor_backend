@@ -19,7 +19,9 @@ router.post("/api/registrarResultadoCita", sesionController.registrarResultados)
 
 router.get("/api/sesion/:idSesion", sesionController.get);
 
-app.use(morgan('dev'));
+router.post("/api/registrarInasistencia", sesionController.registrarInasistencia);
+
+
 
 
 module.exports = router;

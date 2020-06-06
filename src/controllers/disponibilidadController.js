@@ -4,7 +4,7 @@ let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let disponibilidad = require('../models/disponibilidad');
 
-sequelize.sync();
+//sequelize.sync();
 
 controllers.list = async (req, res) => { // lista disponibilidades de un tutor
     try{

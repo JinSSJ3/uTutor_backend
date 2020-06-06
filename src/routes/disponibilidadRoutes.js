@@ -19,7 +19,7 @@ router.post("/api/disponibilidad/modificar", disponibilidadController.modificar)
 
 router.post("/api/disponibilidad/eliminar/:idDisp", disponibilidadController.eliminar);
 
-app.use(morgan('dev'));
+
 
 
 module.exports = router;
