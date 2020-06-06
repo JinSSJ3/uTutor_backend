@@ -7,7 +7,7 @@ let alumnoXSesion = require('../models/alumnoXSesion');
 let compromiso = require('../models/compromiso');
 let areaApoyoXSesion = require('../models/areaApoyoXSesion');
 
-sequelize.sync();
+//sequelize.sync();
 
 
 controllers.listar = async (req, res) => { // lista sesiones de un tutor

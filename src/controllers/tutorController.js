@@ -7,7 +7,7 @@ let rolXUsuario = require('../models/rolXUsuario');
 let rol = require('../models/rol');
 let usuarioXPrograma = require('../models/usuarioXPrograma');
 
-sequelize.sync();
+//sequelize.sync();
 
 
 

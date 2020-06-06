@@ -6,10 +6,11 @@ let alumno = require('../models/alumno');
 let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
 let usuarioXPrograma = require("../models/usuarioXPrograma");
-let asignacionTutoria = require("../models/asignacionTutoria")
-let etiquetaXAlumno = require("../models/etiquetaXAlumno")
-let programa = require("../models/programa")
-let asignacionTutoriaXAlumno = require("../models/asignacionTutoriaXAlumno")
+let asignacionTutoria = require("../models/asignacionTutoria");
+let etiquetaXAlumno = require("../models/etiquetaXAlumno");
+let programa = require("../models/programa");
+let asignacionTutoriaXAlumno = require("../models/asignacionTutoriaXAlumno");
+let etiqueta = require("../models/etiqueta");
 
 
 const Op = Sequelize.Op;
@@ -99,7 +100,7 @@ controllers.listarPorPrograma = async (req, res) => { // Lista a los alumnos de 
                 where: {DESCRIPCION: "Alumno"}
             },{
                 model: usuario,
-                include: {
+                include:{
                     model: usuarioXPrograma,
                     where: {ID_PROGRAMA: req.params.programa},                    
                 },
@@ -118,9 +119,12 @@ controllers.listarPorPrograma = async (req, res) => { // Lista a los alumnos de 
 controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
     try{
         const {id} = req.params;
-        const data = await usuario.findOne({
-            where: {ID_USUARIO: id},
-            include: [rol,programa]
+        const data = await alumno.findOne({
+            where: {ID_ALUMNO: id},
+            include: [{
+                model: usuario,
+                include: [rol,programa]
+            }, etiqueta]
         })
         /*const data = await usuario.findOne({  validar contrasena
             where: {ID_USUARIO: id}
@@ -138,11 +142,13 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un alumno
 
 controllers.buscarPorCodigo = async (req, res) =>{ // devuelve los datos de un alumno segun su codigo
     try{
-        const data = await usuario.findOne({
-            where: {CODIGO: req.params.codigo},
-            include: [rol,programa]
+        const data = await alumno.findOne({
+            include: [{
+                model:usuario,
+                where: {CODIGO: req.params.codigo},
+                include: [rol,programa]
+            }, etiqueta]            
         })
-        
         res.status(201).json({alumno:data});        
     }
     catch(error){

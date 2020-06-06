@@ -25,6 +25,6 @@ router.post("/api/programa/modificar", programaController.modificarPrograma);
 
 router.post("/api/facultad/modificar", programaController.modificarFacultad);
 
-app.use(morgan('dev'));
+
 
 module.exports = router;

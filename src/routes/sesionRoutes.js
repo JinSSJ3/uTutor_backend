@@ -21,7 +21,7 @@ router.get("/api/sesion/:idSesion", sesionController.get);
 
 router.post("/api/registrarInasistencia", sesionController.registrarInasistencia);
 
-app.use(morgan('dev'));
+
 
 
 module.exports = router;
