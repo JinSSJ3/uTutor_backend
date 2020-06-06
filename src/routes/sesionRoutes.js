@@ -19,7 +19,7 @@ router.post("/api/registrarResultadoCita", sesionController.registrarResultados)
 
 router.get("/api/sesion/:idSesion", sesionController.get);
 
-router.post("/api/registrarInasistencia", sesionController.registrarInasistencia);
+
 
 
 

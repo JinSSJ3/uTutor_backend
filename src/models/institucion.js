@@ -16,6 +16,7 @@ let institucion = sequelize.define(
         IMAGEN: Sequelize.BLOB,
         TELEFONO: Sequelize.STRING,
         PAGINA_WEB: Sequelize.STRING,
+        DOMINIO: Sequelize.STRING,
         UBICACION: Sequelize.STRING,
         FACEBOOK: Sequelize.STRING,
         TWITTER: Sequelize.STRING,
