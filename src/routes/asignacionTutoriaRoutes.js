@@ -14,6 +14,8 @@ router.get("/api/asignacion/lista", asignacionTutoriaController.listarPorTutoria
 
 router.get("/api/asignacion", asignacionTutoriaController.lista);
 
+router.get("/api/solicitud/:idTutor/:idTutoria", asignacionTutoriaController.listarSolicitudesXTutor);
+
 router.get("/api/asignacion/:id", asignacionTutoriaController.get);
 
 router.post("/api/asignacion", asignacionTutoriaController.registrar);

@@ -6,6 +6,7 @@ const asignacionTutoria = require('./asignacionTutoria');
 let nametable = 'ASIGNACION_TUTORIA_X_ALUMNO';
 
 let asignacionTutoriaXAlumno = sequelize.define(nametable,{
+    SOLICITUD: Sequelize.INTEGER
     },
     {
     timestamps :false,
