@@ -194,10 +194,10 @@ controllers.registrarSesionInesperada = async (req, res) => {
 };
 
 
-//Esto registra en la base de datos una cita que solicita un alumno.
+//Esto registra en la base de datos una cita que solicita un alumno o una que programa el coordinador (individual o grupal)
 controllers.registrarCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, ALUMNO} = req.body.sesion; 
+    const {ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
 
@@ -215,57 +215,99 @@ controllers.registrarCita = async (req, res) => {
         }
 
         const { Op } = require("sequelize");
+
+        //Revisa que el tutor no tenga otra sesión a esa hora
+        const valid = await sesion.findAll({
+            where:{
+                ID_TUTOR: ID_TUTOR,
+                FECHA: FECHA,
+                ESTADO: {
+                    [Op.not]: "02-cancelada"
+                },
+                [Op.or]: [
+                    {
+                        HORA_FIN: {
+                            [Op.gte]: HORA_FIN,
+                        },
+                        HORA_INICIO: {
+                            [Op.lt]: HORA_FIN,
+                        }
+                    },
+                    {
+                        HORA_INICIO: {
+                            [Op.lte]: HORA_INICIO,
+                        },
+                        HORA_FIN: {
+                            [Op.gt]: HORA_INICIO,
+                        }
+                    },
+                    {
+                        HORA_INICIO: {
+                            [Op.gte]: HORA_INICIO,
+                        },
+                        HORA_FIN: {
+                            [Op.lte]: HORA_FIN,
+                        }
+                    }
+                ]
+              }
+        })
+        if(valid.length != 0){
+            let message = "La hora ya está ocupada";
+            res.status(400).json({message: message});
+            return;
+        }
         
         // Revisa que el alumno no tenga otra sesión a esa hora
-
-        const findAlumSesiones = await alumnoXSesion.findAll({
-            where:{
-                ID_ALUMNO: ALUMNO,
-            }
-        }, {transaction: transaccion})
-        if(findAlumSesiones.length != 0){
-            for(let i=0; i< findAlumSesiones.length; i++){
-                
-                const valid3 = await sesion.findAll({
-                    where:{
-                        ID_SESION: findAlumSesiones[i].ID_SESION,
-                        FECHA: FECHA,
-                        [Op.or]: [
-                            {  
-                                HORA_FIN: {
-                                    [Op.gte]: HORA_FIN,
-                                },
-                                HORA_INICIO: {
-                                    [Op.lt]: HORA_FIN,
-                                }
-                            },
-                            {   
-                                HORA_INICIO: {
-                                    [Op.lte]: HORA_INICIO,
-                                },
-                                HORA_FIN: {
-                                    [Op.gt]: HORA_INICIO,
-                                }
-                            },
-                            {   
-                                HORA_INICIO: {
-                                    [Op.gte]: HORA_INICIO,
-                                },
-                                HORA_FIN: {
-                                    [Op.lte]: HORA_FIN,
-                                }
-                            }
-                        ]
-                        }
-                })
-                if(valid3.length != 0){
-                    let message = "Ya hay una cita pactada a esa hora";
-                    res.status(400).json({message: message});
-                    return;
+        ALUMNOS.forEach(async alumId => {
+            const findAlumSesiones = await alumnoXSesion.findAll({
+                where:{
+                    ID_ALUMNO: alumId,
                 }
-            }  
-        };      
-          
+            }, {transaction: transaccion})
+            if(findAlumSesiones.length != 0){
+                for(let i=0; i< findAlumSesiones.length; i++){
+                    const valid2 = await sesion.findAll({
+                        where:{
+                            ID_SESION: findAlumSesiones[i].ID_SESION,
+                            FECHA: FECHA,
+                            [Op.or]: [
+                                {  
+                                    HORA_FIN: {
+                                        [Op.gte]: HORA_FIN,
+                                    },
+                                    HORA_INICIO: {
+                                        [Op.lt]: HORA_FIN,
+                                    }
+                                },
+                                {   
+                                    HORA_INICIO: {
+                                        [Op.lte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.gt]: HORA_INICIO,
+                                    }
+                                },
+                                {   
+                                    HORA_INICIO: {
+                                        [Op.gte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.lte]: HORA_FIN,
+                                    }
+                                }
+                            ]
+                          }
+                    })
+                    if(valid2.length != 0){
+                        let message = "El alumno ya tiene una sesión a esa hora";
+                        res.status(400).json({message: message});
+                        return;
+                    }
+                }  
+            }       
+        });
+        
         const newSesion = await sesion.create({
             ID_TUTOR: ID_TUTOR,
             ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
@@ -278,10 +320,12 @@ controllers.registrarCita = async (req, res) => {
             ESTADO: "04-futura"
         }, {transaction: transaccion}).then(async result  => {
 
-            const newAlumnoSesion = await alumnoXSesion.create({
-                ID_SESION: result.ID_SESION,
-                ID_ALUMNO: ALUMNO
-            }, {transaction: transaccion})
+            ALUMNOS.forEach(async element => {
+                const newAlumnoSesion = await alumnoXSesion.create({
+                    ID_SESION: result.ID_SESION,
+                    ID_ALUMNO: element
+                }, {transaction: transaccion})
+            })
 
         });
         await transaccion.commit();

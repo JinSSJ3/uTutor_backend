@@ -10,7 +10,8 @@ controllers.list = async (req, res) => { // lista disponibilidades de un tutor
     try{
         const {idtutor} = req.params;
         const data = await disponibilidad.findAll({
-            where: {ID_TUTOR: idtutor},
+            where: {ID_TUTOR: idtutor,
+                    ESTADO: 1},
             include: {
                 model: tutor,
                } 
