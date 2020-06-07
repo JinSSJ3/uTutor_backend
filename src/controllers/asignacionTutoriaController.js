@@ -4,6 +4,7 @@ let sequelize = require('../models/database');
 let asignacionTutoria = require('../models/asignacionTutoria');
 let tutor = require('../models/tutor');
 let alumno = require('../models/alumno');
+let usuario = require('../models/usuario');
 let procesoTutoria = require('../models/procesoTutoria');
 let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
 
@@ -15,6 +16,9 @@ controllers.listarPorTutoria = async (req, res) => {
                 {
                     model: alumno,
                     as: "ALUMNOS"
+                },{
+                    model: asignacionTutoriaXAlumno,
+                    where: {SOLICITUD: 1} // aceptada
                 }
             ],
             where: {
@@ -69,6 +73,10 @@ controllers.lista = async (req, res) => { // devuelve los datos de todas las asi
                 {
                     model: procesoTutoria,
                     as: "PROCESO_TUTORIA"
+                },
+                {
+                    model: asignacionTutoriaXAlumno,
+                    where: {SOLICITUD: 1} // aceptada
                 }
             ]
         })
@@ -78,6 +86,38 @@ controllers.lista = async (req, res) => { // devuelve los datos de todas las asi
         res.json({ error: error.message });
     }
 }
+
+
+controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve los datos de todas las asignaciones
+    try {
+        const dataSolicitud = await asignacionTutoriaXAlumno.findAll({
+            where:{ SOLICITUD: 2},  //pendiente
+            include: [                
+                {
+                    model: alumno,
+                    as: "ALUMNO",
+                    include: {
+                        model: usuario,
+                        attributes: ["NOMBRE", "APELLIDOS"]
+                    }
+                },
+                {
+                    model: asignacionTutoria,
+                    where: {
+                        ID_TUTOR: req.params.idTutor,
+                        ID_PROCESO_TUTORIA: req.params.idTutoria
+                    },
+                    attributes: ["ID_TUTOR"]                                       
+                }], 
+            attributes: ["ID_ASIGNACION"]
+        })
+        res.status(201).json({ solicitudes: dataSolicitud });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
 
 /**
  * @returns La nueva asignacion creado en formato Json()
@@ -102,7 +142,8 @@ controllers.registrar = async (req, res) => {
                 for (element of ALUMNOS) {
                     const nuevaAsignacionTutoriaXAlumno = await asignacionTutoriaXAlumno.create({
                         ID_ALUMNO: element,
-                        ID_ASIGNACION: result.ID_ASIGNACION
+                        ID_ASIGNACION: result.ID_ASIGNACION,
+                        SOLICITUD: 1  // aceptada
                     }, { transaction: transaccion })
                 };
                 await transaccion.commit();
