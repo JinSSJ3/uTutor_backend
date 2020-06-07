@@ -386,3 +386,9 @@ controllers.registrarResultados = async (req, res) => {
 }
 
 module.exports = controllers;
+
+/* controllers.posponerCita = async (req, res) => {  
+    const transaccion = await sequelize.transaction();
+    const {ID_SESION, ID_TUTOR, HORA_INICIO, HORA_FIN, ALUMNOS} = req.body.sesion; 
+    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+} */

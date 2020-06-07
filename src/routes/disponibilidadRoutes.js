@@ -9,7 +9,13 @@ const disponibilidadController = require('../controllers/disponibilidadControlle
 router.get("/",(req, res)=>{
     res.end(`express running on the server ${app.get("port")}`);
 })
-router.get("/api/disponibilidad/:idtutor", disponibilidadController.list);
+router.get("/api/disponibilidad/:idtutor", disponibilidadController.listarPorTutor);
+
+router.get("/api/disponibilidad/", disponibilidadController.listar);
+
+router.get("/api/disponibilidad/listarDia/:fecha/:idtutor", disponibilidadController.listarPorTutorFecha);
+
+router.get("/api/disponibilidad/listarDia/:fecha", disponibilidadController.listarPorFecha);
 
 router.post("/api/disponibilidad", disponibilidadController.register);
 

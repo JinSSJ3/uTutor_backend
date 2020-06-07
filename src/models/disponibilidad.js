@@ -22,7 +22,8 @@ let disponibilidad = sequelize.define(nametable,{
     HORA_INICIO: Sequelize.STRING,
     HORA_FIN: Sequelize.STRING,
     FECHA: Sequelize.DATEONLY,
-    ESTADO: Sequelize.INTEGER
+    ESTADO: Sequelize.INTEGER,
+    LUGAR: Sequelize.STRING
     },
     {
     timestamps :false,

@@ -6,11 +6,61 @@ let disponibilidad = require('../models/disponibilidad');
 
 //sequelize.sync();
 
-controllers.list = async (req, res) => { // lista disponibilidades de un tutor
+controllers.listarPorTutor = async (req, res) => { // lista disponibilidades de un tutor
     try{
         const {idtutor} = req.params;
         const data = await disponibilidad.findAll({
             where: {ID_TUTOR: idtutor,
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+               } 
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listar = async (req, res) => { // lista disponibilidades
+    try{
+        const data = await disponibilidad.findAll({
+            where: {ESTADO: 1},
+            include: {
+                model: tutor,
+               } 
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorFecha = async (req, res) => { //listar disponibilidades por fecha
+    try{
+        const {fecha} = req.params;
+        const data = await disponibilidad.findAll({
+            where: {FECHA: fecha,
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+               } 
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidades por fecha por tutor
+    try{
+        const {fecha, idtutor} = req.params;
+        const data = await disponibilidad.findAll({
+            where: {ID_TUTOR: idtutor,
+                    FECHA: fecha,
                     ESTADO: 1},
             include: {
                 model: tutor,
@@ -44,7 +94,7 @@ controllers.get = async (req, res) =>{ // devuelve una disponibilidad
 
 controllers.register = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR} = req.body.disponibilidad; 
+    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     
     try {
@@ -92,6 +142,7 @@ controllers.register = async (req, res) => {
             HORA_FIN: HORA_FIN,
             FECHA: FECHA,
             ESTADO: 1,
+            LUGAR: LUGAR,
             ID_TUTOR: ID_TUTOR
         }, {transaction: transaccion});
         await transaccion.commit();
@@ -124,7 +175,7 @@ controllers.eliminar = async (req, res) => {
 
 controllers.modificar = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_DISPONIBILIDAD, HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR} = req.body.disponibilidad; 
+    const {ID_DISPONIBILIDAD, HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     
     try {
@@ -173,7 +224,8 @@ controllers.modificar = async (req, res) => {
             ID_TUTOR: ID_TUTOR,
             HORA_INICIO: HORA_INICIO,
             HORA_FIN: HORA_FIN,
-            FECHA: FECHA
+            FECHA: FECHA,
+            LUGAR: LUGAR
         }, {
             where: {ID_DISPONIBILIDAD: ID_DISPONIBILIDAD}
         }, {transaction: transaccion})
