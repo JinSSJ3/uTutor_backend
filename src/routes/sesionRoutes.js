@@ -19,9 +19,8 @@ router.post("/api/registrarResultadoCita", sesionController.registrarResultados)
 
 router.get("/api/sesion/:idSesion", sesionController.get);
 
+router.get("/api/posponerCita", sesionController.posponerCita);
 
-
-
-
+router.get("/api/cancelarCita", sesionController.cancelarCita);
 
 module.exports = router;
