@@ -119,6 +119,29 @@ controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve los dato
 }
 
 
+controllers.responderSolicitud = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();
+    const {ID_ASIGNACION, ID_ALUMNO, RESPUESTA} = req.body.solicitud;
+    try {
+        const solicitudModificada = await asignacionTutoriaXAlumno.update({
+            SOLICITUD: RESPUESTA
+        }, {
+            where: {
+                ID_ASIGNACION: ID_ASIGNACION,
+                ID_ALUMNO: ID_ALUMNO
+            }
+        }, {transaction: transaccion})
+
+        await transaccion.commit();
+        res.status(201).json({solicitud: req.body.solicitud});
+    }catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
+
 /**
  * @returns La nueva asignacion creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
