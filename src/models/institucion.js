@@ -13,14 +13,11 @@ let institucion = sequelize.define(
         },
         NOMBRE: Sequelize.STRING,
         INICIALES: Sequelize.STRING,
-        IMAGEN: Sequelize.BLOB,
+        IMAGEN: Sequelize.STRING,
         TELEFONO: Sequelize.STRING,
         PAGINA_WEB: Sequelize.STRING,
         DOMINIO: Sequelize.STRING,
-        UBICACION: Sequelize.STRING,
-        FACEBOOK: Sequelize.STRING,
-        TWITTER: Sequelize.STRING,
-        YOUTUBE: Sequelize.STRING
+        UBICACION: Sequelize.STRING
     },
     {
         timestamps: false,

@@ -9,6 +9,9 @@ const institucionController = require('../controllers/institucionController');
 router.get("/",(req, res)=>{
     res.end(`express running on the server ${app.get("port")}`);
 })
+
+router.get("/api/institucion/imagen", institucionController.guardarImagen);
+
 router.get("/api/institucion", institucionController.listar);
 
 router.post("/api/institucion", institucionController.registrar);
