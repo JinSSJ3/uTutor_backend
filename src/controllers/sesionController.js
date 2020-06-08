@@ -23,6 +23,23 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
     }
 };
 
+controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor por fecha
+    try{
+        const {idtutor, fecha} = req.params;
+        const data = await sesion.findAll({
+            where: {ID_TUTOR: idtutor,
+                    FECHA: fecha,
+                    ESTADO: {
+                        [Op.not]: "02-cancelada"
+                    }}
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 controllers.get = async (req, res) =>{ // devuelve una sesion
     try{
         const {idSesion} = req.params;

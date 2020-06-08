@@ -23,4 +23,6 @@ router.post("/api/posponerCita", sesionController.posponerCita);
 
 router.post("/api/cancelarCita", sesionController.cancelarCita);
 
+router.get("/api/listaSesiones/:idtutor/:fecha", sesionController.listarPorFecha);
+
 module.exports = router;
