@@ -35,10 +35,12 @@ controllers.guardarImagen = async (req, res) => {
 controllers.listar = async (req, res) => { 
     try{
         const inst = await institucion.findOne();
-        let cadena = inst.dataValues.IMAGEN.split(".")
-        inst.dataValues.IMAGEN = fs.readFileSync(inst.dataValues.IMAGEN, "base64")
-        inst.dataValues.EXTENSION = cadena[cadena.length -1]
-        
+        if (inst.dataValues.IMAGEN){
+            let cadena = inst.dataValues.IMAGEN.split(".")
+            inst.dataValues.IMAGEN = fs.readFileSync(inst.dataValues.IMAGEN, "base64")
+            inst.dataValues.EXTENSION = cadena[cadena.length -1]
+        }              
+        inst.dataValues.EXTENSION = ""
         res.status(201).json({institucion:inst});         
     }    
     catch (error) {
