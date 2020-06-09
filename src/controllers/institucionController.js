@@ -102,7 +102,7 @@ controllers.modificar = async (req, res) => {
         let ruta = null
         if(IMAGEN){            
             fs.readFile(IMAGEN, function (err, data) {
-                let ruta = path.join("..","Imagenes","Institucion","logo."+EXTENSION)
+                ruta = path.join("..","Imagenes","Institucion","logo."+EXTENSION)
                 fsPath.writeFile(ruta, data, function (err) {
                     if (err) {
                         return console.log(err);
