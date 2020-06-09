@@ -3,6 +3,7 @@ const controllers = {}
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let disponibilidad = require('../models/disponibilidad');
+let usuario = require('../models/usuario');
 
 //sequelize.sync();
 
@@ -14,6 +15,10 @@ controllers.listarPorTutor = async (req, res) => { // lista disponibilidades de 
                     ESTADO: 1},
             include: {
                 model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
                } 
         });
         res.status(201).json({data:data});         
@@ -29,6 +34,10 @@ controllers.listar = async (req, res) => { // lista disponibilidades
             where: {ESTADO: 1},
             include: {
                 model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
                } 
         });
         res.status(201).json({data:data});         
@@ -46,6 +55,10 @@ controllers.listarPorFecha = async (req, res) => { //listar disponibilidades por
                     ESTADO: 1},
             include: {
                 model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
                } 
         });
         res.status(201).json({data:data});         
@@ -64,6 +77,10 @@ controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidade
                     ESTADO: 1},
             include: {
                 model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
                } 
         });
         res.status(201).json({data:data});         
@@ -81,7 +98,11 @@ controllers.get = async (req, res) =>{ // devuelve una disponibilidad
             where: {ID_TUTOR: idtutor,
                     ID_DISPONIBILIDAD: id},
             include: {
-                model: tutor
+                model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
                }
         })
         res.status(201).json({data:data});        
