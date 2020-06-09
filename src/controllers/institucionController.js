@@ -62,6 +62,7 @@ controllers.registrar = async (req, res) => {
     const {NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
+        let ruta = null
         if(IMAGEN){
             fs.readFile(IMAGEN, function (err, data) {
                 let ruta = path.join("..","Imagenes","Institucion","logo."+EXTENSION)
@@ -99,6 +100,7 @@ controllers.modificar = async (req, res) => {
     const {ID, NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion;
     try {
         if(IMAGEN){
+            let ruta = null
             fs.readFile(IMAGEN, function (err, data) {
                 let ruta = path.join("..","Imagenes","Institucion","logo."+EXTENSION)
                 fsPath.writeFile(ruta, data, function (err) {
