@@ -1,4 +1,5 @@
 const controllers = {}
+const moment = require('moment');
 
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
@@ -174,18 +175,21 @@ controllers.register = async (req, res) => {
             res.json({error: error.message})
         }
     }else if(REPETICION==2){
-        let fec = new Date(FECHA);
-        let mes = fec.getMonth();
-        let dia = fec.getDate();
-        fec.setDate(fec.getDate() + 1);
-        let dia2 = fec.getDate();
-        if(dia2<dia) mes++;
+        let fec = moment(FECHA, "YYYY-MM-DD", true);
+        fec.format();
+        let mes = fec.month();
+        let dia = fec.day();
+        console.log(mes);
+        console.log(fec);
+        console.log(dia);
         let dias = [];
-        while (fec.getMonth() === mes) {
-            let nuevaFecha = new Date(fec.getTime());
-            dias.push(nuevaFecha.getFullYear() + '-' + (nuevaFecha.getMonth()+1) + '-' + (nuevaFecha.getDate()));
-            fec.setDate(fec.getDate() + 7);
+        while (fec.month() === mes) {
+            let nuevaFecha = moment(fec);
+            dias.push(moment(nuevaFecha).format('YYYY-MM-DD'));
+            fec = moment(fec).add(7, 'days');
+            console.log(fec);
         }
+        console.log(dias)
         try {
             const { Op } = require("sequelize");
             dias.forEach(async fechaRep => {
@@ -223,7 +227,6 @@ controllers.register = async (req, res) => {
                       }
                 })
                 if(valid.length != 0){
-                    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
                     let message = "Una de las horas ya está ocupada";
                     res.status(400).json({message: message});
                     return;
