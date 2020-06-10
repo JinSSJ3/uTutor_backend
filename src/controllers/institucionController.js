@@ -62,10 +62,9 @@ controllers.registrar = async (req, res) => {
     const {NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
-        let ruta = null
+        let ruta = IMAGEN?path.join("..","Imagenes","Institucion","logo."+EXTENSION):null;
         if(IMAGEN){
             fs.readFile(IMAGEN, function (err, data) {
-                let ruta = path.join("..","Imagenes","Institucion","logo."+EXTENSION)
                 fsPath.writeFile(ruta, data, function (err) {
                     // la funcion es la que maneja lo que sucede despues de termine el evento
                     if (err) {
@@ -99,10 +98,9 @@ controllers.modificar = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const {ID, NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion;
     try {
-        let ruta = null
+        let ruta = IMAGEN?path.join("..","Imagenes","Institucion","logo."+EXTENSION):null;
         if(IMAGEN){            
             fs.readFile(IMAGEN, function (err, data) {
-                ruta = path.join("..","Imagenes","Institucion","logo."+EXTENSION)
                 fsPath.writeFile(ruta, data, function (err) {
                     if (err) {
                         return console.log(err);
@@ -123,7 +121,9 @@ controllers.modificar = async (req, res) => {
         }, {transaction: transaccion})
 
         await transaccion.commit();
-        res.status(201).json({institucion: req.body.institucion});
+        inst = {...req.body.institucion};
+        inst.IMAGEN = ruta;
+        res.status(201).json({institucion: inst});
     }catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
