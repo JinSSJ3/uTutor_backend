@@ -6,6 +6,8 @@ let sesion = require('../models/sesion');
 let alumnoXSesion = require('../models/alumnoXSesion');
 let compromiso = require('../models/compromiso');
 let areaApoyoXSesion = require('../models/areaApoyoXSesion');
+let usuario = require('../models/usuario');
+let alumno = require('../models/alumno');
 
 //sequelize.sync();
 
@@ -15,6 +17,13 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
         const {idtutor} = req.params;
         const data = await sesion.findAll({
             where: {ID_TUTOR: idtutor},
+            include: [{
+                model: alumno,
+                include: [{
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }]
+            }]
         });
         res.status(201).json({data:data});         
     }    
@@ -31,7 +40,14 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                     FECHA: fecha,
                     ESTADO: {
                         [Op.not]: "02-cancelada"
-                    }}
+                    },
+                    include: [{
+                        model: alumno,
+                        include: [{
+                            model: usuario,
+                            attributes: ['NOMBRE', 'APELLIDOS']
+                        }]
+                    }] }
         });
         res.status(201).json({data:data});         
     }    
