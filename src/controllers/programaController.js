@@ -16,9 +16,9 @@ controllers.listar = async (req, res) => { //listar todos los programas
                     model: programa,
                     as: 'FACULTAD'
                 },
-                where: {ID_FACULTAD: {[Op.ne]: null}}
+                where: { ID_FACULTAD: { [Op.ne]: null } }
             }
-            
+
         );
         res.status(201).json({ programa: programas });
     } catch (error) {
@@ -27,7 +27,7 @@ controllers.listar = async (req, res) => { //listar todos los programas
 };
 
 
-controllers.listarProgramasYFacultades = async (req, res) => { 
+controllers.listarProgramasYFacultades = async (req, res) => {
     try {
         const programas = await programa.findAll(
             {
@@ -85,6 +85,7 @@ controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // 
 
 controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo programas por coordinador
     const idCoordinador = req.params.id
+    console.log("GOT: ", idCoordinador)
     try {
         const programas = await usuarioXPrograma.findAll(
             {
@@ -92,7 +93,7 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
                 include: {
                     model: programa,
                     where: {
-                        ID_FACULTAD: {[Op.ne]: null}
+                        ID_FACULTAD: { [Op.ne]: null }
                     },
                     include: {
                         model: programa,
@@ -110,11 +111,48 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
     }
 };
 
+controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // lista solo programas por coordinador
+    const idCoordinador = req.params.id
+    console.log("GOT: ", idCoordinador)
+    try {
+        const programas = await usuarioXPrograma.findAll(
+            {
+                //include: [institucion]
+                attributes: [],
+                include: {
+                    model: programa,
+                    where: {
+                        ID_FACULTAD: { [Op.ne]: null }
+                    },
+                    include: {
+                        model: programa,
+                        as: 'FACULTAD',
+                    }
+                },
+                where: {
+                    ID_USUARIO: idCoordinador,
+                }
+            }
+        );
+        for (var i = 0; i < programas.length; i++) {
+            programas[i] = programas[i].PROGRAMA;
+        }
+        res.status(201).json({ programa: programas });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 controllers.listarFacultad = async (req, res) => {
     try {
         const facultades = await programa.findAll(
             {
-                where: {ID_FACULTAD: null}
+                where: {
+                    [Op.or]: [
+                        { ID_FACULTAD: null },
+                        sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+                    ]
+                }
             }
         );
         res.status(201).json({ facultad: facultades });
@@ -129,68 +167,68 @@ controllers.listarFacultad = async (req, res) => {
  * @returns El nuevo programa (facultad) creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
  */
-controllers.registrarFacultad = async (req, res) => {  
+controllers.registrarFacultad = async (req, res) => {
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio una "facultad" en el cuerpo ("body") del request ("req")
-     *  */ 
+     *  */
     const transaccion = await sequelize.transaction();
-    const {ID_INSTITUCION, NOMBRE, IMAGEN} = req.body.facultad;
+    const { ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
-    
+
     try {
         const nuevaFacultad = await programa.create({
             ID_FACULTAD: null,
             ID_INSTITUCION: ID_INSTITUCION,
             NOMBRE: NOMBRE,
             IMAGEN: IMAGEN
-        }, {transaction: transaccion});
-            
+        }, { transaction: transaccion });
+
         await transaccion.commit();
-        res.status(201).json({facultad: nuevaFacultad});   
-    }catch (error) {
+        res.status(201).json({ facultad: nuevaFacultad });
+    } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
-        res.json({error: error.message})
+        res.json({ error: error.message })
     }
-    
+
 };
 
 /**
  * @returns El nuevo programa creado en formato Json()
  * HTTP status code 201 significa que se creo exitosamente
  */
-controllers.registrarPrograma = async (req, res) => {  
+controllers.registrarPrograma = async (req, res) => {
     /**
      * Aqui deberia haber una validacion (un middleware) para validar
      * que se envio un "programa" en el cuerpo ("body") del request ("req")
-     *  */ 
+     *  */
     const transaccion = await sequelize.transaction();
-    const {ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN} = req.body.programa;
+    const { ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.programa;
     console.log("GOT: ", req.body.programa);//solo para asegurarme de que el objeto llego al backend
-    
+
     try {
         const nuevoPrograma = await programa.create({
             ID_FACULTAD: ID_FACULTAD,
             ID_INSTITUCION: ID_INSTITUCION,
             NOMBRE: NOMBRE,
             IMAGEN: IMAGEN
-        }, {transaction: transaccion});
-             
+        }, { transaction: transaccion });
+
         await transaccion.commit();
-        res.status(201).json({programa: nuevoPrograma});   
-    }catch (error) {
+        res.status(201).json({ programa: nuevoPrograma });
+    } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
-        res.json({error: error.message})
+        res.json({ error: error.message })
     }
-    
+
 };
 
-controllers.modificarFacultad = async (req, res) => {  
-    
+controllers.modificarFacultad = async (req, res) => {
+
     const transaccion = await sequelize.transaction();
-    const {ID_PROGRAMA,ID_INSTITUCION,NOMBRE, IMAGEN} = req.body.facultad; 
+    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const facultadModificada = await programa.update({
@@ -198,23 +236,23 @@ controllers.modificarFacultad = async (req, res) => {
             NOMBRE: NOMBRE,
             IMAGEN: IMAGEN
         }, {
-            where: {ID_PROGRAMA: ID_PROGRAMA}
-        }, {transaction: transaccion});
-           
+            where: { ID_PROGRAMA: ID_PROGRAMA }
+        }, { transaction: transaccion });
+
         await transaccion.commit();
-        res.status(201).json({facultad: facultadModificada});   
-    }catch (error) {
+        res.status(201).json({ facultad: facultadModificada });
+    } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
-        res.json({error: error.message})
+        res.json({ error: error.message })
     }
-    
+
 };
 
-controllers.modificarPrograma = async (req, res) => {  
-    
+controllers.modificarPrograma = async (req, res) => {
+
     const transaccion = await sequelize.transaction();
-    const {ID_PROGRAMA, ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN} = req.body.programa; 
+    const { ID_PROGRAMA, ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.programa;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const programaModificado = await programa.update({
@@ -223,17 +261,17 @@ controllers.modificarPrograma = async (req, res) => {
             NOMBRE: NOMBRE,
             IMAGEN: IMAGEN
         }, {
-            where: {ID_PROGRAMA: ID_PROGRAMA}
-        }, {transaction: transaccion});
-           
+            where: { ID_PROGRAMA: ID_PROGRAMA }
+        }, { transaction: transaccion });
+
         await transaccion.commit();
-        res.status(201).json({programa: programaModificado});   
-    }catch (error) {
+        res.status(201).json({ programa: programaModificado });
+    } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
-        res.json({error: error.message})
+        res.json({ error: error.message })
     }
-    
+
 };
 
 module.exports = controllers;
