@@ -41,13 +41,14 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                     ESTADO: {
                         [Op.not]: "02-cancelada"
                     },
+                    },
                     include: [{
                         model: alumno,
                         include: [{
                             model: usuario,
                             attributes: ['NOMBRE', 'APELLIDOS']
                         }]
-                    }] }
+                    }] 
         });
         res.status(201).json({data:data});         
     }    
