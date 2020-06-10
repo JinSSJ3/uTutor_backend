@@ -115,63 +115,134 @@ controllers.get = async (req, res) =>{ // devuelve una disponibilidad
 
 controllers.register = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR} = req.body.disponibilidad; 
+    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
-    
-    try {
-        const { Op } = require("sequelize");
-        const valid = await disponibilidad.findAll({
-            where:{
-                ID_TUTOR: ID_TUTOR,
+    if (REPETICION == 1){
+         try {
+            const { Op } = require("sequelize");
+            const valid = await disponibilidad.findAll({
+                where:{
+                    ID_TUTOR: ID_TUTOR,
+                    FECHA: FECHA,
+                    ESTADO: 1,
+                    [Op.or]: [
+                        {
+                            HORA_FIN: {
+                                [Op.gte]: HORA_FIN,
+                            },
+                            HORA_INICIO: {
+                                [Op.lt]: HORA_FIN,
+                            }
+                        },
+                        {
+                            HORA_INICIO: {
+                                [Op.lte]: HORA_INICIO,
+                            },
+                            HORA_FIN: {
+                                [Op.gt]: HORA_INICIO,
+                            }
+                        },
+                        {
+                            HORA_INICIO: {
+                                [Op.gte]: HORA_INICIO,
+                            },
+                            HORA_FIN: {
+                                [Op.lte]: HORA_FIN,
+                            }
+                        }
+                    ]
+                  }
+            })
+            if(valid.length != 0){
+                let message = "La hora ya está ocupada";
+                res.status(400).json({error: message});
+                return;
+            }
+            const newDisp = await disponibilidad.create({
+                HORA_INICIO: HORA_INICIO,
+                HORA_FIN: HORA_FIN,
                 FECHA: FECHA,
                 ESTADO: 1,
-                [Op.or]: [
-                    {
-                        HORA_FIN: {
-                            [Op.gte]: HORA_FIN,
-                        },
-                        HORA_INICIO: {
-                            [Op.lt]: HORA_FIN,
-                        }
-                    },
-                    {
-                        HORA_INICIO: {
-                            [Op.lte]: HORA_INICIO,
-                        },
-                        HORA_FIN: {
-                            [Op.gt]: HORA_INICIO,
-                        }
-                    },
-                    {
-                        HORA_INICIO: {
-                            [Op.gte]: HORA_INICIO,
-                        },
-                        HORA_FIN: {
-                            [Op.lte]: HORA_FIN,
-                        }
-                    }
-                ]
-              }
-        })
-        if(valid.length != 0){
-            let message = "La hora ya está ocupada";
-            res.status(400).json({error: message});
-            return;
+                LUGAR: LUGAR,
+                ID_TUTOR: ID_TUTOR
+            }, {transaction: transaccion});
+            await transaccion.commit();
+            res.status(201).json({newDisp: newDisp});
+            
+        } catch (error) {
+            await transaccion.rollback();
+            res.json({error: error.message})
         }
-        const newDisp = await disponibilidad.create({
-            HORA_INICIO: HORA_INICIO,
-            HORA_FIN: HORA_FIN,
-            FECHA: FECHA,
-            ESTADO: 1,
-            LUGAR: LUGAR,
-            ID_TUTOR: ID_TUTOR
-        }, {transaction: transaccion});
-        await transaccion.commit();
-        res.status(201).json({newDisp: newDisp});
-        
-    } catch (error) {
-        await transaccion.rollback();
-        res.json({error: error.message})
+    }else if(REPETICION==2){
+        let fec = new Date(FECHA);
+        let mes = fec.getMonth();
+        let dia = fec.getDate();
+        fec.setDate(fec.getDate() + 1);
+        let dia2 = fec.getDate();
+        if(dia2<dia) mes++;
+        let dias = [];
+        while (fec.getMonth() === mes) {
+            let nuevaFecha = new Date(fec.getTime());
+            dias.push(nuevaFecha.getFullYear() + '-' + (nuevaFecha.getMonth()+1) + '-' + (nuevaFecha.getDate()));
+            fec.setDate(fec.getDate() + 7);
+        }
+        try {
+            const { Op } = require("sequelize");
+            dias.forEach(async fechaRep => {
+                const valid = await disponibilidad.findAll({
+                    where:{
+                        ID_TUTOR: ID_TUTOR,
+                        FECHA: fechaRep,
+                        ESTADO: 1,
+                        [Op.or]: [
+                            {
+                                HORA_FIN: {
+                                    [Op.gte]: HORA_FIN,
+                                },
+                                HORA_INICIO: {
+                                    [Op.lt]: HORA_FIN,
+                                }
+                            },
+                            {
+                                HORA_INICIO: {
+                                    [Op.lte]: HORA_INICIO,
+                                },
+                                HORA_FIN: {
+                                    [Op.gt]: HORA_INICIO,
+                                }
+                            },
+                            {
+                                HORA_INICIO: {
+                                    [Op.gte]: HORA_INICIO,
+                                },
+                                HORA_FIN: {
+                                    [Op.lte]: HORA_FIN,
+                                }
+                            }
+                        ]
+                      }
+                })
+                if(valid.length != 0){
+                    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+                    let message = "Una de las horas ya está ocupada";
+                    res.status(400).json({message: message});
+                    return;
+                }
+                const newDisp = await disponibilidad.create({
+                    HORA_INICIO: HORA_INICIO,
+                    HORA_FIN: HORA_FIN,
+                    FECHA: fechaRep,
+                    ESTADO: 1,
+                    LUGAR: LUGAR,
+                    ID_TUTOR: ID_TUTOR
+                }, {transaction: transaccion});
+                await transaccion.commit();
+            })
+            res.status(201).json({dias: dias});
+        } catch (error) {
+            await transaccion.rollback();
+            res.json({error: error.message})
+        }
     }
     
 };
