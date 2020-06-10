@@ -19,7 +19,7 @@ router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
 
 router.get("/api/programa&facultad/coordinador/:id", programaController.listarProgramasYFacultadesPorCoordinador);
 
-router.get("/api/programa/coordinador/:id", programaController.listarProgramasPorCoordinador);
+router.get("/api/programa/coordinador/:id", programaController.listarProgramasPorCoordinadorConFormato);
 
 router.post("/api/facultad", programaController.registrarFacultad);
 
