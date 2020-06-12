@@ -39,8 +39,10 @@ controllers.listar = async (req, res) => {
             let cadena = inst.dataValues.IMAGEN.split(".")
             inst.dataValues.IMAGEN = fs.readFileSync(inst.dataValues.IMAGEN, "base64")
             inst.dataValues.EXTENSION = cadena[cadena.length -1]
-        }              
-        inst.dataValues.EXTENSION = ""
+        }
+        else{              
+            inst.dataValues.EXTENSION = ""
+        }
         res.status(201).json({institucion:inst});         
     }    
     catch (error) {
