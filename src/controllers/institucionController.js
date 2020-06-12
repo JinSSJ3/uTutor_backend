@@ -4,7 +4,8 @@ let sequelize = require('../models/database');
 let institucion = require('../models/institucion');
 const fsPath =  require('fs-path');
 const fs =  require('fs');
-const path = require('path')
+const path = require('path');
+const { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } = require('constants');
 
 
 controllers.guardarImagen = async (req, res) => {
@@ -65,15 +66,13 @@ controllers.registrar = async (req, res) => {
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         let ruta = IMAGEN?path.join("..","Imagenes","Institucion","logo."+EXTENSION):null;
-        if(IMAGEN){
-            fs.readFile(IMAGEN, function (err, data) {
-                fsPath.writeFile(ruta, data, function (err) {
-                    // la funcion es la que maneja lo que sucede despues de termine el evento
-                    if (err) {
-                        return console.log(err);
-                    }
-                })
+        if(IMAGEN){            
+            fsPath.writeFile(ruta, IMAGEN, function (err) {
+                if (err) {
+                    return console.log(err);
+                }
             })
+            
         }
         const nuevaInstitucion = await institucion.create({
             NOMBRE: NOMBRE,
@@ -101,14 +100,12 @@ controllers.modificar = async (req, res) => {
     const {ID, NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion;
     try {
         let ruta = IMAGEN?path.join("..","Imagenes","Institucion","logo."+EXTENSION):null;
-        if(IMAGEN){            
-            fs.readFile(IMAGEN, function (err, data) {
-                fsPath.writeFile(ruta, data, function (err) {
-                    if (err) {
-                        return console.log(err);
-                    }
-                })
-            })
+        if(IMAGEN){
+            fsPath.writeFile(ruta, IMAGEN, function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+            })            
         }
         const institucionModificada = await institucion.update({
             NOMBRE: NOMBRE,
