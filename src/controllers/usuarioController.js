@@ -5,6 +5,7 @@ let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 let usuarioXPrograma = require('../models/usuarioXPrograma')
 let programa = require('../models/programa')
+let rol = require('../models/rol')
 
 const Op = Sequelize.Op;
 
@@ -15,7 +16,7 @@ controllers.buscarPorCorreo = async (req, res) => {
             include: [{
                 model: usuarioXPrograma,
                 include: [programa]
-            }]
+            },rol]
         })
         res.status(201).json({usuario:user});
     }catch (error){
@@ -30,7 +31,7 @@ controllers.buscarPorCodigo = async (req, res) => {
             include: [{
                 model: usuarioXPrograma,
                 include: [programa]
-            }]
+            },rol]
         })
         res.status(201).json({usuario:user});
     }catch (error){
@@ -65,7 +66,7 @@ controllers.login = async (req, res) => {
                         include: [{
                             model: usuarioXPrograma,
                             include: [programa]
-                        }]
+                        },rol]
                     })                
                 }
             }
