@@ -45,6 +45,7 @@ app.use(require('./src/routes/sesionRoutes'));
 app.use(require('./src/routes/etiquetaRoutes'));
 app.use(require('./src/routes/asignacionTutoriaRoutes'));
 app.use(require('./src/routes/institucionRoutes'));
+app.use(require('./src/routes/usuarioRoutes'));
 
 
 
