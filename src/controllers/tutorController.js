@@ -27,6 +27,28 @@ controllers.list = async (req, res) => { // fetch all all tutors from DB
 };
 
 
+controllers.listarPorPrograma = async (req, res) => { // fetch all all tutors from DB
+    try{
+        const tutores = await tutor.findAll({
+            include: {
+                model: usuario,
+                required: true,
+                include: [{
+                    model: usuarioXPrograma,
+                    where: {
+                        ID_PROGRAMA: req.params.idPrograma
+                    },
+                    required: true
+                }]
+               } 
+        });
+        res.status(201).json({tutores:tutores});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
     try{
         const {id} = req.params;

@@ -1,8 +1,81 @@
 const controllers = {}
-
+const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
+let usuarioXPrograma = require('../models/usuarioXPrograma')
+let programa = require('../models/programa')
+let rol = require('../models/rol')
+
+const Op = Sequelize.Op;
+
+controllers.buscarPorCorreo = async (req, res) => {
+    try{
+        const user = await usuario.findOne({
+            where: {CORREO: req.params.correo},
+            include: [{
+                model: usuarioXPrograma,
+                include: [programa]
+            },rol]
+        })
+        res.status(201).json({usuario:user});
+    }catch (error){
+        res.json({error: error.message});    
+    }
+}
+
+controllers.buscarPorCodigo = async (req, res) => {
+    try{
+        const user = await usuario.findOne({
+            where: {CODIGO: req.params.codigo},
+            include: [{
+                model: usuarioXPrograma,
+                include: [programa]
+            },rol]
+        })
+        res.status(201).json({usuario:user});
+    }catch (error){
+        res.json({error: error.message});    
+    }
+}
+
+controllers.validarUsuarioUnico = async (req, res) => {
+    try{
+        const user = await usuario.findOne({
+            where: {USUARIO: req.params.usuario}           
+        })
+        res.status(201).json({usuario:user});
+    }catch (error){
+        res.json({error: error.message});    
+    }
+}
+
+
+controllers.login = async (req, res) => {
+    const {USUARIO, CONTRASENHA} = req.body.usuario;
+    try{
+       const data = await usuario.findOne({ 
+            where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}}
+        })
+        .then(async result => { 
+            let user = null
+            if(result){
+                if(await result.validPassword(CONTRASENHA)){
+                    user = await usuario.findOne({
+                        where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
+                        include: [{
+                            model: usuarioXPrograma,
+                            include: [programa]
+                        },rol]
+                    })                
+                }
+            }
+            res.status(201).json({usuario:user});
+        })
+    }catch (error){
+        res.json({error: error.message});    
+    }
+}
 
 
 controllers.list = async (req, res) => { // fetch all all tutors from DB
