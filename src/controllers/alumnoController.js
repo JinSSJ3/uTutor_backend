@@ -3,9 +3,9 @@ const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
 let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
-let rolXUsuario = require("../models/rolXUsuario");
+//let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
-let usuarioXPrograma = require("../models/usuarioXPrograma");
+let rolXUsuarioXPrograma = require("../models/rolXUsuarioXPrograma");
 let asignacionTutoria = require("../models/asignacionTutoria");
 let etiquetaXAlumno = require("../models/etiquetaXAlumno");
 let programa = require("../models/programa");
@@ -17,7 +17,7 @@ const Op = Sequelize.Op;
 
 controllers.listar = async (req, res) => { // fetch all all studenst from DB
     try{
-        const alumnos = await rolXUsuario.findAll({
+        const alumnos = await rolXUsuarioXPrograma.findAll({
             include: [{
                 model:rol,
                 where: {DESCRIPCION: "Alumno"}
@@ -94,19 +94,16 @@ controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumno
 
 controllers.listarPorPrograma = async (req, res) => { // Lista a los alumnos de un programa determinado
     try{
-        const alumnos = await rolXUsuario.findAll({
+        const alumnos = await rolXUsuarioXPrograma.findAll({
             include: [{
                 model:rol,
                 where: {DESCRIPCION: "Alumno"}
             },{
                 model: usuario,
-                include:{
-                    model: usuarioXPrograma,
-                    where: {ID_PROGRAMA: req.params.programa},                    
-                },
                 required: true
             }],
-            where: {ESTADO: 1}
+            where: {ID_PROGRAMA: req.params.programa,
+                    ESTADO: 1}
         });
         res.status(201).json({alumnos:alumnos});         
     }    
@@ -190,16 +187,18 @@ controllers.registrar = async (req, res) => {
                 where: {DESCRIPCION: "Alumno"}
             }, {transaction: transaccion})
 
-            const rolDeUsuario = await rolXUsuario.create({
+/*             const rolDeUsuario = await rolXUsuario.create({
                 ID_USUARIO: result.ID_USUARIO,
                 ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion})         
+            }, {transaction: transaccion})       */   
 
            
             for(element of PROGRAMA){
-                const programaDeUsuario = await usuarioXPrograma.create({
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
                     ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element
+                    ID_PROGRAMA: element,
+                    ID_ROL: idRol.ID_ROL,
+                    ESTADO: '1'
                 }, {transaction: transaccion})
             }
 
@@ -241,15 +240,21 @@ controllers.modificar = async (req, res) => {
             await etiquetaXAlumno.destroy({
                 where:{ID_ALUMNO: ID}
             }, {transaction: transaccion})
+
+            const idRol = await rol.findOne({
+                attributes:["ID_ROL"],
+                where: {DESCRIPCION: "Alumno"}
+            }, {transaction: transaccion})
             
-            await usuarioXPrograma.destroy({
+            await rolXUsuarioXPrograma.destroy({
                 where:{ID_USUARIO: ID}            
             }, {transaction: transaccion})
 
             for(element of PROGRAMA){
-                const programaDeUsuario = await usuarioXPrograma.create({
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
                     ID_USUARIO: ID,
-                    ID_PROGRAMA: element
+                    ID_PROGRAMA: element,
+                    ID_ROL: idRol.ID_ROL
                 }, {transaction: transaccion})
             }
 
@@ -278,7 +283,7 @@ controllers.eliminar = async (req, res) => {
             where: {DESCRIPCION: "Alumno"}
         }, {transaction: transaccion})
 
-        const coordinadorModificado = await rolXUsuario.update({
+        const coordinadorModificado = await rolXUsuarioxPrograma.update({
             ESTADO: 0            
         },{
             where: {

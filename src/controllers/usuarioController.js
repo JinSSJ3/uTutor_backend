@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
-let usuarioXPrograma = require('../models/usuarioXPrograma')
+let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma')
 let programa = require('../models/programa')
 let rol = require('../models/rol')
 
@@ -14,7 +14,7 @@ controllers.buscarPorCorreo = async (req, res) => {
         const user = await usuario.findOne({
             where: {CORREO: req.params.correo},
             include: [{
-                model: usuarioXPrograma,
+                model: rolXUsuarioXPrograma,
                 include: [programa]
             },rol]
         })
@@ -29,7 +29,7 @@ controllers.buscarPorCodigo = async (req, res) => {
         const user = await usuario.findOne({
             where: {CODIGO: req.params.codigo},
             include: [{
-                model: usuarioXPrograma,
+                model: rolXUsuarioXPrograma,
                 include: [programa]
             },rol]
         })
@@ -64,7 +64,7 @@ controllers.login = async (req, res) => {
                     user = await usuario.findOne({
                         where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
                         include: [{
-                            model: usuarioXPrograma,
+                            model: rolXUsuarioXPrograma,
                             include: [programa]
                         },rol]
                     })                

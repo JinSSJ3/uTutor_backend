@@ -3,9 +3,9 @@ const controllers = {}
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
-let rolXUsuario = require('../models/rolXUsuario');
+//let rolXUsuario = require('../models/rolXUsuario');
 let rol = require('../models/rol');
-let usuarioXPrograma = require('../models/usuarioXPrograma');
+let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 let programa = require('../models/programa')
 
 //sequelize.sync();
@@ -34,7 +34,7 @@ controllers.listarPorPrograma = async (req, res) => { // fetch all all tutors fr
                 model: usuario,
                 required: true,
                 include: [{
-                    model: usuarioXPrograma,
+                    model: rolXUsuarioXPrograma,
                     where: {
                         ID_PROGRAMA: req.params.idPrograma
                     },
@@ -55,7 +55,7 @@ controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
         const data = await usuario.findOne({
             where: {ID_USUARIO: id},
             include: [{
-                model: usuarioXPrograma,
+                model: rolXUsuarioXPrograma,
                 attributes: ['ID_PROGRAMA'],
                 include: [{
                     model: programa,
@@ -98,16 +98,18 @@ controllers.register = async (req, res) => {
                 attributes:["ID_ROL"],
                 where: {DESCRIPCION: "Tutor"}
             })
-            const newRolUsuario = await rolXUsuario.create({
+/*             const newRolUsuario = await rolXUsuario.create({
                 ID_USUARIO: result.ID_USUARIO,
                 ESTADO: '1',
                 ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion})
+            }, {transaction: transaccion}) */
 
             PROGRAMA.forEach(async element => {
-                const programaDeUsuario = await usuarioXPrograma.create({
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
                     ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element
+                    ID_PROGRAMA: element,
+                    ESTADO: '1',
+                    ID_ROL: idRol.ID_ROL
                 }, {transaction: transaccion})
             })
         });
@@ -141,14 +143,21 @@ controllers.modificar = async (req, res) => {
         }, {transaction: transaccion})
         .then(async result => {                   
             
-            await usuarioXPrograma.destroy({
+            const idRol = await rol.findOne({
+                attributes:["ID_ROL"],
+                where: {DESCRIPCION: "Tutor"}
+            })
+
+            await rolXUsuarioXPrograma.destroy({
                 where:{ID_USUARIO: ID_TUTOR}            
             }, {transaction: transaccion})
 
             for(element of PROGRAMA){
-                const programaDeUsuario = await usuarioXPrograma.create({
-                    ID_USUARIO: ID_TUTOR,
-                    ID_PROGRAMA: element
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                    ID_USUARIO: result.ID_USUARIO,
+                    ID_PROGRAMA: element,
+                    ESTADO: '1',
+                    ID_ROL: idRol.ID_ROL
                 }, {transaction: transaccion})
             }
 

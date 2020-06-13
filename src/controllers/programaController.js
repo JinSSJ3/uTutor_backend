@@ -2,7 +2,7 @@ const controllers = {}
 const Sequelize = require('sequelize')
 let sequelize = require('../models/database');
 let programa = require('../models/programa');
-let usuarioXPrograma = require('../models/usuarioXPrograma');
+let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 //let institucion = require('../models/institucion')
 
 Op = Sequelize.Op;
@@ -66,7 +66,7 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
 
 controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // lista facultades y programas por coordinador
     try {
-        const programas = await usuarioXPrograma.findAll(
+        const programas = await rolXUsuarioXPrograma.findAll(
             {
                 //include: [institucion]
                 include: {
@@ -87,7 +87,7 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
     const idCoordinador = req.params.id
     console.log("GOT: ", idCoordinador)
     try {
-        const programas = await usuarioXPrograma.findAll(
+        const programas = await rolXUsuarioXPrograma.findAll(
             {
                 //include: [institucion]
                 include: {
@@ -115,7 +115,7 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
     const idCoordinador = req.params.id
     console.log("GOT: ", idCoordinador)
     try {
-        const programas = await usuarioXPrograma.findAll(
+        const programas = await rolXUsuarioXPrograma.findAll(
             {
                 //include: [institucion]
                 attributes: [],

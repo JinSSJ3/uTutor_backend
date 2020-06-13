@@ -2,9 +2,9 @@ const controllers = {}
 const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
 let coordinador = require('../models/usuario');
-let rolXUsuario = require("../models/rolXUsuario");
+//let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
-let usuarioXPrograma = require("../models/usuarioXPrograma");
+let rolXUsuarioXPrograma = require("../models/rolXUsuarioXPrograma");
 let programa = require("../models/programa");
 
 
@@ -12,7 +12,7 @@ let programa = require("../models/programa");
 
 controllers.listar = async (req, res) => { // lista a todos los coordinadores
     try{
-        const coordinadores = await rolXUsuario.findAll({           
+        const coordinadores = await rolXUsuarioXPrograma.findAll({           
             include: [{
                 model: rol,
                 where: {DESCRIPCION: "Coordinador"}
@@ -31,19 +31,16 @@ controllers.listar = async (req, res) => { // lista a todos los coordinadores
 
 controllers.listarPorPrograma = async (req, res) => { // lista a todos los coordinadores por programa
     try{
-        const coordinadores = await rolXUsuario.findAll({           
+        const coordinadores = await rolXUsuarioXPrograma.findAll({           
             include: [{
                 model: rol,
                 where: {DESCRIPCION: "Coordinador"},
             },{
                 model:coordinador,
-                include: {
-                    model: usuarioXPrograma,
-                    where: {ID_PROGRAMA: req.params.id}
-                },
                 required: true
-            }],            
-            where:{ESTADO: 1} // activo
+            }],
+            where: {ID_PROGRAMA: req.params.id,
+                    ESTADO: 1} // activo          
         });
         res.status(201).json({coordinadores:coordinadores});         
     }    
@@ -109,15 +106,17 @@ controllers.registrar = async (req, res) => {
                 where: {DESCRIPCION: "Coordinador"}
             }, {transaction: transaccion})
 
-            const rolDeUsuario = await rolXUsuario.create({
+/*             const rolDeUsuario = await rolXUsuario.create({
                 ID_USUARIO: result.ID_USUARIO,
                 ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion})
+            }, {transaction: transaccion}) */
                         
             for(element of PROGRAMA){
-                const programaDeUsuario = await usuarioXPrograma.create({
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
                     ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element
+                    ID_PROGRAMA: element,
+                    ID_ROL: idRol.ID_ROL,
+                    ESTADO: '1'
                 }, {transaction: transaccion})
             }                     
             await transaccion.commit();
@@ -151,14 +150,21 @@ controllers.modificar = async (req, res) => {
             where: {ID_USUARIO: ID}
         }, {transaction: transaccion})
         .then(async result => {
-            await usuarioXPrograma.destroy({
+
+            const idRol = await rol.findOne({
+                attributes:["ID_ROL"],
+                where: {DESCRIPCION: "Coordinador"}
+            }, {transaction: transaccion})
+
+            await rolXUsuarioXPrograma.destroy({
                 where:{ID_USUARIO: ID}            
             }, {transaction: transaccion})
                         
             for(element of PROGRAMA){
-                const programaDeUsuario = await usuarioXPrograma.create({
-                    ID_USUARIO: ID,
-                    ID_PROGRAMA: element
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                    ID_USUARIO: result.ID_USUARIO,
+                    ID_PROGRAMA: element,
+                    ID_ROL: idRol.ID_ROL
                 }, {transaction: transaccion})
             }                     
             await transaccion.commit();
@@ -180,7 +186,7 @@ controllers.eliminar = async (req, res) => {
             where: {DESCRIPCION: "Coordinador"}
         }, {transaction: transaccion})
 
-        const coordinadorModificado = await rolXUsuario.update({
+        const coordinadorModificado = await rolXUsuarioXPrograma.update({
             ESTADO: 0            
         },{
             where: {
