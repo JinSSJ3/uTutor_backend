@@ -5,6 +5,7 @@ let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let disponibilidad = require('../models/disponibilidad');
 let usuario = require('../models/usuario');
+let rolXUsuarioXPrograma = require("../models/rolXUsuarioXPrograma");
 
 //sequelize.sync();
 
@@ -69,6 +70,32 @@ controllers.listarPorFecha = async (req, res) => { //listar disponibilidades por
     }
 };
 
+controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilidades por programa y fecha
+    try{
+        const {idprograma, fecha} = req.params;
+        const data = await disponibilidad.findAll({
+            where: {FECHA: fecha,
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    include: {
+                        model: rolXUsuarioXPrograma,
+                        where: {ID_PROGRAMA:idprograma} 
+                    }
+                }
+               } 
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+
 controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidades por fecha por tutor
     try{
         const {fecha, idtutor} = req.params;
@@ -81,6 +108,32 @@ controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidade
                 include: {
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
+                }
+               } 
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponibilidades por fecha por tutor
+    try{
+        const {idprograma, fecha, idtutor} = req.params;
+        const data = await disponibilidad.findAll({
+            where: {ID_TUTOR: idtutor,
+                    FECHA: fecha,
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    include: {
+                        model: rolXUsuarioXPrograma,
+                        where: {ID_PROGRAMA:idprograma} 
+                    }
                 }
                } 
         });

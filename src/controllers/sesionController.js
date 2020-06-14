@@ -137,7 +137,7 @@ controllers.registrarSesionInesperada = async (req, res) => {
             const findAlumSesiones = await alumnoXSesion.findAll({
                 where:{
                     ID_ALUMNO: alumId,
-                    ESTADO: {
+                    ASISTENCIA_ALUMNO: {
                         [Op.not]: 2
                     }
                 }
@@ -202,8 +202,8 @@ controllers.registrarSesionInesperada = async (req, res) => {
             COMPROMISOS.forEach(async comp => {
                 const newCompromiso = await compromiso.create({
                     ID_SESION: result.ID_SESION,
-                    DESCRIPCION: comp,
-                    ESTADO: 0
+                    DESCRIPCION: comp.campo,
+                    ESTADO: comp.check
                 }, {transaction: transaccion})
             })
 
@@ -221,9 +221,10 @@ controllers.registrarSesionInesperada = async (req, res) => {
                     ASISTENCIA_ALUMNO: 1
                 }, {transaction: transaccion})
             })
+            await transaccion.commit();
+            res.status(201).json({sesion: result});
         });
-        await transaccion.commit();
-        res.status(201).json({sesion: newSesion});
+        
     } catch (error) {
             await transaccion.rollback();
             res.json({error: error.message})
@@ -300,7 +301,7 @@ controllers.registrarCita = async (req, res) => {
             const findAlumSesiones = await alumnoXSesion.findAll({
                 where:{
                     ID_ALUMNO: alumId,
-                    ESTADO: {
+                    ASISTENCIA_ALUMNO: {
                         [Op.not]: 2
                     }
                 }
@@ -366,10 +367,10 @@ controllers.registrarCita = async (req, res) => {
                     ID_ALUMNO: element
                 }, {transaction: transaccion})
             })
-
+            await transaccion.commit();
+            res.status(201).json({sesion: result});
         });
-        await transaccion.commit();
-        res.status(201).json({sesion: newSesion});
+
     } catch (error) {
             await transaccion.rollback();
             res.json({error: error.message})
@@ -393,9 +394,9 @@ controllers.registrarResultados = async (req, res) => {
 
         COMPROMISOS.forEach(async comp => {
             const newCompromiso = await compromiso.create({
-                ID_SESION: ID_SESION,
-                DESCRIPCION: comp,
-                ESTADO: 0
+                ID_SESION: result.ID_SESION,
+                DESCRIPCION: comp.campo,
+                ESTADO: comp.check
             }, {transaction: transaccion})
         })
 
@@ -417,7 +418,7 @@ controllers.registrarResultados = async (req, res) => {
         }
 
         await transaccion.commit();
-        res.status(201).json({sesion: miSesion});
+        res.status(201).json({miSesion: miSesion});
     } catch (error) {
         console.log(error);
         await transaccion.rollback();
@@ -495,7 +496,7 @@ controllers.posponerCita = async (req, res) => {
             const findAlumSesiones = await alumnoXSesion.findAll({
                 where:{
                     ID_ALUMNO: alumId,
-                    ESTADO: {
+                    ASISTENCIA_ALUMNO: {
                         [Op.not]: 2
                     },
                     ID_SESION: {

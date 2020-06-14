@@ -15,7 +15,11 @@ router.get("/api/disponibilidad/", disponibilidadController.listar);
 
 router.get("/api/disponibilidad/listarDia/:fecha/:idtutor", disponibilidadController.listarPorTutorFecha);
 
+router.get("/api/disponibilidad/listarPrograma/:idprograma/:fecha/:idtutor/", disponibilidadController.listarPorProgramaTutorFecha);
+
 router.get("/api/disponibilidad/listarDia/:fecha", disponibilidadController.listarPorFecha);
+
+router.get("/api/disponibilidad/listarPrograma/:idprograma/:fecha", disponibilidadController.listarPorProgramaFecha);
 
 router.post("/api/disponibilidad", disponibilidadController.register);
 
