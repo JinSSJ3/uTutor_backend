@@ -12,15 +12,15 @@ let programa = require("../models/programa");
 
 controllers.listar = async (req, res) => { // lista a todos los coordinadores
     try{
-        const coordinadores = await rolXUsuarioXPrograma.findAll({           
+        const coordinadores = await coordinador.findAll({           
             include: [{
-                model: rol,
-                where: {DESCRIPCION: "Coordinador"}
-            },{
-                model: coordinador,
-                include: [programa]
-            }],            
-            where:{ESTADO: 1} // activo
+                model: rolXUsuarioXPrograma,
+                where: {ESTADO: 1},
+                include:[{
+                    model: rol,
+                    where: {DESCRIPCION: "Coordinador"}
+                }, programa]
+            }],           
         });
         res.status(201).json({coordinadores:coordinadores});         
     }    
@@ -35,12 +35,15 @@ controllers.listarPorPrograma = async (req, res) => { // lista a todos los coord
             include: [{
                 model: rol,
                 where: {DESCRIPCION: "Coordinador"},
+                required: true
             },{
                 model:coordinador,
                 required: true
             }],
-            where: {ID_PROGRAMA: req.params.id,
-                    ESTADO: 1} // activo          
+            where: {
+                ID_PROGRAMA: req.params.id,
+                ESTADO: 1  // activo
+            }           
         });
         res.status(201).json({coordinadores:coordinadores});         
     }    

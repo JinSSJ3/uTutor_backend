@@ -37,9 +37,15 @@ controllers.listarPorPrograma = async (req, res) => { // fetch all all tutors fr
                 include: [{
                     model: rolXUsuarioXPrograma,
                     where: {
-                        ID_PROGRAMA: req.params.idPrograma
+                        ID_PROGRAMA: req.params.idPrograma,
+                        ESTADO: 1
                     },
-                    required: true
+                    required: true,
+                    include:{
+                        model: rol,
+                        where: {DESCRIPCION: "TUTOR"},
+                        required: true
+                    }
                 }]
                } 
         });

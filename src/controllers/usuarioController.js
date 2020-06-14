@@ -15,8 +15,8 @@ controllers.buscarPorCorreo = async (req, res) => {
             where: {CORREO: req.params.correo},
             include: [{
                 model: rolXUsuarioXPrograma,
-                include: [programa]
-            },rol]
+                include: [programa, rol]
+            }]
         })
         res.status(201).json({usuario:user});
     }catch (error){
@@ -30,8 +30,8 @@ controllers.buscarPorCodigo = async (req, res) => {
             where: {CODIGO: req.params.codigo},
             include: [{
                 model: rolXUsuarioXPrograma,
-                include: [programa]
-            },rol]
+                include: [programa, rol]
+            }]
         })
         res.status(201).json({usuario:user});
     }catch (error){
@@ -65,8 +65,9 @@ controllers.login = async (req, res) => {
                         where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
                         include: [{
                             model: rolXUsuarioXPrograma,
-                            include: [programa]
-                        },rol]
+                            include: [programa,rol],
+                            where: {ESTADO: 1}
+                        }]
                     })                
                 }
             }
@@ -77,35 +78,6 @@ controllers.login = async (req, res) => {
     }
 }
 
-
-controllers.list = async (req, res) => { // fetch all all tutors from DB
-    try{
-        const tutores = await tutor.findAll({
-            include: {
-                model: usuario,
-               } 
-        });
-        res.status(201).json({tutores:tutores});         
-    }    
-    catch (error) {
-        res.json({error: error.message});    
-    }
-};
-
-
-controllers.get = async (req, res) =>{ // devuelve los datos de un tutor
-    try{
-        const {id} = req.params;
-        const data = await tutor.findAll({
-            where: {ID_TUTOR: id}
-        })
-        res.status(201).json({data:data});        
-    }
-    catch(error){
-        res.json({error: error.message});
-    }
-
-}
 
 
  /*
