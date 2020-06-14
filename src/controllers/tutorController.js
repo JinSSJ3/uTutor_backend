@@ -17,6 +17,7 @@ controllers.list = async (req, res) => { // fetch all all tutors from DB
         const tutores = await tutor.findAll({
             include: {
                 model: usuario,
+                include: {model: rolXUsuarioXPrograma, where: {'ESTADO': 1}},
                } 
         });
         res.status(201).json({tutores:tutores});         

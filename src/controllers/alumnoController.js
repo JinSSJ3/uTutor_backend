@@ -17,16 +17,11 @@ const Op = Sequelize.Op;
 
 controllers.listar = async (req, res) => { // fetch all all studenst from DB
     try{
-        const alumnos = await rolXUsuarioXPrograma.findAll({
-            include: [{
-                model:rol,
-                where: {DESCRIPCION: "Alumno"}
-            },{
+        const alumnos = await alumno.findAll({
+            include: {
                 model: usuario,
-                include: [programa],
-                required: true
-            }],
-            where: {ESTADO: 1}
+                include: {model: rolXUsuarioXPrograma, where: {'ESTADO': 1}},
+               } 
         });
         res.status(201).json({alumnos:alumnos});         
     }    
