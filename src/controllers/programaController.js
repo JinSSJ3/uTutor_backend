@@ -176,7 +176,8 @@ controllers.registrarFacultad = async (req, res) => {
      * que se envio una "facultad" en el cuerpo ("body") del request ("req")
      *  */
     const transaccion = await sequelize.transaction();
-    const { ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.facultad;
+    const transaccion2 = await sequelize.transaction();
+    const { ID_INSTITUCION, NOMBRE, IMAGEN, INDEPENDIENTE } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
 
     try {
@@ -206,10 +207,25 @@ controllers.registrarFacultad = async (req, res) => {
         }, { transaction: transaccion });
 
         await transaccion.commit();
+
+        if (INDEPENDIENTE) {
+            const facultadModificada = await programa.update(
+                { ID_FACULTAD: nuevaFacultad.ID_PROGRAMA },
+                { where: { ID_PROGRAMA: nuevaFacultad.ID_PROGRAMA } },
+                { transaction: transaccion2 }
+            );
+
+            await transaccion2.commit();
+            nuevaFacultad.ID_FACULTAD = nuevaFacultad.ID_PROGRAMA;
+            res.status(201).json({ registro: { ok: 1, facultad: nuevaFacultad } });
+            return
+        }
+
         res.status(201).json({ registro: { ok: 1, facultad: nuevaFacultad } });
     } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
+        await transaccion2.rollback();
         res.json({ error: error.message })
     }
 
@@ -271,13 +287,15 @@ controllers.modificarFacultad = async (req, res) => {
     const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
-        const facultadModificada = await programa.update({
-            ID_INSTITUCION: ID_INSTITUCION,
-            NOMBRE: NOMBRE,
-            IMAGEN: IMAGEN
-        }, {
-            where: { ID_PROGRAMA: ID_PROGRAMA }
-        }, { transaction: transaccion });
+        const facultadModificada = await programa.update(
+            {
+                ID_INSTITUCION: ID_INSTITUCION,
+                NOMBRE: NOMBRE,
+                IMAGEN: IMAGEN
+            },
+            { where: { ID_PROGRAMA: ID_PROGRAMA } },
+            { transaction: transaccion }
+        );
 
         await transaccion.commit();
         res.status(201).json({ facultad: facultadModificada });
