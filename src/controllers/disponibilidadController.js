@@ -21,7 +21,10 @@ controllers.listarPorTutor = async (req, res) => { // lista disponibilidades de 
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }
-               } 
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
         });
         res.status(201).json({data:data});         
     }    
@@ -40,7 +43,10 @@ controllers.listar = async (req, res) => { // lista disponibilidades
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }
-               } 
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
         });
         res.status(201).json({data:data});         
     }    
@@ -53,15 +59,20 @@ controllers.listarPorFecha = async (req, res) => { //listar disponibilidades por
     try{
         const {fecha} = req.params;
         const data = await disponibilidad.findAll({
-            where: {FECHA: fecha,
-                    ESTADO: 1},
+            where: {
+                FECHA: fecha,
+                ESTADO: 1
+            },
             include: {
                 model: tutor,
                 include: {
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }
-               } 
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
         });
         res.status(201).json({data:data});         
     }    
@@ -86,7 +97,10 @@ controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilid
                         where: {ID_PROGRAMA:idprograma} 
                     }
                 }
-               } 
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
         });
         res.status(201).json({data:data});         
     }    
@@ -109,7 +123,10 @@ controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidade
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }
-               } 
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
         });
         res.status(201).json({data:data});         
     }    
@@ -135,7 +152,10 @@ controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponi
                         where: {ID_PROGRAMA:idprograma} 
                     }
                 }
-               } 
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
         });
         res.status(201).json({data:data});         
     }    
