@@ -73,7 +73,8 @@ controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // 
                     model: programa
                 },
                 where: {
-                    ID_USUARIO: req.params.id
+                    ID_USUARIO: req.params.id,
+                    ID_ROL: 2
                 }
             }
         );
@@ -102,6 +103,7 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
                 },
                 where: {
                     ID_USUARIO: idCoordinador,
+                    ID_ROL: 2
                 }
             }
         );
@@ -131,6 +133,7 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
                 },
                 where: {
                     ID_USUARIO: idCoordinador,
+                    ID_ROL: 2
                 }
             }
         );
