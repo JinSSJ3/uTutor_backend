@@ -62,7 +62,7 @@ controllers.registrar = async (req, res) => {
      * que se envio una "tutoria" en el cuerpo ("body") del request ("req")
      *  */ 
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion; 
+    const {NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION, DOMINIO2} = req.body.institucion; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         let ruta = IMAGEN?path.join("..","Imagenes","Institucion","logo."+EXTENSION):null;
@@ -82,7 +82,8 @@ controllers.registrar = async (req, res) => {
             TELEFONO: TELEFONO,
             PAGINA_WEB: PAGINA_WEB,
             UBICACION: UBICACION,
-            DOMINIO: DOMINIO
+            DOMINIO: DOMINIO,
+            DOMINIO2: DOMINIO2
         }, {transaction: transaccion})
 
         await transaccion.commit();
@@ -98,7 +99,7 @@ controllers.registrar = async (req, res) => {
 controllers.modificar = async (req, res) => {  
     
     const transaccion = await sequelize.transaction();
-    const {ID, NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION} = req.body.institucion;
+    const {ID, NOMBRE, INICIALES, IMAGEN, TELEFONO, PAGINA_WEB, UBICACION, DOMINIO, EXTENSION, DOMINIO2} = req.body.institucion;
     try {
         let ruta = IMAGEN?path.join("..","Imagenes","Institucion","logo."+EXTENSION):null;
         if(IMAGEN){
@@ -116,7 +117,8 @@ controllers.modificar = async (req, res) => {
             TELEFONO: TELEFONO,
             PAGINA_WEB: PAGINA_WEB,
             UBICACION: UBICACION,
-            DOMINIO: DOMINIO
+            DOMINIO: DOMINIO,
+            DOMINIO2: DOMINIO2
         }, {
             where: {ID_INSTITUCION: ID}
         }, {transaction: transaccion})
