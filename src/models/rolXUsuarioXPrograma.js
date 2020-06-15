@@ -8,25 +8,12 @@ let nametable = 'ROL_X_USUARIO_X_PROGRAMA';
 
 let rolXUsuarioXPrograma = sequelize.define(nametable,{
 
-  /*  ID_USUARIO:{
+    ID_ROL_X_USUARIO_X_PROGRAMA:{
         type: Sequelize.INTEGER,
         primaryKey: true,
-        foreignKey:true,
-        references: {
-            model: "USUARIO",
-            key: "ID_USUARIO"
-        }
+        autoIncrement: true
     },
-    ID_ROL: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        foreignKey:true,
-        references: {
-            model: "ROL",
-            key: "ID_ROL"
-        }       
-    }*/
-    ESTADO: Sequelize.TINYINT
+    ESTADO: Sequelize.TINYINT    
 },
 {
     timestamps :false,
