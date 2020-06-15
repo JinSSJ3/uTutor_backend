@@ -17,6 +17,7 @@ let institucion = sequelize.define(
         TELEFONO: Sequelize.STRING,
         PAGINA_WEB: Sequelize.STRING,
         DOMINIO: Sequelize.STRING,
+        DOMINIO2: Sequelize.STRING,
         UBICACION: Sequelize.STRING
     },
     {
