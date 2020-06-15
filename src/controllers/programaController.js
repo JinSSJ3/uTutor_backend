@@ -211,6 +211,25 @@ controllers.registrarPrograma = async (req, res) => {
     console.log("GOT: ", req.body.programa);//solo para asegurarme de que el objeto llego al backend
 
     try {
+        const programasPorFacultad = await programa.findAll(
+            {
+                //include: [institucion]
+                include: {
+                    model: programa,
+                    as: 'FACULTAD',
+                },
+                where: {
+                    ID_FACULTAD: ID_FACULTAD
+                }
+            }
+        );
+        //Validar que el nombre no este duplicado
+        for (var i = 0; i < programasPorFacultad.length; i++) {
+            if (programasPorFacultad[i].NOMBRE.trim() === NOMBRE.trim()) {
+                res.status(409).json({ obj: { ok: 0, programa: null } });
+                return
+            };
+        }
         const nuevoPrograma = await programa.create({
             ID_FACULTAD: ID_FACULTAD,
             ID_INSTITUCION: ID_INSTITUCION,
@@ -219,7 +238,7 @@ controllers.registrarPrograma = async (req, res) => {
         }, { transaction: transaccion });
 
         await transaccion.commit();
-        res.status(201).json({ programa: nuevoPrograma });
+        res.status(201).json({ obj: { ok: 1, programa: nuevoPrograma } });
     } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
