@@ -180,6 +180,24 @@ controllers.registrarFacultad = async (req, res) => {
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
 
     try {
+        const facultades = await programa.findAll(
+            {
+                where: {
+                    [Op.or]: [
+                        { ID_FACULTAD: null },
+                        sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+                    ]
+                }
+            }
+        );
+        // Validar que el nombre no este duplicado
+        for (var i = 0; i < facultades.length; i++) {
+            if (facultades[i].NOMBRE.trim() === NOMBRE.trim()) {
+                res.status(409).json({ registro: { ok: 0, facultad: null } });
+                return
+            };
+        }
+
         const nuevaFacultad = await programa.create({
             ID_FACULTAD: null,
             ID_INSTITUCION: ID_INSTITUCION,
@@ -188,7 +206,7 @@ controllers.registrarFacultad = async (req, res) => {
         }, { transaction: transaccion });
 
         await transaccion.commit();
-        res.status(201).json({ facultad: nuevaFacultad });
+        res.status(201).json({ registro: { ok: 1, facultad: nuevaFacultad } });
     } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
@@ -223,10 +241,10 @@ controllers.registrarPrograma = async (req, res) => {
                 }
             }
         );
-        //Validar que el nombre no este duplicado
+        // Validar que el nombre no este duplicado
         for (var i = 0; i < programasPorFacultad.length; i++) {
             if (programasPorFacultad[i].NOMBRE.trim() === NOMBRE.trim()) {
-                res.status(409).json({ obj: { ok: 0, programa: null } });
+                res.status(409).json({ registro: { ok: 0, programa: null } });
                 return
             };
         }
@@ -238,7 +256,7 @@ controllers.registrarPrograma = async (req, res) => {
         }, { transaction: transaccion });
 
         await transaccion.commit();
-        res.status(201).json({ obj: { ok: 1, programa: nuevoPrograma } });
+        res.status(201).json({ registro: { ok: 1, programa: nuevoPrograma } });
     } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
@@ -264,7 +282,6 @@ controllers.modificarFacultad = async (req, res) => {
         await transaccion.commit();
         res.status(201).json({ facultad: facultadModificada });
     } catch (error) {
-        //console.log("err0");
         await transaccion.rollback();
         res.json({ error: error.message })
     }
