@@ -65,7 +65,14 @@ controllers.login = async (req, res) => {
                         where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
                         include: [{
                             model: rolXUsuarioXPrograma,
-                            include: [programa,rol],
+                            include: [{
+                                model:programa,
+                                include: [{
+                                    model: programa,
+                                    as: 'FACULTAD',
+                                    attributes: ["NOMBRE"]
+                                }]
+                            }, rol],
                             where: {ESTADO: 1}
                         }]
                     })                
