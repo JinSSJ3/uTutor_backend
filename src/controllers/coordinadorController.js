@@ -29,6 +29,7 @@ controllers.listarCoordinadoresFacultad = async (req, res) => { // lista a todos
     }
 };
 
+
 controllers.listarCoordinadoresPrograma = async (req, res) => { 
     try{              // lista a todos los coordinadores de programa de una facultad en especifico
         const coordinadores = await coordinador.findAll({           

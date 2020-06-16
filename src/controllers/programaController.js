@@ -3,6 +3,7 @@ const Sequelize = require('sequelize')
 let sequelize = require('../models/database');
 let programa = require('../models/programa');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
+let rol = require('../models/rol');
 //let institucion = require('../models/institucion')
 
 Op = Sequelize.Op;
@@ -63,6 +64,27 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
         res.json({ error: error.message });
     }
 };
+
+controllers.listarFacultadesDeUnCoordinador = async (req, res) => {
+    try{
+        const facultades = await programa.findAll({           
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: {ID_USUARIO: req.params.idCoordinador, ESTADO: 1},
+                include:[{
+                    model: rol,
+                    where: {DESCRIPCION: "Coordinador Facultad"},
+                    attributes:[]
+                }],
+                attributes: []
+            }],           
+        });
+        res.status(201).json({facultades:facultades});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+}
 
 controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // lista facultades y programas por coordinador
     try {
