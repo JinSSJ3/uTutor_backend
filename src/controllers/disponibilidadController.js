@@ -81,6 +81,7 @@ controllers.listarPorFecha = async (req, res) => { //listar disponibilidades por
     }
 };
 
+
 controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilidades por programa y fecha
     try{
         const {idprograma, fecha} = req.params;
@@ -89,13 +90,16 @@ controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilid
                     ESTADO: 1},
             include: {
                 model: tutor,
+                required: true,
                 include: {
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS'],
                     include: {
                         model: rolXUsuarioXPrograma,
-                        where: {ID_PROGRAMA:idprograma} 
-                    }
+                        where: {ID_PROGRAMA:idprograma},
+                        required: true
+                    },
+                    required: true
                 }
             },
             order: [
@@ -107,7 +111,7 @@ controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilid
     catch (error) {
         res.json({error: error.message});    
     }
-};
+}
 
 
 controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidades por fecha por tutor
@@ -144,13 +148,16 @@ controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponi
                     ESTADO: 1},
             include: {
                 model: tutor,
+                required: true,
                 include: {
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS'],
                     include: {
                         model: rolXUsuarioXPrograma,
-                        where: {ID_PROGRAMA:idprograma} 
-                    }
+                        where: {ID_PROGRAMA:idprograma},
+                        required: true 
+                    },
+                    required: true
                 }
             },
             order: [
