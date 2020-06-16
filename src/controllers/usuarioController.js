@@ -15,7 +15,14 @@ controllers.buscarPorCorreo = async (req, res) => {
             where: {CORREO: req.params.correo},
             include: [{
                 model: rolXUsuarioXPrograma,
-                include: [programa, rol]
+                include: [{
+                    model:programa,
+                    include: [{
+                        model: programa,
+                        as: 'FACULTAD',
+                        attributes: ["NOMBRE"]
+                    }]
+                }, rol]
             }]
         })
         res.status(201).json({usuario:user});
