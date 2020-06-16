@@ -37,12 +37,13 @@ controllers.listarCoordinadoresPrograma = async (req, res) => {
                 where: {ESTADO: 1},
                 include:[{
                     model: rol,
-                    where: {DESCRIPCION: "Coordinador Facultad"}
+                    where: {DESCRIPCION: "Coordinador Programa"}
                 }, {
                     model: programa,
                     where: {ID_FACULTAD: req.params.idFacultad},
                     required: true
-                }]
+                }],
+                attributes: ["ESTADO"]
             }],           
         });
         res.status(201).json({coordinadores:coordinadores});         
