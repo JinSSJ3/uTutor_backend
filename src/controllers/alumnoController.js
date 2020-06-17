@@ -32,24 +32,27 @@ controllers.listar = async (req, res) => { // fetch all all studenst from DB
 
 controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
     try{
-        const alumnos = await asignacionTutoriaXAlumno.findAll({
+        const alumnos = await asignacionTutoria.findAll({
             include: {
-                model: alumno,
+                model:asignacionTutoriaXAlumno,                 
+                required: true,
                 include: [{
-                    model: usuario,
-                    include: [programa],
-                    required: true
-                },{
-                    model:asignacionTutoria,
-                    where: {
-                        ESTADO: 1,
-                        ID_TUTOR: req.params.tutor,
-                        ID_PROCESO_TUTORIA: req.params.tutoria
-                    }
-                }],
-                required: true
-            }
+                    model: alumno,
+                    include: [{
+                        model: usuario,
+                        include: [programa],
+                        required: true                    
+                    }],
+                required: true            
+                }]            
+            },
+            where: {
+                ESTADO: 1,
+                ID_TUTOR: req.params.tutor,
+                ID_PROCESO_TUTORIA: req.params.tutoria
+            },
         });
+        console.log("dsfds")
         res.status(201).json({alumnos:alumnos});         
     }    
     catch (error) {
@@ -60,29 +63,30 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
 
 controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumnos de un tutor de una tutoria determinado
     try{
-        const alumnos = await asignacionTutoriaXAlumno.findAll({
+        const alumnos = await asignacionTutoria.findAll({
             include: {
-                model: alumno,
+                model:asignacionTutoriaXAlumno,                 
+                required: true,
                 include: [{
-                    model: usuario,
-                    include: [programa],
-                    where: {[Op.or]: [{NOMBRE: {[Op.like]: '%' + req.params.nombre+ '%'}},
-                                    {APELLIDOS:{[Op.like]: '%' + req.params.nombre+ '%'}}]},
-                    required: true
-                },{
-                    model:asignacionTutoria,
-                    where: {
-                        ESTADO: 1,
-                        ID_TUTOR: req.params.tutor,
-                        ID_PROCESO_TUTORIA: req.params.tutoria
-                    }
-                }],
-                required: true
-            }
+                    model: alumno,
+                    include: [{
+                        model: usuario,
+                        include: [programa],
+                        required: true,
+                        where: {[Op.or]: [{NOMBRE: {[Op.like]: '%' + req.params.nombre+ '%'}},
+                                    {APELLIDOS:{[Op.like]: '%' + req.params.nombre+ '%'}}]},                    
+                    }],
+                required: true            
+                }]            
+            },
+            where: {
+                ESTADO: 1,
+                ID_TUTOR: req.params.tutor,
+                ID_PROCESO_TUTORIA: req.params.tutoria
+            },
         });
         res.status(201).json({alumnos:alumnos});         
-    }    
-    catch (error) {
+    }catch (error) {
         res.json({error: error.message});    
     }
 };
