@@ -13,7 +13,7 @@ router.get("/api/programa", programaController.listar);
 
 router.get("/api/programa&facultad", programaController.listarProgramasYFacultades);
 
-router.get("/api/programa/:idCoordinador/:idFacultad", programaController.listarProgramasDeUnCoordinador);
+//router.get("/api/programa/:idCoordinador/:idFacultad", programaController.listarProgramasDeUnCoordinador);
 
 router.get("/api/facultad/coordinador/:idCoordinador", programaController.listarFacultadesDeUnCoordinador);
 
