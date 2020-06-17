@@ -199,28 +199,28 @@ controllers.registrarSesionInesperada = async (req, res) => {
             ESTADO: "01-realizada_sin_cita"
         }, {transaction: transaccion}).then(async result  => {
 
-            COMPROMISOS.forEach(async comp => {
+            for(element of COMPROMISOS){
                 const newCompromiso = await compromiso.create({
                     ID_SESION: result.ID_SESION,
-                    DESCRIPCION: comp.campo,
-                    ESTADO: comp.check
+                    DESCRIPCION: element.campo,
+                    ESTADO: element.check
                 }, {transaction: transaccion})
-            })
+            }
 
-            AREAS_APOYO.forEach(async area => {
+            for(element of AREAS_APOYO){
                 const newArea = await areaApoyoXSesion.create({
                     ID_SESION: result.ID_SESION,
-                    ID_AREA_APOYO: area
+                    ID_AREA_APOYO: element
                 }, {transaction: transaccion})
-            })
+            }
 
-            ALUMNOS.forEach(async alumn => {
+            for(element of ALUMNOS){
                 const newAlumnoSesion = await alumnoXSesion.create({
                     ID_SESION: result.ID_SESION,
-                    ID_ALUMNO: alumn,
+                    ID_ALUMNO: element,
                     ASISTENCIA_ALUMNO: 1
                 }, {transaction: transaccion})
-            })
+            }
             await transaccion.commit();
             res.status(201).json({sesion: result});
         });
@@ -361,12 +361,12 @@ controllers.registrarCita = async (req, res) => {
             ESTADO: "04-futura"
         }, {transaction: transaccion}).then(async result  => {
 
-            ALUMNOS.forEach(async element => {
+            for(element of ALUMNOS){
                 const newAlumnoSesion = await alumnoXSesion.create({
                     ID_SESION: result.ID_SESION,
                     ID_ALUMNO: element
                 }, {transaction: transaccion})
-            })
+            }
             await transaccion.commit();
             res.status(201).json({sesion: result});
         });
