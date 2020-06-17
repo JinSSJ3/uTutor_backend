@@ -602,3 +602,18 @@ controllers.cancelarCita = async (req, res) => {
 }
 
 module.exports = controllers;
+
+
+//Listar compromisos
+controllers.listarCompromisos = async (req, res) => {
+    try{
+        const {idsesion} = req.params;
+        const data = await compromiso.findAll({
+            where: {ID_SESION: idsesion},
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
