@@ -5,7 +5,6 @@ let institucion = require('../models/institucion');
 const fsPath =  require('fs-path');
 const fs =  require('fs');
 const path = require('path');
-const { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } = require('constants');
 
 
 controllers.guardarImagen = async (req, res) => {

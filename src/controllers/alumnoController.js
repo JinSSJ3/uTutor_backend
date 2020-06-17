@@ -173,38 +173,70 @@ controllers.registrar = async (req, res) => {
             IMAGEN: IMAGEN
         }, {transaction: transaccion})
         .then(async result => {
-            const nuevo = await alumno.create({
-                ID_ALUMNO: result.ID_USUARIO
-            }, {transaction: transaccion})                     
-           
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Alumno"}
-            }, {transaction: transaccion})
+            const validacionCodigo = await usuario.findOne({
+                where: {CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
 
-/*             const rolDeUsuario = await rolXUsuario.create({
-                ID_USUARIO: result.ID_USUARIO,
-                ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion})       */   
+            const validacionCorreo = await usuario.findOne({
+                where:{CORREO: CORREO}
+            })
 
-           
-            for(element of PROGRAMA){
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
+            if (!validacionCodigo && !validacionCorreo){
+                const nuevo = await alumno.create({
+                    ID_ALUMNO: result.ID_USUARIO
+                }, {transaction: transaccion})                     
+            
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Alumno"}
+                }, {transaction: transaccion})
+
+    /*             const rolDeUsuario = await rolXUsuario.create({
                     ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element,
-                    ID_ROL: idRol.ID_ROL,
-                    ESTADO: '1'
-                }, {transaction: transaccion})
-            }
+                    ID_ROL: idRol.ID_ROL
+                }, {transaction: transaccion})       */   
 
-            for(element of ETIQUETA){
-                const etiquetaDeAlumno = await etiquetaXAlumno.create({
-                    ID_ALUMNO: result.ID_USUARIO,
-                    ID_ETIQUETA: element
-                }, {transaction: transaccion})
+            
+                for(element of PROGRAMA){
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: result.ID_USUARIO,
+                        ID_PROGRAMA: element,
+                        ID_ROL: idRol.ID_ROL,
+                        ESTADO: '1'
+                    }, {transaction: transaccion})
+                }
+
+                for(element of ETIQUETA){
+                    const etiquetaDeAlumno = await etiquetaXAlumno.create({
+                        ID_ALUMNO: result.ID_USUARIO,
+                        ID_ETIQUETA: element
+                    }, {transaction: transaccion})
+                }
+                await transaccion.commit();
+                res.status(201).json({alumno: result});
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido"})
+                }
             }
-            await transaccion.commit();
-            res.status(201).json({alumno: result});            
         });
     } catch (error) {        
         await transaccion.rollback();
@@ -229,27 +261,53 @@ controllers.modificar = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN
         },{
-            where: {ID_USUARIO: ID}
-        }, {transaction: transaccion})
-        .then(async result => {                   
+            where: {ID_USUARIO: ID},
+            transaction: transaccion
+        })
+           
+        const validacionCodigo = await usuario.findOne({
+            where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
+            include:[{
+                model: rolXUsuarioXPrograma,
+                attributes: ["ESTADO"],
+                include: [{
+                    model:programa,
+                    attributes: ["ID_PROGRAMA", "NOMBRE"],
+                    include: {
+                        model: programa,
+                        as: "FACULTAD",
+                        attributes: ["ID_FACULTAD", "NOMBRE"]
+                    }
+                }, rol]
+            }]
+        })
+
+        const validacionCorreo = await usuario.findOne({
+            where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
+        })
+            
+        if (!validacionCodigo && !validacionCorreo){
             await etiquetaXAlumno.destroy({
-                where:{ID_ALUMNO: ID}
-            }, {transaction: transaccion})
+                where:{ID_ALUMNO: ID},
+                transaction: transaccion
+            })
 
             const idRol = await rol.findOne({
                 attributes:["ID_ROL"],
                 where: {DESCRIPCION: "Alumno"}
             }, {transaction: transaccion})
-            
+                
             await rolXUsuarioXPrograma.destroy({
-                where:{ID_USUARIO: ID}            
-            }, {transaction: transaccion})
+                where:{ID_USUARIO: ID},
+                transaction: transaccion            
+            })
 
             for(element of PROGRAMA){
                 const programaDeUsuario = await rolXUsuarioXPrograma.create({
                     ID_USUARIO: ID,
                     ID_PROGRAMA: element,
-                    ID_ROL: idRol.ID_ROL
+                    ID_ROL: idRol.ID_ROL,
+                    ESTADO: 1
                 }, {transaction: transaccion})
             }
 
@@ -260,9 +318,17 @@ controllers.modificar = async (req, res) => {
                 }, {transaction: transaccion})
             }
             await transaccion.commit();
-            res.status(201).json({alumno: req.body.alumno}); 
-            
-        }); 
+            res.status(201).json({alumno: req.body.alumno});
+        }else{
+            await transaccion.rollback();
+            if(validacionCodigo && validacionCorreo){
+                res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+            }else if(validacionCodigo){
+                res.json({error: "Codigo repetido", usuario: validacionCodigo})
+            }else if(validacionCorreo){
+                res.json({error: "Correo repetido"})
+            }
+        }
     } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})

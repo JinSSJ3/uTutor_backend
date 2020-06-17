@@ -129,26 +129,54 @@ controllers.registrarCoordinadorPrograma = async (req, res) => {
             IMAGEN: IMAGEN            
         }, {transaction: transaccion})
         .then(async result => {
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Coordinador Programa"}
-            }, {transaction: transaccion})
+            const validacionCodigo = await coordinador.findOne({
+                where: {CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
 
-/*             const rolDeUsuario = await rolXUsuario.create({
-                ID_USUARIO: result.ID_USUARIO,
-                ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion}) */
-                        
-            for(element of PROGRAMA){
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                    ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element,
-                    ID_ROL: idRol.ID_ROL,
-                    ESTADO: '1'
+            const validacionCorreo = await coordinador.findOne({
+                where:{CORREO: CORREO}
+            })
+
+            if (!validacionCodigo && !validacionCorreo){
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Coordinador Programa"}
                 }, {transaction: transaccion})
-            }                     
-            await transaccion.commit();
-            res.status(201).json({coordinador: result}); 
+
+                            
+                for(element of PROGRAMA){
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: result.ID_USUARIO,
+                        ID_PROGRAMA: element,
+                        ID_ROL: idRol.ID_ROL,
+                        ESTADO: '1'
+                    }, {transaction: transaccion})
+                }                     
+                await transaccion.commit();
+                res.status(201).json({coordinador: result}); 
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido"})
+                }
+            }
         })
     } catch (error) {
         await transaccion.rollback();
@@ -177,26 +205,54 @@ controllers.registrarCoordinadorFacultad = async (req, res) => {
             IMAGEN: IMAGEN            
         }, {transaction: transaccion})
         .then(async result => {
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Coordinador Facultad"}
-            }, {transaction: transaccion})
+            const validacionCodigo = await coordinador.findOne({
+                where: {CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
 
-/*             const rolDeUsuario = await rolXUsuario.create({
-                ID_USUARIO: result.ID_USUARIO,
-                ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion}) */
-                        
-            for(element of FACULTAD){
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                    ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element,
-                    ID_ROL: idRol.ID_ROL,
-                    ESTADO: '1'
+            const validacionCorreo = await coordinador.findOne({
+                where:{CORREO: CORREO}
+            })
+
+            if (!validacionCodigo && !validacionCorreo){
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Coordinador Facultad"}
                 }, {transaction: transaccion})
-            }                     
-            await transaccion.commit();
-            res.status(201).json({coordinador: result}); 
+
+                            
+                for(element of FACULTAD){
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: result.ID_USUARIO,
+                        ID_PROGRAMA: element,
+                        ID_ROL: idRol.ID_ROL,
+                        ESTADO: '1'
+                    }, {transaction: transaccion})
+                }                     
+                await transaccion.commit();
+                res.status(201).json({coordinador: result}); 
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido"})
+                }
+            }
         })
     } catch (error) {
         await transaccion.rollback();
@@ -223,28 +279,61 @@ controllers.modificarCoordinadorPrograma = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN            
         },{
-            where: {ID_USUARIO: ID}
-        }, {transaction: transaccion})
+            where: {ID_USUARIO: ID},
+            transaction: transaccion
+        })
         .then(async result => {
+            const validacionCodigo = await coordinador.findOne({
+                where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
 
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Coordinador Programa"}
-            }, {transaction: transaccion})
+            const validacionCorreo = await coordinador.findOne({
+                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
+            })
 
-            await rolXUsuarioXPrograma.destroy({
-                where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL}            
-            }, {transaction: transaccion})
-                        
-            for(element of PROGRAMA){
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                    ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element,
-                    ID_ROL: idRol.ID_ROL
+            if (!validacionCodigo && !validacionCorreo){
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Coordinador Programa"}
                 }, {transaction: transaccion})
-            }                     
-            await transaccion.commit();
-            res.status(201).json({coordinador: req.body.coordinador}); 
+
+                await rolXUsuarioXPrograma.destroy({
+                    where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL},
+                    transaction: transaccion            
+                })
+                            
+                for(element of PROGRAMA){
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: result.ID_USUARIO,
+                        ID_PROGRAMA: element,
+                        ID_ROL: idRol.ID_ROL
+                    }, {transaction: transaccion})
+                }                     
+                await transaccion.commit();
+                res.status(201).json({coordinador: req.body.coordinador});
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido"})
+                }
+            } 
         })
     } catch (error) {
         await transaccion.rollback();
@@ -272,28 +361,61 @@ controllers.modificarCoordinadorFacultad = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN            
         },{
-            where: {ID_USUARIO: ID}
-        }, {transaction: transaccion})
+            where: {ID_USUARIO: ID},
+            transaction: transaccion
+        })
         .then(async result => {
+            const validacionCodigo = await coordinador.findOne({
+                where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
 
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Coordinador Facultad"}
-            }, {transaction: transaccion})
+            const validacionCorreo = await coordinador.findOne({
+                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
+            })
 
-            await rolXUsuarioXPrograma.destroy({
-                where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL}            
-            }, {transaction: transaccion})
-                        
-            for(element of FACULTAD){
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                    ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element,
-                    ID_ROL: idRol.ID_ROL
+            if (!validacionCodigo && !validacionCorreo){
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Coordinador Facultad"}
                 }, {transaction: transaccion})
-            }                     
-            await transaccion.commit();
-            res.status(201).json({coordinador: req.body.coordinador}); 
+
+                await rolXUsuarioXPrograma.destroy({
+                    where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL},
+                    transaction: transaccion            
+                })
+                            
+                for(element of FACULTAD){
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: result.ID_USUARIO,
+                        ID_PROGRAMA: element,
+                        ID_ROL: idRol.ID_ROL
+                    }, {transaction: transaccion})
+                }                     
+                await transaccion.commit();
+                res.status(201).json({coordinador: req.body.coordinador}); 
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido"})
+                }
+            }
         })
     } catch (error) {
         await transaccion.rollback();
