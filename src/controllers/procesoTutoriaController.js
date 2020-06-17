@@ -49,7 +49,8 @@ controllers.listarPorProgramaYTutor = async (req, res) => {
                 ESTADO: 1,
                 ID_TUTOR: req.params.idTutor
             },
-            attributes: [Sequelize.col("PROCESO_TUTORIA.*")]
+            attributes: [Sequelize.col("PROCESO_TUTORIA.*")],
+            group: ["ID_PROCESO_TUTORIA"]
         });
         res.status(201).json({tutoria:tutorias});         
     }    
