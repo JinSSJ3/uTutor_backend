@@ -13,7 +13,7 @@ router.get("/api/programa", programaController.listar);
 
 router.get("/api/programa&facultad", programaController.listarProgramasYFacultades);
 
-//router.get("/api/programa/:idCoordinador/:idFacultad", programaController.listarProgramasDeUnCoordinador);
+router.get("/api/programa/lista/:idCoordinador/:idFacultad", programaController.listarProgramasDeUnCoordinador);
 
 router.get("/api/facultad/coordinador/:idCoordinador", programaController.listarFacultadesDeUnCoordinador);
 
@@ -24,6 +24,8 @@ router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
 router.get("/api/programa&facultad/coordinador/:id", programaController.listarProgramasYFacultadesPorCoordinador);
 
 router.get("/api/programa/coordinador/:id", programaController.listarProgramasPorCoordinadorConFormato);
+
+router.get("/api/facultad/lista/:idCoordinador", programaController.listarFacultadesDeUnCoordinadorPrograma);
 
 router.post("/api/facultad", programaController.registrarFacultad);
 
