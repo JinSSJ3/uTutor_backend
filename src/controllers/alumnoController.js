@@ -261,72 +261,74 @@ controllers.modificar = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN
         },{
-            where: {ID_USUARIO: ID}
-        }, {transaction: transaccion})
-        .then(async result => {    
-            const validacionCodigo = await usuario.findOne({
-                where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
-                include:[{
-                    model: rolXUsuarioXPrograma,
-                    attributes: ["ESTADO"],
-                    include: [{
-                        model:programa,
-                        attributes: ["ID_PROGRAMA", "NOMBRE"],
-                        include: {
-                            model: programa,
-                            as: "FACULTAD",
-                            attributes: ["ID_FACULTAD", "NOMBRE"]
-                        }
-                    }, rol]
-                }]
-            })
+            where: {ID_USUARIO: ID},
+            transaction: transaccion
+        })
+           
+        const validacionCodigo = await usuario.findOne({
+            where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
+            include:[{
+                model: rolXUsuarioXPrograma,
+                attributes: ["ESTADO"],
+                include: [{
+                    model:programa,
+                    attributes: ["ID_PROGRAMA", "NOMBRE"],
+                    include: {
+                        model: programa,
+                        as: "FACULTAD",
+                        attributes: ["ID_FACULTAD", "NOMBRE"]
+                    }
+                }, rol]
+            }]
+        })
 
-            const validacionCorreo = await usuario.findOne({
-                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
-            })
+        const validacionCorreo = await usuario.findOne({
+            where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
+        })
             
-            if (!validacionCodigo && !validacionCorreo){
-                await etiquetaXAlumno.destroy({
-                    where:{ID_ALUMNO: ID}
-                }, {transaction: transaccion})
+        if (!validacionCodigo && !validacionCorreo){
+            await etiquetaXAlumno.destroy({
+                where:{ID_ALUMNO: ID},
+                transaction: transaccion
+            })
 
-                const idRol = await rol.findOne({
-                    attributes:["ID_ROL"],
-                    where: {DESCRIPCION: "Alumno"}
-                }, {transaction: transaccion})
+            const idRol = await rol.findOne({
+                attributes:["ID_ROL"],
+                where: {DESCRIPCION: "Alumno"}
+            }, {transaction: transaccion})
                 
-                await rolXUsuarioXPrograma.destroy({
-                    where:{ID_USUARIO: ID}            
+            await rolXUsuarioXPrograma.destroy({
+                where:{ID_USUARIO: ID},
+                transaction: transaccion            
+            })
+
+            for(element of PROGRAMA){
+                const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                    ID_USUARIO: ID,
+                    ID_PROGRAMA: element,
+                    ID_ROL: idRol.ID_ROL,
+                    ESTADO: 1
                 }, {transaction: transaccion})
+            }
 
-                for(element of PROGRAMA){
-                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                        ID_USUARIO: ID,
-                        ID_PROGRAMA: element,
-                        ID_ROL: idRol.ID_ROL
-                    }, {transaction: transaccion})
-                }
-
-                for(element of ETIQUETA){
-                    const etiquetaDeAlumno = await etiquetaXAlumno.create({
-                        ID_ALUMNO: ID,
-                        ID_ETIQUETA: element
-                    }, {transaction: transaccion})
-                }
-                await transaccion.commit();
-                res.status(201).json({alumno: req.body.alumno});
-            }else{
-                await transaccion.rollback();
-                if(validacionCodigo && validacionCorreo){
-                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
-                }else if(validacionCodigo){
-                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
-                }else if(validacionCorreo){
-                    res.json({error: "Correo repetido"})
-                }
-            } 
-                
-        }); 
+            for(element of ETIQUETA){
+                const etiquetaDeAlumno = await etiquetaXAlumno.create({
+                    ID_ALUMNO: ID,
+                    ID_ETIQUETA: element
+                }, {transaction: transaccion})
+            }
+            await transaccion.commit();
+            res.status(201).json({alumno: req.body.alumno});
+        }else{
+            await transaccion.rollback();
+            if(validacionCodigo && validacionCorreo){
+                res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+            }else if(validacionCodigo){
+                res.json({error: "Codigo repetido", usuario: validacionCodigo})
+            }else if(validacionCorreo){
+                res.json({error: "Correo repetido"})
+            }
+        }
     } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})

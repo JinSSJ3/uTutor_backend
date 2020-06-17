@@ -279,8 +279,9 @@ controllers.modificarCoordinadorPrograma = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN            
         },{
-            where: {ID_USUARIO: ID}
-        }, {transaction: transaccion})
+            where: {ID_USUARIO: ID},
+            transaction: transaccion
+        })
         .then(async result => {
             const validacionCodigo = await coordinador.findOne({
                 where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
@@ -310,8 +311,9 @@ controllers.modificarCoordinadorPrograma = async (req, res) => {
                 }, {transaction: transaccion})
 
                 await rolXUsuarioXPrograma.destroy({
-                    where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL}            
-                }, {transaction: transaccion})
+                    where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL},
+                    transaction: transaccion            
+                })
                             
                 for(element of PROGRAMA){
                     const programaDeUsuario = await rolXUsuarioXPrograma.create({
@@ -359,8 +361,9 @@ controllers.modificarCoordinadorFacultad = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN            
         },{
-            where: {ID_USUARIO: ID}
-        }, {transaction: transaccion})
+            where: {ID_USUARIO: ID},
+            transaction: transaccion
+        })
         .then(async result => {
             const validacionCodigo = await coordinador.findOne({
                 where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
@@ -390,8 +393,9 @@ controllers.modificarCoordinadorFacultad = async (req, res) => {
                 }, {transaction: transaccion})
 
                 await rolXUsuarioXPrograma.destroy({
-                    where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL}            
-                }, {transaction: transaccion})
+                    where:{ID_USUARIO: ID, ID_ROL: idRol.ID_ROL},
+                    transaction: transaccion            
+                })
                             
                 for(element of FACULTAD){
                     const programaDeUsuario = await rolXUsuarioXPrograma.create({
