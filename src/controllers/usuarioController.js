@@ -57,6 +57,24 @@ controllers.validarUsuarioUnico = async (req, res) => {
     }
 }
 
+controllers.modificarPerfil = async (req,res) => {
+    const transaccion = await sequelize.transaction();
+    const {ID_USUARIO, TELEFONO, DIRECCION} = req.body.usuario;
+    try {
+        const usuarioModificado = await usuario.update({
+            TELEFONO: TELEFONO,
+            CORREO: CORREO
+        }, {
+            where: {ID_USUARIO: ID_USUARIO}
+        }, {transaction: transaccion})
+
+        await transaccion.commit();
+        res.status(201).json({usuario: req.body.usuario});
+    }catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+}
 
 controllers.login = async (req, res) => {
     const {USUARIO, CONTRASENHA} = req.body.usuario;

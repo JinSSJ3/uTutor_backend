@@ -16,5 +16,7 @@ router.get("/api/usuario/validar/:usuario", usuarioController.validarUsuarioUnic
 
 router.post("/api/usuario/login", usuarioController.login);
 
+router.post("/api/usuario/actualizarperfil", usuarioController.modificarPerfil);
+
 
 module.exports = router;
