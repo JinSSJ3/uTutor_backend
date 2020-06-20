@@ -63,7 +63,7 @@ controllers.modificarPerfil = async (req,res) => {
     try {
         const usuarioModificado = await usuario.update({
             TELEFONO: TELEFONO,
-            CORREO: CORREO
+            DIRECCION: DIRECCION
         }, {
             where: {ID_USUARIO: ID_USUARIO}
         }, {transaction: transaccion})
