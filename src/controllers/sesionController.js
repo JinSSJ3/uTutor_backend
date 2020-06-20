@@ -8,6 +8,7 @@ let compromiso = require('../models/compromiso');
 let areaApoyoXSesion = require('../models/areaApoyoXSesion');
 let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
+let procesoTutoría = require('../models/procesoTutoria');
 
 //sequelize.sync();
 
@@ -23,6 +24,28 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }]
+            }]
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alumno
+    try{
+        const {idalumno} = req.params;
+        const data = await sesion.findAll({
+            where: {ESTADO: {
+                [Op.not]: "02-cancelada"
+            }},
+            include: [{
+                model: alumno,
+                where: {ID_ALUMNO: idalumno},
+                required: true
+            },
+            {model: procesoTutoría,           
             }]
         });
         res.status(201).json({data:data});         

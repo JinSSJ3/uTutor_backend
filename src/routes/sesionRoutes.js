@@ -27,4 +27,6 @@ router.get("/api/listaSesiones/:idtutor/:fecha", sesionController.listarPorFecha
 
 router.get("/api/listaCompromisos/:idsesion", sesionController.listarCompromisos);
 
+router.get("/api/listaSesionAlumno/:idalumno", sesionController.listarPorAlumno);
+
 module.exports = router;
