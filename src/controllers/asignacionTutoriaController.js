@@ -88,7 +88,7 @@ controllers.lista = async (req, res) => { // devuelve los datos de todas las asi
 }
 
 
-controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve los datos de todas las asignaciones
+controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve las solicitudes pendientes de un tutor
     try {
         const dataSolicitud = await asignacionTutoriaXAlumno.findAll({
             where:{ SOLICITUD: 2},  //pendiente
@@ -130,8 +130,16 @@ controllers.responderSolicitud = async (req, res) => {
             where: {
                 ID_ASIGNACION: ID_ASIGNACION,
                 ID_ALUMNO: ID_ALUMNO
-            }
-        }, {transaction: transaccion})
+            },
+            transaction: transaccion
+        })
+
+        await asignacionTutoria.update({
+            ESTADO: 1
+        }, {
+            where: {ID_ASIGNACION: ID_ASIGNACION},
+            transaction: transaccion
+        })
 
         await transaccion.commit();
         res.status(201).json({solicitud: req.body.solicitud});
@@ -141,6 +149,34 @@ controllers.responderSolicitud = async (req, res) => {
     }
     
 };
+
+
+controllers.mandarSolicitudTutoria = async (req, res) => {
+    const transaccion = await sequelize.transaction();
+    const { ID_PROCESO_TUTORIA, ID_TUTOR, ID_ALUMNO, FECHA_ASIGNACION } = req.body.solicitud;
+    try {
+        const nuevaSolicitud = await asignacionTutoria.create({
+            ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
+            ID_TUTOR: ID_TUTOR,
+            FECHA_ASIGNACION: FECHA_ASIGNACION,
+            ESTADO: 0  // todavia no se ha aceptado la asignacion
+        }, { transaction: transaccion })
+            .then(async result => {
+                await asignacionTutoriaXAlumno.create({
+                    ID_ASIGNACION: result.ID_ASIGNACION,
+                    ID_ALUMNO: ID_ALUMNO,
+                    SOLICITUD: 2  // pendiente
+                }, { transaction: transaccion })
+                await transaccion.commit();
+                res.status(201).json({ solicitud: result });
+            })
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
+};
+
 
 /**
  * @returns La nueva asignacion creado en formato Json()

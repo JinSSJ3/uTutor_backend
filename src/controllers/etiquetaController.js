@@ -16,7 +16,7 @@ controllers.listar = async (req, res) => {
 controllers.get = async (req, res) =>{ // devuelve los datos de un alumno 
     try{    
         const data = await etiqueta.findOne({
-            where: {ID_etiqueta: req.params.id}
+            where: {ID_ETIQUETA: req.params.id}
         })
 
         res.status(201).json({etiqueta:data});        
