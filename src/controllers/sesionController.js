@@ -45,8 +45,15 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
                 where: {ID_ALUMNO: idalumno},
                 required: true
             },
+            {model: tutor,
+                include: [{
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']}
+                ]},
             {model: procesoTutoría,           
-            }]
+            }
+        ],
+            
         });
         res.status(201).json({data:data});         
     }    
@@ -437,7 +444,9 @@ controllers.registrarResultados = async (req, res) => {
             }
         }, {transaction: transaccion})
         miSesion.RESULTADO = RESULTADO;
-        miSesion.ESTADO = "00-realizada_cita";
+        if (miSesion.ESTADO != "01-realizada_sin_cita"){
+            miSesion.ESTADO = "00-realizada_cita";
+        }    
         await miSesion.save({transaction: transaccion});
 
         COMPROMISOS.forEach(async comp => {
