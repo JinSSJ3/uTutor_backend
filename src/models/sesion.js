@@ -42,6 +42,6 @@ let sesion = sequelize.define(nametable,{
 });
 
 sesion.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA"});
-tutor.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
+sesion.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
 
 module.exports = sesion;
