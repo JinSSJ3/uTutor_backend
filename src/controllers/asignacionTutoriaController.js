@@ -123,7 +123,8 @@ controllers.responderSolicitud = async (req, res) => {
     
     const transaccion = await sequelize.transaction();
     const {ID_ASIGNACION, ID_ALUMNO, RESPUESTA} = req.body.solicitud;
-    try {
+    try {        
+        let date = new Date()
         const solicitudModificada = await asignacionTutoriaXAlumno.update({
             SOLICITUD: RESPUESTA
         }, {
@@ -135,13 +136,15 @@ controllers.responderSolicitud = async (req, res) => {
         })
 
         await asignacionTutoria.update({
-            ESTADO: 1
+            ESTADO: 1,            
+            FECHA_ASIGNACION: date + date.getTimezoneOffset(),
         }, {
             where: {ID_ASIGNACION: ID_ASIGNACION},
             transaction: transaccion
         })
 
         await transaccion.commit();
+        console.log(date + date.getTimezoneOffset())
         res.status(201).json({solicitud: req.body.solicitud});
     }catch (error) {
         await transaccion.rollback();
@@ -153,12 +156,11 @@ controllers.responderSolicitud = async (req, res) => {
 
 controllers.mandarSolicitudTutoria = async (req, res) => {
     const transaccion = await sequelize.transaction();
-    const { ID_PROCESO_TUTORIA, ID_TUTOR, ID_ALUMNO, FECHA_ASIGNACION } = req.body.solicitud;
+    const { ID_PROCESO_TUTORIA, ID_TUTOR, ID_ALUMNO} = req.body.solicitud;
     try {
         const nuevaSolicitud = await asignacionTutoria.create({
             ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
             ID_TUTOR: ID_TUTOR,
-            FECHA_ASIGNACION: FECHA_ASIGNACION,
             ESTADO: 0  // todavia no se ha aceptado la asignacion
         }, { transaction: transaccion })
             .then(async result => {
