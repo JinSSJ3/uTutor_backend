@@ -55,6 +55,31 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
     }
 };
 
+controllers.listarPorAlumnoRealizadas = async (req, res) => { //listar sesiones realizadas por alumno
+    try{
+        const {idalumno} = req.params;
+        const data = await sesion.findAll({
+            where: {
+                    [Op.or]: [
+                        {ESTADO: "01-realizada_sin_cita"},
+                        {ESTADO: "00-realizada_cita"}
+                    ],
+                },
+                include: [{
+                    model: alumno,
+                    where: {ID_ALUMNO: idalumno},
+                    required: true
+                },
+                {model: procesoTutoría,           
+                }]
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor por fecha
     try{
         const {idtutor, fecha} = req.params;
