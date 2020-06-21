@@ -450,6 +450,9 @@ controllers.registrarResultados = async (req, res) => {
         await miSesion.save({transaction: transaccion});
 
         COMPROMISOS.forEach(async comp => {
+
+
+
             const newCompromiso = await compromiso.create({
                 ID_SESION: result.ID_SESION,
                 DESCRIPCION: comp.campo,
@@ -486,7 +489,7 @@ controllers.registrarResultados = async (req, res) => {
 //Posponer cita
 controllers.posponerCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS} = req.body.sesion; 
+    const {ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS, RAZON} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
 
@@ -614,6 +617,7 @@ controllers.posponerCita = async (req, res) => {
         miSesion.ESTADO = "03-pospuesta";
         miSesion.HORA_INICIO = HORA_INICIO;
         miSesion.HORA_FIN = HORA_FIN;
+        miSesion.RAZON_MANTENIMIENTO = RAZON;
         await miSesion.save({transaction: transaccion});
 
         await transaccion.commit();
@@ -628,7 +632,7 @@ controllers.posponerCita = async (req, res) => {
 //Cancelar cita
 controllers.cancelarCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, ALUMNOS} = req.body.sesion; 
+    const {ID_SESION, ALUMNOS, RAZON} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
         const miSesion = await sesion.findOne({
@@ -637,6 +641,7 @@ controllers.cancelarCita = async (req, res) => {
             }
         }, {transaction: transaccion})
         miSesion.ESTADO = "02-cancelada";
+        miSesion.RAZON_MANTENIMIENTO = RAZON;
         await miSesion.save({transaction: transaccion});
 
          for(let i=0; i<ALUMNOS.length;i++){
