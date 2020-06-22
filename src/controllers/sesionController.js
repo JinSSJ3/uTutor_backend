@@ -451,13 +451,23 @@ controllers.registrarResultados = async (req, res) => {
 
         COMPROMISOS.forEach(async comp => {
 
-
-
-            const newCompromiso = await compromiso.create({
-                ID_SESION: result.ID_SESION,
-                DESCRIPCION: comp.campo,
-                ESTADO: comp.check
+            const miCompromiso = await compromiso.findOne({
+                where:{
+                    ID_SESION: ID_SESION,
+                    DESCRIPCION: comp.campo
+                }
             }, {transaction: transaccion})
+            console.log("AAAAAAAAAAAAAa"+miCompromiso);
+            if(miCompromiso == null){
+                const newCompromiso = await compromiso.create({
+                    ID_SESION: ID_SESION,
+                    DESCRIPCION: comp.campo,
+                    ESTADO: comp.check
+                }, {transaction: transaccion})
+            }else{
+                miCompromiso.ESTADO = comp.check;
+                await miCompromiso.save({transaction: transaccion});
+            }  
         })
 
         AREAS_APOYO.forEach(async area => {
