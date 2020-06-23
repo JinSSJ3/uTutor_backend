@@ -38,9 +38,6 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
     try{
         const {idalumno} = req.params;
         const data = await sesion.findAll({
-            where: {ESTADO: {
-                [Op.not]: "02-cancelada"
-            }},
             include: [{
                 model: alumno,
                 where: {ID_ALUMNO: idalumno},
@@ -54,6 +51,9 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
             {model: procesoTutoría,           
             }
         ],
+        order: [
+            ['FECHA', 'DESC']
+        ]
             
         });
         res.status(201).json({data:data});         
