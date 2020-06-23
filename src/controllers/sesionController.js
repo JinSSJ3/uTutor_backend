@@ -104,7 +104,7 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                             model: usuario,
                             attributes: ['NOMBRE', 'APELLIDOS']
                         }]
-                    }] 
+                    },{model: compromiso}] 
         });
         res.status(201).json({data:data});         
     }    
