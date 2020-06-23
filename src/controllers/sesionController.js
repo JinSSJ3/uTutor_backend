@@ -9,6 +9,7 @@ let areaApoyoXSesion = require('../models/areaApoyoXSesion');
 let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
 let procesoTutoría = require('../models/procesoTutoria');
+let notificacion = require('../models/notificacion');
 
 //sequelize.sync();
 
@@ -499,7 +500,7 @@ controllers.registrarResultados = async (req, res) => {
 //Posponer cita
 controllers.posponerCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS, RAZON} = req.body.sesion; 
+    const {ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS, RAZON, EMISOR, RECEPTOR} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
 
@@ -630,6 +631,15 @@ controllers.posponerCita = async (req, res) => {
         miSesion.RAZON_MANTENIMIENTO = RAZON;
         await miSesion.save({transaction: transaccion});
 
+        for(element of RECEPTOR){
+            const newNotif = await notificacion.create({
+                ID_SESION: ID_SESION,
+                ID_EMISOR: EMISOR,
+                ID_RECEPTOR: element,
+                ESTADO: 1
+            }, {transaction: transaccion})
+        }
+
         await transaccion.commit();
         res.status(201).json({sesion: miSesion});
 
@@ -642,7 +652,7 @@ controllers.posponerCita = async (req, res) => {
 //Cancelar cita
 controllers.cancelarCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, ALUMNOS, RAZON} = req.body.sesion; 
+    const {ID_SESION, ALUMNOS, RAZON, EMISOR, RECEPTOR} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
         const miSesion = await sesion.findOne({
@@ -654,7 +664,7 @@ controllers.cancelarCita = async (req, res) => {
         miSesion.RAZON_MANTENIMIENTO = RAZON;
         await miSesion.save({transaction: transaccion});
 
-         for(let i=0; i<ALUMNOS.length;i++){
+        for(let i=0; i<ALUMNOS.length;i++){
             const asist = await alumnoXSesion.findOne({
                 where:{
                     ID_SESION: ID_SESION,
@@ -663,6 +673,15 @@ controllers.cancelarCita = async (req, res) => {
             })
             asist.ASISTENCIA_ALUMNO = 2;
             await asist.save({transaction: transaccion});
+        }
+
+        for(element of RECEPTOR){
+            const newNotif = await notificacion.create({
+                ID_SESION: ID_SESION,
+                ID_EMISOR: EMISOR,
+                ID_RECEPTOR: element,
+                ESTADO: 1
+            }, {transaction: transaccion})
         }
 
         await transaccion.commit();
