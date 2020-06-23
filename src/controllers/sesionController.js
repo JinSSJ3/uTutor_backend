@@ -459,13 +459,13 @@ controllers.registrarResultados = async (req, res) => {
                 }
             }, {transaction: transaccion})
             console.log("AAAAAAAAAAAAAa"+miCompromiso);
-            if(miCompromiso == null){
+            if((miCompromiso == null) && (comp.campo != "")){
                 const newCompromiso = await compromiso.create({
                     ID_SESION: ID_SESION,
                     DESCRIPCION: comp.campo,
                     ESTADO: comp.check
                 }, {transaction: transaccion})
-            }else{
+            }else if(comp.campo!=""){
                 miCompromiso.ESTADO = comp.check;
                 await miCompromiso.save({transaction: transaccion});
             }  
