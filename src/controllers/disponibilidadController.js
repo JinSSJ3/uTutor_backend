@@ -33,6 +33,31 @@ controllers.listarPorTutor = async (req, res) => { // lista disponibilidades de 
     }
 };
 
+controllers.listarPorTutorYFacultad = async (req, res) => { // lista disponibilidades de un tutor en una facultad especifica
+    try{
+        const {idtutor, idFacultad} = req.params;
+        const data = await disponibilidad.findAll({
+            where: {ID_TUTOR: idtutor,
+                    ID_FACULTAD: idFacultad, 
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 controllers.listar = async (req, res) => { // lista disponibilidades
     try{
         const data = await disponibilidad.findAll({
@@ -196,7 +221,7 @@ controllers.get = async (req, res) =>{ // devuelve una disponibilidad
 
 controllers.register = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION} = req.body.disponibilidad; 
+    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION, ID_FACULTAD} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     if (REPETICION == 1){
          try {
@@ -245,7 +270,8 @@ controllers.register = async (req, res) => {
                 FECHA: FECHA,
                 ESTADO: 1,
                 LUGAR: LUGAR,
-                ID_TUTOR: ID_TUTOR
+                ID_TUTOR: ID_TUTOR,
+                ID_FACULTAD: ID_FACULTAD
             }, {transaction: transaccion});
             await transaccion.commit();
             res.status(201).json({newDisp: newDisp});

@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 let sequelize = require("./database");
 let tutor = require('../models/tutor');
+let programa = require('./programa');
 
 let nametable = 'DISPONIBILIDAD';
 
@@ -19,6 +20,14 @@ let disponibilidad = sequelize.define(nametable,{
             key: "ID_TUTOR"
         }
     },
+    ID_FACULTAD:{
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: "PROGRAMA",
+            key: "ID_PROGRAMA"
+        }
+    },
     HORA_INICIO: Sequelize.STRING,
     HORA_FIN: Sequelize.STRING,
     FECHA: Sequelize.DATEONLY,
@@ -31,5 +40,6 @@ let disponibilidad = sequelize.define(nametable,{
 });
 
 disponibilidad.belongsTo(tutor, {foreignKey:{name:"ID_TUTOR"}});
+disponibilidad.belongsTo(programa, {foreignKey:{name:"ID_FACULTAD"}});
 
 module.exports = disponibilidad;

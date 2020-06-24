@@ -29,6 +29,8 @@ router.post("/api/disponibilidad/modificar", disponibilidadController.modificar)
 
 router.post("/api/disponibilidad/eliminar/:idDisp", disponibilidadController.eliminar);
 
+router.get("/api/disponibilidadporfacultad/:idtutor/:idFacultad", disponibilidadController.listarPorTutorYFacultad);
+
 
 
 

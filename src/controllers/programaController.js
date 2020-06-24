@@ -113,6 +113,33 @@ controllers.listarFacultadesDeUnCoordinadorPrograma = async (req, res) => {
     }
 }
 
+controllers.listarFacultadesDeUnTutor = async (req, res) => { 
+    try{        // lista las facultades de un tutor
+        const facultades = await programa.findAll({           
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: {ID_USUARIO: req.params.idTutor, ESTADO: 1},
+                include:[{
+                    model: rol,
+                    where: {DESCRIPCION: "Tutor"},
+                    attributes:[]
+                }],
+                attributes: []
+            },{
+                model: programa,
+                as: "FACULTAD",
+                attributes: ["ID_PROGRAMA", "NOMBRE"]
+            }],            
+            attributes: [],
+            group: ["PROGRAMA.ID_FACULTAD"]                       
+        });
+        res.status(201).json({facultades:facultades});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+}
+
 controllers.listarProgramasDeUnCoordinador = async (req, res) => { 
     try{        // lista los programas de un coordinador de programa segun una facultad
         const programas = await programa.findAll({           
