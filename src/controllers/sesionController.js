@@ -10,6 +10,7 @@ let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
 let procesoTutoría = require('../models/procesoTutoria');
 let notificacion = require('../models/notificacion');
+let areaApoyo = require('../models/areaApoyo');
 
 //sequelize.sync();
 
@@ -702,6 +703,17 @@ controllers.listarCompromisos = async (req, res) => {
         const data = await compromiso.findAll({
             where: {ID_SESION: idsesion},
         });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+//Listar areas de apoyo
+controllers.listarAreasApoyo = async (req, res) => {
+    try{
+        const data = await areaApoyo.findAll();
         res.status(201).json({data:data});         
     }    
     catch (error) {

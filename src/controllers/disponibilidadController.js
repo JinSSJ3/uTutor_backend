@@ -197,6 +197,42 @@ controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponi
 };
 
 
+controllers.listarPorProgramaMultipleTutorFecha = async (req, res) => { //listar disponibilidades por fecha por tutor
+    try{
+        const {idprograma, fecha} = req.params;
+        const {tutores} = req.body.tutores; 
+        console.log("GOT: ", req.body.tutores);//solo para asegurarme de que el objeto llego al backend
+
+        const data = await disponibilidad.findAll({
+            where: {ID_TUTOR: tutores,
+                    FECHA: fecha,
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+                required: true,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    include: {
+                        model: rolXUsuarioXPrograma,
+                        where: {ID_PROGRAMA:idprograma},
+                        required: true 
+                    },
+                    required: true
+                }
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+
 controllers.get = async (req, res) =>{ // devuelve una disponibilidad
     try{
         const {idtutor, id} = req.params;
