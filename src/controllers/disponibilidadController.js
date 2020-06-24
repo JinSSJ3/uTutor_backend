@@ -343,7 +343,8 @@ controllers.register = async (req, res) => {
                     FECHA: fechaRep,
                     ESTADO: 1,
                     LUGAR: LUGAR,
-                    ID_TUTOR: ID_TUTOR
+                    ID_TUTOR: ID_TUTOR,
+                    ID_FACULTAD: ID_FACULTAD
                 }, {transaction: transaccion});
                 await transaccion.commit();
             })
