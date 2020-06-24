@@ -399,7 +399,7 @@ controllers.modificarCoordinadorFacultad = async (req, res) => {
                             
                 for(element of FACULTAD){
                     const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                        ID_USUARIO: result.ID_USUARIO,
+                        ID_USUARIO: ID,
                         ID_PROGRAMA: element,
                         ID_ROL: idRol.ID_ROL
                     }, {transaction: transaccion})
