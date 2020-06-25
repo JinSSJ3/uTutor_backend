@@ -128,7 +128,7 @@ controllers.listarFacultadesDeUnTutor = async (req, res) => {
             },{
                 model: programa,
                 as: "FACULTAD",
-                attributes: ["ID_PROGRAMA", "NOMBRE"]
+                attributes: ["ID_PROGRAMA", "NOMBRE", "ANTICIPACION_DISPONIBILIDAD"]
             }],            
             attributes: [],
             group: ["PROGRAMA.ID_FACULTAD"]                       
@@ -277,7 +277,7 @@ controllers.registrarFacultad = async (req, res) => {
      *  */
     const transaccion = await sequelize.transaction();
     const transaccion2 = await sequelize.transaction();
-    const { ID_INSTITUCION, NOMBRE, IMAGEN, INDEPENDIENTE } = req.body.facultad;
+    const { ID_INSTITUCION, NOMBRE, IMAGEN, INDEPENDIENTE, DIAS_DISP } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
 
     try {
@@ -303,7 +303,8 @@ controllers.registrarFacultad = async (req, res) => {
             ID_FACULTAD: null,
             ID_INSTITUCION: ID_INSTITUCION,
             NOMBRE: NOMBRE,
-            IMAGEN: IMAGEN
+            IMAGEN: IMAGEN,
+            ANTICIPACION_DISPONIBILIDAD: DIAS_DISP
         }, { transaction: transaccion });
 
         await transaccion.commit();
@@ -384,14 +385,15 @@ controllers.registrarPrograma = async (req, res) => {
 controllers.modificarFacultad = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
-    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.facultad;
+    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const facultadModificada = await programa.update(
             {
                 ID_INSTITUCION: ID_INSTITUCION,
                 NOMBRE: NOMBRE,
-                IMAGEN: IMAGEN
+                IMAGEN: IMAGEN,
+                ANTICIPACION_DISPONIBILIDAD: DIAS_DISP
             },
             { where: { ID_PROGRAMA: ID_PROGRAMA } },
             { transaction: transaccion }
