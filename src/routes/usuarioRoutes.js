@@ -18,5 +18,7 @@ router.post("/api/usuario/login", usuarioController.login);
 
 router.post("/api/usuario/actualizarperfil", usuarioController.modificarPerfil);
 
+router.post("/api/usuario/asignarrol", usuarioController.asignarRol);
+
 
 module.exports = router;

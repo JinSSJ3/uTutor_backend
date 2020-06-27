@@ -57,6 +57,25 @@ controllers.validarUsuarioUnico = async (req, res) => {
     }
 }
 
+controllers.asignarRol = async (req,res) => {
+    const transaccion = await sequelize.transaction();
+    const {ID_USUARIO, ID_ROL, ID_PROGRAMA} = req.body.asignacion;
+    try {
+        const nuevaAsignacion = await rolXUsuarioXPrograma.create({
+            ID_USUARIO: ID_USUARIO,
+            ID_ROL: ID_ROL,
+            ID_PROGRAMA: ID_PROGRAMA,
+            ESTADO: 1
+        }, {transaction: transaccion})
+
+        await transaccion.commit();
+        res.status(201).json({nuevaAsignacion: nuevaAsignacion});
+    }catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+}
+
 controllers.modificarPerfil = async (req,res) => {
     const transaccion = await sequelize.transaction();
     const {ID_USUARIO, TELEFONO, DIRECCION} = req.body.usuario;
