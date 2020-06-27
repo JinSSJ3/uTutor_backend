@@ -57,19 +57,46 @@ controllers.validarUsuarioUnico = async (req, res) => {
     }
 }
 
+
+controllers.listarRolesPorPrograma = async (req,res) => {
+    try {
+        const roles = await rolXUsuarioXPrograma.findAll({
+            where: {
+                ID_USUARIO: req.params.idUsuario,
+                ID_PROGRAMA: req.params.idPrograma
+            },
+            include: [rol],
+            attributes: []
+        })
+        res.status(201).json({roles: roles});
+    }catch (error) {
+        res.json({error: error.message})
+    }
+}
+
+
 controllers.asignarRol = async (req,res) => {
     const transaccion = await sequelize.transaction();
-    const {ID_USUARIO, ID_ROL, ID_PROGRAMA} = req.body.asignacion;
+    const {ID_USUARIO, ID_ROLES, ID_PROGRAMA} = req.body.asignacion;
     try {
-        const nuevaAsignacion = await rolXUsuarioXPrograma.create({
-            ID_USUARIO: ID_USUARIO,
-            ID_ROL: ID_ROL,
-            ID_PROGRAMA: ID_PROGRAMA,
-            ESTADO: 1
-        }, {transaction: transaccion})
+
+        await rolXUsuarioXPrograma.destroy({
+            where:{ID_USUARIO: ID_USUARIO, ID_PROGRAMA: ID_PROGRAMA},
+            transaction: transaccion            
+        })
+
+        for (rol of ID_ROLES){
+            const nuevaAsignacion = await rolXUsuarioXPrograma.create({
+                ID_USUARIO: ID_USUARIO,
+                ID_ROL: rol,
+                ID_PROGRAMA: ID_PROGRAMA,
+                ESTADO: 1
+            }, {transaction: transaccion})
+
+        }        
 
         await transaccion.commit();
-        res.status(201).json({nuevaAsignacion: nuevaAsignacion});
+        res.status(201).json({nuevaAsignacion: req.body.asignacion});
     }catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
@@ -128,42 +155,6 @@ controllers.login = async (req, res) => {
         res.json({error: error.message});    
     }
 }
-
-
-
- /*
- * @returns El nuevo student creado en formato Json()
- * HTTP status code 201 significa que se creo exitosamente
- */
-/*
-controllers.register = async (req, res) => {  
-    /**
-     * Aqui deberia haber una validacion (un middleware) para validar
-     * que se envio un "student" en el cuerpo ("body") del request ("req")
-     *  */ 
-/*
-    const {names, lastnames, studentCode, email, phoneNumber, address, username, password} = req.body.student; 
-    console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
-    try {
-        const newTutor = await tutor.create({
-            USUARIO: username,
-            CONTRASENHA: password,
-            NOMBRES: names,
-            APELLIDOS: lastnames,
-            CORREO: email,
-            CODIGO: studentCode,
-            TELEFONO: phoneNumber,
-            DIRECCION: address,
-            IMAGEN: null,
-            ESTADO: 1,
-        });        
-        res.status(201).json({tutor: newTutor});
-    } catch (error) {
-        res.json({error: error.message})
-    }
-    
-};   
-     */
 
 
 module.exports = controllers;

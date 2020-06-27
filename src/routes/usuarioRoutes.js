@@ -14,6 +14,8 @@ router.get("/api/usuario/buscar/:codigo", usuarioController.buscarPorCodigo);
 
 router.get("/api/usuario/validar/:usuario", usuarioController.validarUsuarioUnico);
 
+router.get("/api/usuario/rol/:idUsuario/:idPrograma", usuarioController.listarRolesPorPrograma);
+
 router.post("/api/usuario/login", usuarioController.login);
 
 router.post("/api/usuario/actualizarperfil", usuarioController.modificarPerfil);
