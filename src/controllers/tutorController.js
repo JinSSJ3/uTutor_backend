@@ -7,9 +7,55 @@ let usuario = require('../models/usuario');
 let rol = require('../models/rol');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 let programa = require('../models/programa')
+let asignacionTutoria = require('../models/asignacionTutoria')
+let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
+const { Sequelize } = require('sequelize');
 
 //sequelize.sync();
 
+
+
+controllers.listarTutorAsignado = async (req, res) => { // lista el tutor asignado a un alumno en cierto proceso de tutoria
+    try{
+        const tutores = await tutor.findAll({
+            include: [{
+                model: usuario,
+                include: {
+                    model: rolXUsuarioXPrograma, 
+                    where: {
+                        ESTADO: 1
+                    },
+                    include: {
+                        model: rol,
+                        where: {DESCRIPCION: "Tutor"},
+                        attributes: []
+                    },
+                    attributes: []
+                }
+               },{
+                   model: asignacionTutoria,
+                   where: {
+                       ID_TUTOR: Sequelize.col("TUTOR.ID_TUTOR"),
+                       ID_PROCESO_TUTORIA: req.params.idTutoria,
+                       ESTADO: 1
+                   },
+                   include: {
+                       model: asignacionTutoriaXAlumno,
+                       where: {
+                           ID_ALUMNO: req.params.idAlumno,
+                           SOLICITUD: 1
+                       },
+                       attributes: []
+                   },
+                   attributes: []
+               }], 
+        });
+        res.status(201).json({tutor:tutores});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
 
 
 controllers.list = async (req, res) => { // fetch all all tutors from DB
