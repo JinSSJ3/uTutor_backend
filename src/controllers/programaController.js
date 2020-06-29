@@ -432,6 +432,26 @@ controllers.modificarPrograma = async (req, res) => {
     const { ID_PROGRAMA, ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.programa;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
+        const programasPorFacultad = await programa.findAll(
+            {
+                //include: [institucion]
+                include: {
+                    model: programa,
+                    as: 'FACULTAD',
+                },
+                where: {
+                    ID_FACULTAD: ID_FACULTAD
+                }
+            }
+        );
+        // Validar que el nombre no este duplicado
+        for (var i = 0; i < programasPorFacultad.length; i++) {
+            if (programasPorFacultad[i].NOMBRE.trim() === NOMBRE.trim()) {
+                res.status(409).json({ modificacion: { ok: 0 } });
+                return
+            };
+        }
+
         const programaModificado = await programa.update({
             ID_FACULTAD: ID_FACULTAD,
             ID_INSTITUCION: ID_INSTITUCION,
