@@ -1,7 +1,6 @@
 const controllers = {}
 const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
-let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma')
 let programa = require('../models/programa')
