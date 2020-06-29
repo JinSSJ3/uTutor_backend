@@ -471,4 +471,26 @@ controllers.modificarPrograma = async (req, res) => {
 
 };
 
+controllers.listarProgramasDeUnTutor = async (req, res) => { 
+    try{        // lista los programas de un tutor
+        const programas = await programa.findAll({           
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: {ID_USUARIO: req.params.idTutor, ESTADO: 1},
+                include:[{
+                    model: rol,
+                    where: {DESCRIPCION: "Tutor"},
+                    attributes:[]
+                }],
+                attributes: []
+            }],            
+            attributes: ["ID_PROGRAMA", "NOMBRE"]                
+        });
+        res.status(201).json({programas:programas});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+}
+
 module.exports = controllers;
