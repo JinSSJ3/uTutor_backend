@@ -37,7 +37,7 @@ controllers.buscarPorCodigo = async (req, res) => {
             include: [{
                 model: rolXUsuarioXPrograma,
                 include: [programa, rol]
-            }]
+           }]
         })
         res.status(201).json({usuario:user});
     }catch (error){
@@ -84,10 +84,10 @@ controllers.asignarRol = async (req,res) => {
             transaction: transaccion            
         })
 
-        for (rol of ID_ROLES){
-            const nuevaAsignacion = await rolXUsuarioXPrograma.create({
+        for (role of ID_ROLES){
+            await rolXUsuarioXPrograma.create({
                 ID_USUARIO: ID_USUARIO,
-                ID_ROL: rol,
+                ID_ROL: role,
                 ID_PROGRAMA: ID_PROGRAMA,
                 ESTADO: 1
             }, {transaction: transaccion})

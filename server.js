@@ -32,7 +32,7 @@ alumno.belongsToMany(etiqueta, {through: etiquetaXAlumno, foreignKey: "ID_ALUMNO
 etiquetaXAlumno.belongsTo(etiqueta,{foreignKey: "ID_ETIQUETA"});
 etiquetaXAlumno.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
 etiqueta.hasMany(etiquetaXAlumno,{foreignKey: "ID_ETIQUETA"});
-//tutor.hasMany(asignacionTutoria, {foreignKey: "ID_TUTOR"});
+tutor.hasMany(asignacionTutoria, {foreignKey: "ID_TUTOR"});
 
 
 app.use(morgan('dev'));
