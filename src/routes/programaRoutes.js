@@ -19,6 +19,8 @@ router.get("/api/facultad/coordinador/:idCoordinador", programaController.listar
 
 router.get("/api/facultad/tutor/:idTutor", programaController.listarFacultadesDeUnTutor);
 
+router.get("/api/programa/tutor/:idTutor", programaController.listarProgramasDeUnTutor);
+
 router.get("/api/facultad", programaController.listarFacultad);
 
 router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
