@@ -265,14 +265,26 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
 
 // controllers.listarFacultad = async (req, res) => {
 //     try {
-//         const facultades = await programa.findAll(
+//         const facultades = await rolXUsuarioXPrograma.findAll(
 //             {
-//                 where: {
-//                     [Op.or]: [
-//                         { ID_FACULTAD: null },
-//                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
-//                     ]
-//                 }
+//                 include: [
+//                     {
+//                         model: programa,
+//                         where: {
+//                             [Op.or]: [
+//                                 { ID_FACULTAD: null },
+//                                 sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+//                             ]
+//                         }
+//                     },
+//                     {
+//                         model: coordinador
+//                     },
+//                     {
+//                         model: rol,
+//                         where: { DESCRIPCION: "Coordinador Facultad" }
+//                     }
+//                 ]
 //             }
 //         );
 //         res.status(201).json({ facultad: facultades });
@@ -282,26 +294,22 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
 // };
 controllers.listarFacultad = async (req, res) => {
     try {
-        const facultades = await rolXUsuarioXPrograma.findAll(
+        const facultades = await programa.findAll(
             {
-                include: [
-                    {
-                        model: programa,
-                        where: {
-                            [Op.or]: [
-                                { ID_FACULTAD: null },
-                                sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
-                            ]
-                        }
-                    },
-                    {
-                        model: coordinador
-                    },
-                    {
+                where: {
+                    [Op.or]: [
+                        { ID_FACULTAD: null },
+                        sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+                    ]
+                },
+                include:{
+                    model: coordinador,
+                    include:{
                         model: rol,
-                        where: { DESCRIPCION: "Coordinador Facultad" }
+                        where: {DESCRIPCION: "Coordinador Facultad"}
                     }
-                ]
+                    
+                }
             }
         );
         res.status(201).json({ facultad: facultades });
@@ -309,7 +317,6 @@ controllers.listarFacultad = async (req, res) => {
         res.json({ error: error.message });
     }
 };
-
 
 
 /**
