@@ -46,6 +46,34 @@ controllers.listarProgramasYFacultades = async (req, res) => {
     }
 };
 
+// controllers.listarPorFacultad = async (req, res) => {// listar programas por facultad
+//     try {
+//         const programas = await programa.findAll(
+//             {
+//                 //include: [institucion]
+//                 include: [
+//                     {
+//                         model: programa,
+//                         as: 'FACULTAD',
+//                     },
+//                     {
+//                         model: coordinador,
+//                         include: {
+//                             model: rol,
+//                             where: { DESCRIPCION: "Coordinador Programa" }
+//                         }
+//                     }
+//                 ],
+//                 where: {
+//                     ID_FACULTAD: req.params.id
+//                 }
+//             }
+//         );
+//         res.status(201).json({ programa: programas });
+//     } catch (error) {
+//         res.json({ error: error.message });
+//     }
+// };
 controllers.listarPorFacultad = async (req, res) => {// listar programas por facultad
     try {
         const programas = await rolXUsuarioXPrograma.findAll(
@@ -255,16 +283,45 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
     }
 };
 
+// controllers.listarFacultad = async (req, res) => {
+//     try {
+//         const facultades = await programa.findAll(
+//             {
+//                 where: {
+//                     [Op.or]: [
+//                         { ID_FACULTAD: null },
+//                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+//                     ]
+//                 }
+//             }
+//         );
+//         res.status(201).json({ facultad: facultades });
+//     } catch (error) {
+//         res.json({ error: error.message });
+//     }
+// };
 controllers.listarFacultad = async (req, res) => {
     try {
-        const facultades = await programa.findAll(
+        const facultades = await rolXUsuarioXPrograma.findAll(
             {
-                where: {
-                    [Op.or]: [
-                        { ID_FACULTAD: null },
-                        sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
-                    ]
-                }
+                include: [
+                    {
+                        model: programa,
+                        where: {
+                            [Op.or]: [
+                                { ID_FACULTAD: null },
+                                sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+                            ]
+                        }
+                    },
+                    {
+                        model: coordinador
+                    },
+                    {
+                        model: rol,
+                        where: { DESCRIPCION: "Coordinador Facultad" }
+                    }
+                ]
             }
         );
         res.status(201).json({ facultad: facultades });
