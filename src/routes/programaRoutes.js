@@ -39,4 +39,6 @@ router.post("/api/facultad/modificar", programaController.modificarFacultad);
 
 router.get("/api/programa/tutor/:idTutor", programaController.listarProgramasDeUnTutor);
 
+router.get("/api/programa/alumno/:idAlumno", programaController.listarProgramasDeUnAlumno);
+
 module.exports = router;

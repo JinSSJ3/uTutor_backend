@@ -455,4 +455,26 @@ controllers.listarProgramasDeUnTutor = async (req, res) => {
     }
 }
 
+controllers.listarProgramasDeUnAlumno = async (req, res) => { 
+    try{        // lista los programas de un tutor
+        const programas = await programa.findAll({           
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: {ID_USUARIO: req.params.idAlumno, ESTADO: 1},
+                include:[{
+                    model: rol,
+                    where: {DESCRIPCION: "Alumno"},
+                    attributes:[]
+                }],
+                attributes: []
+            }],            
+            attributes: ["ID_PROGRAMA", "NOMBRE"]                
+        });
+        res.status(201).json({programas:programas});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+}
+
 module.exports = controllers;
