@@ -11,6 +11,7 @@ let alumno = require('../models/alumno');
 let procesoTutoría = require('../models/procesoTutoria');
 let notificacion = require('../models/notificacion');
 let areaApoyo = require('../models/areaApoyo');
+const procesoTutoria = require('../models/procesoTutoria');
 
 //sequelize.sync();
 
@@ -704,6 +705,71 @@ controllers.listarCompromisos = async (req, res) => {
             where: {ID_SESION: idsesion},
         });
         res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarSesionesPorAlumnoYProcesoTutoria = async (req, res) => {
+    const idAlumno = req.params.idAlumno;
+    const idProcesoTutoria = req.params.idProcesoTutoria;
+    try{
+        const data = await sesion.findAll({
+            include:[
+                {
+                    model: compromiso
+                },
+                {
+                    model: alumno,
+                    where: { ID_ALUMNO: idAlumno },
+                    attributes: []
+                },
+                {
+                    model: procesoTutoría,
+                    where: { ID_PROCESO_TUTORIA: idProcesoTutoria },
+                    attributes: []
+                }
+            ]
+        });
+        res.status(201).json({ sesiones: data });         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+//Listar compromisos por alumno
+controllers.listarCompromisosPorAlumnoYProcesoTutoria = async (req, res) => {
+    const idAlumno = req.params.idAlumno;
+    const idProcesoTutoria = req.params.idProcesoTutoria;
+    try{
+        const data = await sesion.findAll({
+            include:[
+                {
+                    model: compromiso
+                },
+                {
+                    model: alumno,
+                    where: { ID_ALUMNO: idAlumno },
+                    attributes: []
+                },
+                {
+                    model: procesoTutoría,
+                    where: { ID_PROCESO_TUTORIA: idProcesoTutoria },
+                    attributes: []
+                }
+            ]
+        });
+        
+        var compromisos = [];
+        for (var i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            console.log("hola",data[i].COMPROMISOs);
+            compromisos = compromisos.concat(data[i].COMPROMISOs);
+        }
+
+        res.status(201).json({ compromisos: compromisos });         
     }    
     catch (error) {
         res.json({error: error.message});    
