@@ -48,25 +48,24 @@ controllers.listarProgramasYFacultades = async (req, res) => {
 
 controllers.listarPorFacultad = async (req, res) => {// listar programas por facultad
     try {
-        const programas = await programa.findAll(
+        const programas = await rolXUsuarioXPrograma.findAll(
             {
-                //include: [institucion]
                 include: [
                     {
+                        //include: [institucion],
                         model: programa,
-                        as: 'FACULTAD',
+                        where: {
+                            ID_FACULTAD: req.params.id
+                        }
                     },
                     {
-                        model: coordinador,
-                        include: {
-                            model: rol,
-                            where: { DESCRIPCION: "Coordinador Programa" }
-                        }
+                        model: coordinador
+                    },
+                    {
+                        model: rol,
+                        where: { DESCRIPCION: "Coordinador Programa" }
                     }
-                ],
-                where: {
-                    ID_FACULTAD: req.params.id
-                }
+                ]
             }
         );
         res.status(201).json({ programa: programas });
