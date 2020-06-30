@@ -2,6 +2,7 @@ const controllers = {}
 const Sequelize = require('sequelize')
 let sequelize = require('../models/database');
 let programa = require('../models/programa');
+let coordinador = require('../models/usuario');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 let rol = require('../models/rol');
 //let institucion = require('../models/institucion')
@@ -50,10 +51,19 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
         const programas = await programa.findAll(
             {
                 //include: [institucion]
-                include: {
-                    model: programa,
-                    as: 'FACULTAD',
-                },
+                include: [
+                    {
+                        model: programa,
+                        as: 'FACULTAD',
+                    },
+                    {
+                        model: coordinador,
+                        include: {
+                            model: rol,
+                            where: { DESCRIPCION: "Coordinador Programa" }
+                        }
+                    }
+                ],
                 where: {
                     ID_FACULTAD: req.params.id
                 }
@@ -471,25 +481,25 @@ controllers.modificarPrograma = async (req, res) => {
 
 };
 
-controllers.listarProgramasDeUnTutor = async (req, res) => { 
-    try{        // lista los programas de un tutor
-        const programas = await programa.findAll({           
+controllers.listarProgramasDeUnTutor = async (req, res) => {
+    try {        // lista los programas de un tutor
+        const programas = await programa.findAll({
             include: [{
                 model: rolXUsuarioXPrograma,
-                where: {ID_USUARIO: req.params.idTutor, ESTADO: 1},
-                include:[{
+                where: { ID_USUARIO: req.params.idTutor, ESTADO: 1 },
+                include: [{
                     model: rol,
-                    where: {DESCRIPCION: "Tutor"},
-                    attributes:[]
+                    where: { DESCRIPCION: "Tutor" },
+                    attributes: []
                 }],
                 attributes: []
-            }],            
-            attributes: ["ID_PROGRAMA", "NOMBRE"]                
+            }],
+            attributes: ["ID_PROGRAMA", "NOMBRE"]
         });
-        res.status(201).json({programas:programas});         
-    }    
+        res.status(201).json({ programas: programas });
+    }
     catch (error) {
-        res.json({error: error.message});    
+        res.json({ error: error.message });
     }
 }
 
