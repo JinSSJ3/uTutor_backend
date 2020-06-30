@@ -12,15 +12,32 @@ controllers.listarPorTutoria = async (req, res) => {
     const idTutoria = req.query.tutoria;
     try {
         const dataAsignaciones = await asignacionTutoria.findAll({
-            include: [tutor,
-                {
-                    model: alumno,
-                    as: "ALUMNOS"
-                },{
-                    model: asignacionTutoriaXAlumno,
-                    where: {SOLICITUD: 1} // aceptada
+            include: [{
+                model: tutor,
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }]
+            },
+            {
+                model: alumno,
+                as: "ALUMNOS",
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }],
+                through:{
+                    attributes: []
                 }
-            ],
+            },{
+                model: asignacionTutoriaXAlumno,
+                where: {SOLICITUD: 1}, // aceptada
+                attributes: []
+            },{
+                model: procesoTutoria,
+                as: "PROCESO_TUTORIA",
+                attributes: ["ID_PROCESO_TUTORIA", "NOMBRE"]
+            }],
             where: {
                 ESTADO: 1,
                 ID_PROCESO_TUTORIA: idTutoria
