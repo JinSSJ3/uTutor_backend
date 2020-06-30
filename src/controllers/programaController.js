@@ -46,54 +46,34 @@ controllers.listarProgramasYFacultades = async (req, res) => {
     }
 };
 
-// controllers.listarPorFacultad = async (req, res) => {// listar programas por facultad
-//     try {
-//         const programas = await programa.findAll(
-//             {
-//                 //include: [institucion]
-//                 include: [
-//                     {
-//                         model: programa,
-//                         as: 'FACULTAD',
-//                     },
-//                     {
-//                         model: coordinador,
-//                         include: {
-//                             model: rol,
-//                             where: { DESCRIPCION: "Coordinador Programa" }
-//                         }
-//                     }
-//                 ],
-//                 where: {
-//                     ID_FACULTAD: req.params.id
-//                 }
-//             }
-//         );
-//         res.status(201).json({ programa: programas });
-//     } catch (error) {
-//         res.json({ error: error.message });
-//     }
-// };
 controllers.listarPorFacultad = async (req, res) => {// listar programas por facultad
     try {
-        const programas = await rolXUsuarioXPrograma.findAll(
+        const programas = await programa.findAll(
             {
+                //include: [institucion]
                 include: [
                     {
-                        //include: [institucion],
                         model: programa,
-                        where: {
-                            ID_FACULTAD: req.params.id
-                        }
+                        as: 'FACULTAD',
                     },
                     {
-                        model: coordinador
-                    },
-                    {
-                        model: rol,
-                        where: { DESCRIPCION: "Coordinador Programa" }
+                        model: rolXUsuarioXPrograma,
+                        include:
+                            [
+                                {
+                                    model: rol,
+                                    where: { DESCRIPCION: "Coordinador Programa" }
+                                },
+                                {
+                                    model: coordinador
+                                }
+                            ],
+                        required: false
                     }
-                ]
+                ],
+                where: {
+                    ID_FACULTAD: req.params.id
+                }
             }
         );
         res.status(201).json({ programa: programas });
@@ -559,25 +539,25 @@ controllers.listarProgramasDeUnTutor = async (req, res) => {
     }
 }
 
-controllers.listarProgramasDeUnAlumno = async (req, res) => { 
-    try{        // lista los programas de un tutor
-        const programas = await programa.findAll({           
+controllers.listarProgramasDeUnAlumno = async (req, res) => {
+    try {        // lista los programas de un tutor
+        const programas = await programa.findAll({
             include: [{
                 model: rolXUsuarioXPrograma,
-                where: {ID_USUARIO: req.params.idAlumno, ESTADO: 1},
-                include:[{
+                where: { ID_USUARIO: req.params.idAlumno, ESTADO: 1 },
+                include: [{
                     model: rol,
-                    where: {DESCRIPCION: "Alumno"},
-                    attributes:[]
+                    where: { DESCRIPCION: "Alumno" },
+                    attributes: []
                 }],
                 attributes: []
-            }],            
-            attributes: ["ID_PROGRAMA", "NOMBRE"]                
+            }],
+            attributes: ["ID_PROGRAMA", "NOMBRE"]
         });
-        res.status(201).json({programas:programas});         
-    }    
+        res.status(201).json({ programas: programas });
+    }
     catch (error) {
-        res.json({error: error.message});    
+        res.json({ error: error.message });
     }
 }
 
