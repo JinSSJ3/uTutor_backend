@@ -223,7 +223,7 @@ controllers.listarTutoriasFijasAsignadasAPorAlumno = async (req, res) => {
                     },
                     attributes: []
                 }],
-                attributes: []
+                attributes: ["ID_TUTOR"]
             }],
             where: {
                 ESTADO: 1,
