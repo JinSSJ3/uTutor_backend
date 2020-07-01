@@ -641,6 +641,11 @@ controllers.posponerCita = async (req, res) => {
         await miSesion.save({transaction: transaccion});
 
         for(element of RECEPTOR){
+            await notificacion.destroy({
+                where:{ID_SESION: ID_SESION, ID_EMISOR: EMISOR, ID_RECEPTOR: element},
+                transaction: transaccion 
+            })
+
             const newNotif = await notificacion.create({
                 ID_SESION: ID_SESION,
                 ID_EMISOR: EMISOR,
@@ -685,6 +690,11 @@ controllers.cancelarCita = async (req, res) => {
         }
 
         for(element of RECEPTOR){
+            await notificacion.destroy({
+                where:{ID_SESION: ID_SESION, ID_EMISOR: EMISOR, ID_RECEPTOR: element},
+                transaction: transaccion 
+            })
+
             const newNotif = await notificacion.create({
                 ID_SESION: ID_SESION,
                 ID_EMISOR: EMISOR,
