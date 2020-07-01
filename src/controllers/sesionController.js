@@ -813,3 +813,29 @@ controllers.listarAreasApoyo = async (req, res) => {
         res.json({ error: error.message });
     }
 };
+
+controllers.modificarCompromiso = async (req, res) => {
+
+    const transaccion = await sequelize.transaction();
+    const { ID_COMPROMISO, ID_SESION, DESCRIPCION, ESTADO } = req.body.compromiso;
+    console.log("GOT: ", req.body.compromiso);//solo para asegurarme de que el objeto llego al backend
+    try {
+
+        const compormisoModificado = await compromiso.update(
+            {
+                ID_SESION: ID_SESION,
+                DESCRIPCION: DESCRIPCION,
+                ESTADO: ESTADO
+            },
+            { where: { ID_COMPROMISO: ID_COMPROMISO } },
+            { transaction: transaccion }
+        );
+
+        await transaccion.commit();
+        res.status(201).json({ modificacion: { ok: 1 } });
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
+};
