@@ -18,7 +18,8 @@ let programa = sequelize.define(
             primaryKey: true
         },
         NOMBRE: Sequelize.STRING,
-        IMAGEN: Sequelize.BLOB 
+        IMAGEN: Sequelize.BLOB,
+        ANTICIPACION_DISPONIBILIDAD: Sequelize.INTEGER
     },
     {
         timestamps: false,

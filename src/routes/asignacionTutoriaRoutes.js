@@ -18,6 +18,8 @@ router.get("/api/solicitud/:idTutor/:idTutoria", asignacionTutoriaController.lis
 
 router.post("/api/solicitud/modificar", asignacionTutoriaController.responderSolicitud);
 
+router.post("/api/solicitud/enviar", asignacionTutoriaController.mandarSolicitudTutoria);
+
 router.get("/api/asignacion/:id", asignacionTutoriaController.get);
 
 router.post("/api/asignacion", asignacionTutoriaController.registrar);

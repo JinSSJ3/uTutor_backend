@@ -21,6 +21,23 @@ controllers.listar = async (req, res) => {
     }
 };
 
+controllers.listarTutoriasFijasPorPrograma = async (req, res) => { 
+    try{
+        const tutorias = await tutoria.findAll({
+            include: [etiqueta],
+            where: {
+                ESTADO: 1,
+                ID_PROGRAMA: req.params.idPrograma,
+                TUTOR_FIJO:1
+            }
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+}; 
+
 controllers.listarPorPrograma = async (req, res) => { 
     try{
         const tutorias = await tutoria.findAll({

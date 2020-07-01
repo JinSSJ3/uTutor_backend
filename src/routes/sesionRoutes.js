@@ -27,6 +27,12 @@ router.get("/api/listaSesiones/:idtutor/:fecha", sesionController.listarPorFecha
 
 router.get("/api/listaCompromisos/:idsesion", sesionController.listarCompromisos);
 
+router.get("/api/listaSesionAlumnoProcesoTutoria/:idAlumno/:idProcesoTutoria", sesionController.listarSesionesPorAlumnoYProcesoTutoria);
+
+router.get("/api/listaCompromisosAlumnoProcesoTutoria/:idAlumno/:idProcesoTutoria", sesionController.listarCompromisosPorAlumnoYProcesoTutoria);
+
+router.get("/api/listaAreasApoyo/", sesionController.listarAreasApoyo);
+
 router.get("/api/listaSesionAlumno/:idalumno", sesionController.listarPorAlumno);
 
 router.get("/api/listaSesionRealizada/:idalumno", sesionController.listarPorAlumnoRealizadas);

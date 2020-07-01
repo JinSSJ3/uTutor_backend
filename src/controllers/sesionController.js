@@ -9,7 +9,9 @@ let areaApoyoXSesion = require('../models/areaApoyoXSesion');
 let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
 let procesoTutoría = require('../models/procesoTutoria');
-const areaApoyo = require('../models/areaApoyo');
+let notificacion = require('../models/notificacion');
+let areaApoyo = require('../models/areaApoyo');
+const procesoTutoria = require('../models/procesoTutoria');
 
 //sequelize.sync();
 
@@ -25,7 +27,7 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }]
-            }]
+            },{model: compromiso}]
         });
         res.status(201).json({data:data});         
     }    
@@ -38,16 +40,23 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
     try{
         const {idalumno} = req.params;
         const data = await sesion.findAll({
-            where: {ESTADO: {
-                [Op.not]: "02-cancelada"
-            }},
             include: [{
                 model: alumno,
                 where: {ID_ALUMNO: idalumno},
                 required: true
             },
+            {model: tutor,
+                include: [{
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']}
+                ]},
             {model: procesoTutoría,           
-            }]
+            }
+        ],
+        order: [
+            ['FECHA', 'DESC']
+        ]
+            
         });
         res.status(201).json({data:data});         
     }    
@@ -445,15 +454,30 @@ controllers.registrarResultados = async (req, res) => {
             }
         }, {transaction: transaccion})
         miSesion.RESULTADO = RESULTADO;
-        miSesion.ESTADO = "00-realizada_cita";
+        if (miSesion.ESTADO != "01-realizada_sin_cita"){
+            miSesion.ESTADO = "00-realizada_cita";
+        }    
         await miSesion.save({transaction: transaccion});
 
         COMPROMISOS.forEach(async comp => {
-            const newCompromiso = await compromiso.create({
-                ID_SESION: result.ID_SESION,
-                DESCRIPCION: comp.campo,
-                ESTADO: comp.check
+
+            const miCompromiso = await compromiso.findOne({
+                where:{
+                    ID_SESION: ID_SESION,
+                    DESCRIPCION: comp.campo
+                }
             }, {transaction: transaccion})
+            console.log("AAAAAAAAAAAAAa"+miCompromiso);
+            if((miCompromiso == null) && (comp.campo != "")){
+                const newCompromiso = await compromiso.create({
+                    ID_SESION: ID_SESION,
+                    DESCRIPCION: comp.campo,
+                    ESTADO: comp.check
+                }, {transaction: transaccion})
+            }else if(comp.campo!=""){
+                miCompromiso.ESTADO = comp.check;
+                await miCompromiso.save({transaction: transaccion});
+            }  
         })
 
         AREAS_APOYO.forEach(async area => {
@@ -485,7 +509,7 @@ controllers.registrarResultados = async (req, res) => {
 //Posponer cita
 controllers.posponerCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS} = req.body.sesion; 
+    const {ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS, RAZON, EMISOR, RECEPTOR} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
 
@@ -613,7 +637,17 @@ controllers.posponerCita = async (req, res) => {
         miSesion.ESTADO = "03-pospuesta";
         miSesion.HORA_INICIO = HORA_INICIO;
         miSesion.HORA_FIN = HORA_FIN;
+        miSesion.RAZON_MANTENIMIENTO = RAZON;
         await miSesion.save({transaction: transaccion});
+
+        for(element of RECEPTOR){
+            const newNotif = await notificacion.create({
+                ID_SESION: ID_SESION,
+                ID_EMISOR: EMISOR,
+                ID_RECEPTOR: element,
+                ESTADO: 1
+            }, {transaction: transaccion})
+        }
 
         await transaccion.commit();
         res.status(201).json({sesion: miSesion});
@@ -627,7 +661,7 @@ controllers.posponerCita = async (req, res) => {
 //Cancelar cita
 controllers.cancelarCita = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_SESION, ALUMNOS} = req.body.sesion; 
+    const {ID_SESION, ALUMNOS, RAZON, EMISOR, RECEPTOR} = req.body.sesion; 
     console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
         const miSesion = await sesion.findOne({
@@ -636,9 +670,10 @@ controllers.cancelarCita = async (req, res) => {
             }
         }, {transaction: transaccion})
         miSesion.ESTADO = "02-cancelada";
+        miSesion.RAZON_MANTENIMIENTO = RAZON;
         await miSesion.save({transaction: transaccion});
 
-         for(let i=0; i<ALUMNOS.length;i++){
+        for(let i=0; i<ALUMNOS.length;i++){
             const asist = await alumnoXSesion.findOne({
                 where:{
                     ID_SESION: ID_SESION,
@@ -647,6 +682,15 @@ controllers.cancelarCita = async (req, res) => {
             })
             asist.ASISTENCIA_ALUMNO = 2;
             await asist.save({transaction: transaccion});
+        }
+
+        for(element of RECEPTOR){
+            const newNotif = await notificacion.create({
+                ID_SESION: ID_SESION,
+                ID_EMISOR: EMISOR,
+                ID_RECEPTOR: element,
+                ESTADO: 1
+            }, {transaction: transaccion})
         }
 
         await transaccion.commit();
@@ -667,6 +711,82 @@ controllers.listarCompromisos = async (req, res) => {
         const data = await compromiso.findAll({
             where: {ID_SESION: idsesion},
         });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarSesionesPorAlumnoYProcesoTutoria = async (req, res) => {
+    const idAlumno = req.params.idAlumno;
+    const idProcesoTutoria = req.params.idProcesoTutoria;
+    try{
+        const data = await sesion.findAll({
+            include:[
+                {
+                    model: compromiso
+                },
+                {
+                    model: alumno,
+                    where: { ID_ALUMNO: idAlumno },
+                    attributes: []
+                },
+                {
+                    model: procesoTutoría,
+                    where: { ID_PROCESO_TUTORIA: idProcesoTutoria },
+                    attributes: []
+                }
+            ]
+        });
+        res.status(201).json({ sesiones: data });         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+//Listar compromisos por alumno
+controllers.listarCompromisosPorAlumnoYProcesoTutoria = async (req, res) => {
+    const idAlumno = req.params.idAlumno;
+    const idProcesoTutoria = req.params.idProcesoTutoria;
+    try{
+        const data = await sesion.findAll({
+            include:[
+                {
+                    model: compromiso
+                },
+                {
+                    model: alumno,
+                    where: { ID_ALUMNO: idAlumno },
+                    attributes: []
+                },
+                {
+                    model: procesoTutoría,
+                    where: { ID_PROCESO_TUTORIA: idProcesoTutoria },
+                    attributes: []
+                }
+            ]
+        });
+        
+        var compromisos = [];
+        for (var i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            console.log("hola",data[i].COMPROMISOs);
+            compromisos = compromisos.concat(data[i].COMPROMISOs);
+        }
+
+        res.status(201).json({ compromisos: compromisos });         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+//Listar areas de apoyo
+controllers.listarAreasApoyo = async (req, res) => {
+    try{
+        const data = await areaApoyo.findAll();
         res.status(201).json({data:data});         
     }    
     catch (error) {

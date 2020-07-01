@@ -17,6 +17,8 @@ router.get("/api/programa/lista/:idCoordinador/:idFacultad", programaController.
 
 router.get("/api/facultad/coordinador/:idCoordinador", programaController.listarFacultadesDeUnCoordinador);
 
+router.get("/api/facultad/tutor/:idTutor", programaController.listarFacultadesDeUnTutor);
+
 router.get("/api/facultad", programaController.listarFacultad);
 
 router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
@@ -35,6 +37,8 @@ router.post("/api/programa/modificar", programaController.modificarPrograma);
 
 router.post("/api/facultad/modificar", programaController.modificarFacultad);
 
+router.get("/api/programa/tutor/:idTutor", programaController.listarProgramasDeUnTutor);
 
+router.get("/api/programa/alumno/:idAlumno", programaController.listarProgramasDeUnAlumno);
 
 module.exports = router;

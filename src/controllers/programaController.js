@@ -2,6 +2,7 @@ const controllers = {}
 const Sequelize = require('sequelize')
 let sequelize = require('../models/database');
 let programa = require('../models/programa');
+let coordinador = require('../models/usuario');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 let rol = require('../models/rol');
 //let institucion = require('../models/institucion')
@@ -50,10 +51,20 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
         const programas = await programa.findAll(
             {
                 //include: [institucion]
-                include: {
-                    model: programa,
-                    as: 'FACULTAD',
-                },
+                include: [
+                    {
+                        model: programa,
+                        as: 'FACULTAD',
+                    },
+                    {
+                        model: coordinador,
+                        include:{
+                            model: rol,
+                            where: {DESCRIPCION: "Coordinador Programa"}
+                        }
+                        
+                    }
+                ],
                 where: {
                     ID_FACULTAD: req.params.id
                 }
@@ -65,74 +76,101 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
     }
 };
 
-controllers.listarFacultadesDeUnCoordinador = async (req, res) => { 
-    try{      // lista las facultades de un coordinador de facultad 
-        const facultades = await programa.findAll({           
+controllers.listarFacultadesDeUnCoordinador = async (req, res) => {
+    try {      // lista las facultades de un coordinador de facultad 
+        const facultades = await programa.findAll({
             include: [{
                 model: rolXUsuarioXPrograma,
-                where: {ID_USUARIO: req.params.idCoordinador, ESTADO: 1},
-                include:[{
+                where: { ID_USUARIO: req.params.idCoordinador, ESTADO: 1 },
+                include: [{
                     model: rol,
-                    where: {DESCRIPCION: "Coordinador Facultad"},
-                    attributes:[]
-                }],
-                attributes: []
-            }],           
-        });
-        res.status(201).json({facultades:facultades});         
-    }    
-    catch (error) {
-        res.json({error: error.message});    
-    }
-}
-
-controllers.listarFacultadesDeUnCoordinadorPrograma = async (req, res) => { 
-    try{        // lista las facultades de un coordinador de programa
-        const facultades = await programa.findAll({           
-            include: [{
-                model: rolXUsuarioXPrograma,
-                where: {ID_USUARIO: req.params.idCoordinador, ESTADO: 1},
-                include:[{
-                    model: rol,
-                    where: {DESCRIPCION: "Coordinador Programa"},
-                    attributes:[]
-                }],
-                attributes: []
-            },{
-                model: programa,
-                as: "FACULTAD",
-                attributes: ["ID_PROGRAMA", "NOMBRE"]
-            }],            
-            attributes: [],
-            group: ["PROGRAMA.ID_FACULTAD"]                       
-        });
-        res.status(201).json({facultades:facultades});         
-    }    
-    catch (error) {
-        res.json({error: error.message});    
-    }
-}
-
-controllers.listarProgramasDeUnCoordinador = async (req, res) => { 
-    try{        // lista los programas de un coordinador de programa segun una facultad
-        const programas = await programa.findAll({           
-            include: [{
-                model: rolXUsuarioXPrograma,
-                where: {ID_USUARIO: req.params.idCoordinador, ESTADO: 1},
-                include:[{
-                    model: rol,
-                    where: {DESCRIPCION: "Coordinador Programa"},
-                    attributes:[]
+                    where: { DESCRIPCION: "Coordinador Facultad" },
+                    attributes: []
                 }],
                 attributes: []
             }],
-            where: {ID_FACULTAD: req.params.idFacultad},
-            attributes: ["ID_PROGRAMA", "NOMBRE"]           
         });
-        res.status(201).json({programas:programas});         
-    }    
+        res.status(201).json({ facultades: facultades });
+    }
     catch (error) {
-        res.json({error: error.message});    
+        res.json({ error: error.message });
+    }
+}
+
+controllers.listarFacultadesDeUnCoordinadorPrograma = async (req, res) => {
+    try {        // lista las facultades de un coordinador de programa
+        const facultades = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idCoordinador, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Coordinador Programa" },
+                    attributes: []
+                }],
+                attributes: []
+            }, {
+                model: programa,
+                as: "FACULTAD",
+                attributes: ["ID_PROGRAMA", "NOMBRE"]
+            }],
+            attributes: [],
+            group: ["PROGRAMA.ID_FACULTAD"]
+        });
+        res.status(201).json({ facultades: facultades });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
+controllers.listarFacultadesDeUnTutor = async (req, res) => {
+    try {        // lista las facultades de un tutor
+        const facultades = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idTutor, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Tutor" },
+                    attributes: []
+                }],
+                attributes: []
+            }, {
+                model: programa,
+                as: "FACULTAD",
+                attributes: ["ID_PROGRAMA", "NOMBRE", "ANTICIPACION_DISPONIBILIDAD"]
+            }],
+            attributes: [],
+            group: ["PROGRAMA.ID_FACULTAD"]
+        });
+        res.status(201).json({ facultades: facultades });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
+controllers.listarProgramasDeUnCoordinador = async (req, res) => {
+    try {        // lista los programas de un coordinador de programa segun una facultad
+        const programas = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idCoordinador, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Coordinador Programa" },
+                    attributes: []
+                }],
+                attributes: []
+            }],
+            where: { ID_FACULTAD: req.params.idFacultad },
+            attributes: ["ID_PROGRAMA", "NOMBRE"]
+        });
+        res.status(201).json({ programas: programas });
+    }
+    catch (error) {
+        res.json({ error: error.message });
     }
 }
 
@@ -219,6 +257,35 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
     }
 };
 
+// controllers.listarFacultad = async (req, res) => {
+//     try {
+//         const facultades = await rolXUsuarioXPrograma.findAll(
+//             {
+//                 include: [
+//                     {
+//                         model: programa,
+//                         where: {
+//                             [Op.or]: [
+//                                 { ID_FACULTAD: null },
+//                                 sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+//                             ]
+//                         }
+//                     },
+//                     {
+//                         model: coordinador
+//                     },
+//                     {
+//                         model: rol,
+//                         where: { DESCRIPCION: "Coordinador Facultad" }
+//                     }
+//                 ]
+//             }
+//         );
+//         res.status(201).json({ facultad: facultades });
+//     } catch (error) {
+//         res.json({ error: error.message });
+//     }
+// };
 controllers.listarFacultad = async (req, res) => {
     try {
         const facultades = await programa.findAll(
@@ -228,6 +295,14 @@ controllers.listarFacultad = async (req, res) => {
                         { ID_FACULTAD: null },
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
                     ]
+                },
+                include:{
+                    model: coordinador,
+                    include:{
+                        model: rol,
+                        where: {DESCRIPCION: "Coordinador Facultad"}
+                    }
+                    
                 }
             }
         );
@@ -236,7 +311,6 @@ controllers.listarFacultad = async (req, res) => {
         res.json({ error: error.message });
     }
 };
-
 
 
 /**
@@ -250,7 +324,7 @@ controllers.registrarFacultad = async (req, res) => {
      *  */
     const transaccion = await sequelize.transaction();
     const transaccion2 = await sequelize.transaction();
-    const { ID_INSTITUCION, NOMBRE, IMAGEN, INDEPENDIENTE } = req.body.facultad;
+    const { ID_INSTITUCION, NOMBRE, IMAGEN, INDEPENDIENTE, DIAS_DISP } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
 
     try {
@@ -276,7 +350,8 @@ controllers.registrarFacultad = async (req, res) => {
             ID_FACULTAD: null,
             ID_INSTITUCION: ID_INSTITUCION,
             NOMBRE: NOMBRE,
-            IMAGEN: IMAGEN
+            IMAGEN: IMAGEN,
+            ANTICIPACION_DISPONIBILIDAD: DIAS_DISP
         }, { transaction: transaccion });
 
         await transaccion.commit();
@@ -357,21 +432,40 @@ controllers.registrarPrograma = async (req, res) => {
 controllers.modificarFacultad = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
-    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.facultad;
+    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
+        const facultades = await programa.findAll(
+            {
+                where: {
+                    [Op.or]: [
+                        { ID_FACULTAD: null },
+                        sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+                    ]
+                }
+            }
+        );
+        // Validar que el nombre no este duplicado
+        for (var i = 0; i < facultades.length; i++) {
+            if (facultades[i].NOMBRE.trim() === NOMBRE.trim()) {
+                res.status(409).json({ modificacion: { ok: 0 } });
+                return
+            };
+        }
+
         const facultadModificada = await programa.update(
             {
                 ID_INSTITUCION: ID_INSTITUCION,
                 NOMBRE: NOMBRE,
-                IMAGEN: IMAGEN
+                IMAGEN: IMAGEN,
+                ANTICIPACION_DISPONIBILIDAD: DIAS_DISP
             },
             { where: { ID_PROGRAMA: ID_PROGRAMA } },
             { transaction: transaccion }
         );
 
         await transaccion.commit();
-        res.status(201).json({ facultad: facultadModificada });
+        res.status(201).json({ modificacion: { ok: 1 } });
     } catch (error) {
         await transaccion.rollback();
         res.json({ error: error.message })
@@ -385,6 +479,26 @@ controllers.modificarPrograma = async (req, res) => {
     const { ID_PROGRAMA, ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.programa;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
+        const programasPorFacultad = await programa.findAll(
+            {
+                //include: [institucion]
+                include: {
+                    model: programa,
+                    as: 'FACULTAD',
+                },
+                where: {
+                    ID_FACULTAD: ID_FACULTAD
+                }
+            }
+        );
+        // Validar que el nombre no este duplicado
+        for (var i = 0; i < programasPorFacultad.length; i++) {
+            if (programasPorFacultad[i].NOMBRE.trim() === NOMBRE.trim()) {
+                res.status(409).json({ modificacion: { ok: 0 } });
+                return
+            };
+        }
+
         const programaModificado = await programa.update({
             ID_FACULTAD: ID_FACULTAD,
             ID_INSTITUCION: ID_INSTITUCION,
@@ -395,7 +509,7 @@ controllers.modificarPrograma = async (req, res) => {
         }, { transaction: transaccion });
 
         await transaccion.commit();
-        res.status(201).json({ programa: programaModificado });
+        res.status(201).json({ modificacion: { ok: 1 } });
     } catch (error) {
         //console.log("err0");
         await transaccion.rollback();
@@ -403,5 +517,49 @@ controllers.modificarPrograma = async (req, res) => {
     }
 
 };
+
+controllers.listarProgramasDeUnTutor = async (req, res) => {
+    try {        // lista los programas de un tutor
+        const programas = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idTutor, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Tutor" },
+                    attributes: []
+                }],
+                attributes: []
+            }],
+            attributes: ["ID_PROGRAMA", "NOMBRE"]
+        });
+        res.status(201).json({ programas: programas });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
+controllers.listarProgramasDeUnAlumno = async (req, res) => {
+    try {        // lista los programas de un tutor
+        const programas = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idAlumno, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Alumno" },
+                    attributes: []
+                }],
+                attributes: []
+            }],
+            attributes: ["ID_PROGRAMA", "NOMBRE"]
+        });
+        res.status(201).json({ programas: programas });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
 
 module.exports = controllers;

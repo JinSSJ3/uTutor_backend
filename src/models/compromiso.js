@@ -28,5 +28,6 @@ let compromiso = sequelize.define(nametable,{
 });
 
 compromiso.belongsTo(sesion, {foreignKey:{name:"ID_SESION"}});
+sesion.hasMany(compromiso, {foreignKey:{name:"ID_SESION"}});
 
 module.exports = compromiso;

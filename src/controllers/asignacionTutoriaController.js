@@ -12,15 +12,32 @@ controllers.listarPorTutoria = async (req, res) => {
     const idTutoria = req.query.tutoria;
     try {
         const dataAsignaciones = await asignacionTutoria.findAll({
-            include: [tutor,
-                {
-                    model: alumno,
-                    as: "ALUMNOS"
-                },{
-                    model: asignacionTutoriaXAlumno,
-                    where: {SOLICITUD: 1} // aceptada
+            include: [{
+                model: tutor,
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }]
+            },
+            {
+                model: alumno,
+                as: "ALUMNOS",
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }],
+                through:{
+                    attributes: []
                 }
-            ],
+            },{
+                model: asignacionTutoriaXAlumno,
+                where: {SOLICITUD: 1}, // aceptada
+                attributes: []
+            },{
+                model: procesoTutoria,
+                as: "PROCESO_TUTORIA",
+                attributes: ["ID_PROCESO_TUTORIA", "NOMBRE"]
+            }],
             where: {
                 ESTADO: 1,
                 ID_PROCESO_TUTORIA: idTutoria
@@ -88,7 +105,7 @@ controllers.lista = async (req, res) => { // devuelve los datos de todas las asi
 }
 
 
-controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve los datos de todas las asignaciones
+controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve las solicitudes pendientes de un tutor
     try {
         const dataSolicitud = await asignacionTutoriaXAlumno.findAll({
             where:{ SOLICITUD: 2},  //pendiente
@@ -123,17 +140,28 @@ controllers.responderSolicitud = async (req, res) => {
     
     const transaccion = await sequelize.transaction();
     const {ID_ASIGNACION, ID_ALUMNO, RESPUESTA} = req.body.solicitud;
-    try {
+    try {        
+        let date = new Date()
         const solicitudModificada = await asignacionTutoriaXAlumno.update({
             SOLICITUD: RESPUESTA
         }, {
             where: {
                 ID_ASIGNACION: ID_ASIGNACION,
                 ID_ALUMNO: ID_ALUMNO
-            }
-        }, {transaction: transaccion})
+            },
+            transaction: transaccion
+        })
+
+        await asignacionTutoria.update({
+            ESTADO: 1,            
+            FECHA_ASIGNACION: date + date.getTimezoneOffset(),
+        }, {
+            where: {ID_ASIGNACION: ID_ASIGNACION},
+            transaction: transaccion
+        })
 
         await transaccion.commit();
+        console.log(date + date.getTimezoneOffset())
         res.status(201).json({solicitud: req.body.solicitud});
     }catch (error) {
         await transaccion.rollback();
@@ -141,6 +169,33 @@ controllers.responderSolicitud = async (req, res) => {
     }
     
 };
+
+
+controllers.mandarSolicitudTutoria = async (req, res) => {
+    const transaccion = await sequelize.transaction();
+    const { ID_PROCESO_TUTORIA, ID_TUTOR, ID_ALUMNO} = req.body.solicitud;
+    try {
+        const nuevaSolicitud = await asignacionTutoria.create({
+            ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
+            ID_TUTOR: ID_TUTOR,
+            ESTADO: 0  // todavia no se ha aceptado la asignacion
+        }, { transaction: transaccion })
+            .then(async result => {
+                await asignacionTutoriaXAlumno.create({
+                    ID_ASIGNACION: result.ID_ASIGNACION,
+                    ID_ALUMNO: ID_ALUMNO,
+                    SOLICITUD: 2  // pendiente
+                }, { transaction: transaccion })
+                await transaccion.commit();
+                res.status(201).json({ solicitud: result });
+            })
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
+};
+
 
 /**
  * @returns La nueva asignacion creado en formato Json()

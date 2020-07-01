@@ -11,6 +11,10 @@ let etiquetaXAlumno = require("../models/etiquetaXAlumno");
 let programa = require("../models/programa");
 let asignacionTutoriaXAlumno = require("../models/asignacionTutoriaXAlumno");
 let etiqueta = require("../models/etiqueta");
+let informacionRelevante = require("../models/informacionRelevante");
+const fsPath =  require('fs-path');
+const fs =  require('fs');
+const path = require('path');
 
 
 const Op = Sequelize.Op;
@@ -359,6 +363,36 @@ controllers.eliminar = async (req, res) => {
         await transaccion.commit()    
         res.status(201).json({status: "success"}) 
     } catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
+
+controllers.registrarInformacionRelevante = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();
+    const {ID_ALUMNO, ARCHIVO, DESCRIPCION} = req.body.archivo;
+    try {
+        let ruta = ARCHIVO?path.join("..","Archivos","Alumnos",ID_ALUMNO.toString(), DESCRIPCION.replace(" ","_")+".pdf"):null;
+        if(ARCHIVO){
+            let data = new Buffer(ARCHIVO, "base64");  
+            fsPath.writeFile(ruta, data, function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+            })            
+        }
+        console.log("ruta: ", ruta);
+        const nuevaInformacionRelevante = await informacionRelevante.create({
+            ID_ALUMNO: ID_ALUMNO,
+            DESCRIPCION: DESCRIPCION,
+            ARCHIVO: ruta
+        }, {transaction: transaccion})
+
+        await transaccion.commit();
+        res.status(201).json({informacionRelevante: nuevaInformacionRelevante});
+    }catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
     }

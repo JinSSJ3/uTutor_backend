@@ -22,6 +22,8 @@ router.post("/api/tutoria/eliminar/:id", tutoriaController.eliminar);
 
 router.get("/api/tutoria/:id", tutoriaController.get);
 
+router.get("/api/tutoriafija/:idPrograma", tutoriaController.listarTutoriasFijasPorPrograma);
+
 
 
 

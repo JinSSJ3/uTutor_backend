@@ -33,6 +33,31 @@ controllers.listarPorTutor = async (req, res) => { // lista disponibilidades de 
     }
 };
 
+controllers.listarPorTutorYFacultad = async (req, res) => { // lista disponibilidades de un tutor en una facultad especifica
+    try{
+        const {idtutor, idFacultad} = req.params;
+        const data = await disponibilidad.findAll({
+            where: {ID_TUTOR: idtutor,
+                    ID_FACULTAD: idFacultad, 
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 controllers.listar = async (req, res) => { // lista disponibilidades
     try{
         const data = await disponibilidad.findAll({
@@ -172,6 +197,42 @@ controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponi
 };
 
 
+controllers.listarPorProgramaMultipleTutorFecha = async (req, res) => { //listar disponibilidades por fecha por tutor
+    try{
+        const {idprograma, fecha} = req.params;
+        const {tutores} = req.body.tutores; 
+        console.log("GOT: ", req.body.tutores);//solo para asegurarme de que el objeto llego al backend
+
+        const data = await disponibilidad.findAll({
+            where: {ID_TUTOR: tutores,
+                    FECHA: fecha,
+                    ESTADO: 1},
+            include: {
+                model: tutor,
+                required: true,
+                include: {
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    include: {
+                        model: rolXUsuarioXPrograma,
+                        where: {ID_PROGRAMA:idprograma},
+                        required: true 
+                    },
+                    required: true
+                }
+            },
+            order: [
+                ['HORA_INICIO', 'ASC']
+            ]
+        });
+        res.status(201).json({data:data});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+
 controllers.get = async (req, res) =>{ // devuelve una disponibilidad
     try{
         const {idtutor, id} = req.params;
@@ -196,7 +257,7 @@ controllers.get = async (req, res) =>{ // devuelve una disponibilidad
 
 controllers.register = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION} = req.body.disponibilidad; 
+    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION, ID_FACULTAD} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     if (REPETICION == 1){
          try {
@@ -245,7 +306,8 @@ controllers.register = async (req, res) => {
                 FECHA: FECHA,
                 ESTADO: 1,
                 LUGAR: LUGAR,
-                ID_TUTOR: ID_TUTOR
+                ID_TUTOR: ID_TUTOR,
+                ID_FACULTAD: ID_FACULTAD
             }, {transaction: transaccion});
             await transaccion.commit();
             res.status(201).json({newDisp: newDisp});
@@ -317,7 +379,8 @@ controllers.register = async (req, res) => {
                     FECHA: fechaRep,
                     ESTADO: 1,
                     LUGAR: LUGAR,
-                    ID_TUTOR: ID_TUTOR
+                    ID_TUTOR: ID_TUTOR,
+                    ID_FACULTAD: ID_FACULTAD
                 }, {transaction: transaccion});
                 await transaccion.commit();
             })

@@ -26,5 +26,7 @@ router.post("/api/alumno/eliminar/:id", alumnoController.eliminar);
 
 router.get("/api/alumno/:id", alumnoController.get);
 
+router.post("/api/alumno/informacionrelevante", alumnoController.registrarInformacionRelevante);
+
 
 module.exports = router;
