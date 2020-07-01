@@ -9,6 +9,7 @@ let areaApoyoXSesion = require('../models/areaApoyoXSesion');
 let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
 let procesoTutoría = require('../models/procesoTutoria');
+const areaApoyo = require('../models/areaApoyo');
 
 //sequelize.sync();
 
@@ -96,7 +97,14 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                             model: usuario,
                             attributes: ['NOMBRE', 'APELLIDOS']
                         }]
-                    }] 
+                    },
+                {
+                    model: areaApoyoXSesion,
+                    include: [
+                        areaApoyo
+                    ]
+                }
+            ] 
         });
         res.status(201).json({data:data});         
     }    
@@ -466,7 +474,7 @@ controllers.registrarResultados = async (req, res) => {
         }
 
         await transaccion.commit();
-        res.status(201).json({miSesion: miSesion});
+        res.status(201).json({asist: req.body});
     } catch (error) {
         console.log(error);
         await transaccion.rollback();
