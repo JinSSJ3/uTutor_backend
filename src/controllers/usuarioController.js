@@ -24,7 +24,7 @@ controllers.buscarPorCorreo = async (req, res) => {
                 }, rol]
             }]
         })
-        res.status(201).json({usuario:user});
+        res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
     }catch (error){
         res.json({error: error.message});    
     }
