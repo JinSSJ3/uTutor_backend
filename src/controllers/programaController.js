@@ -57,17 +57,20 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
                         as: 'FACULTAD',
                     },
                     {
-                        model: coordinador,
-                        include:{
+                        model: rolXUsuarioXPrograma,
+                        include:[{
                             model: rol,
-                            where: {DESCRIPCION: "Coordinador Programa"}
-                        }
-                        
-                    }
-                ],
+                            where: {DESCRIPCION: "Coordinador Programa"},
+                            attributes: []
+                        },{
+                            model: coordinador,
+                            attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                        }]    
+                    }],
                 where: {
                     ID_FACULTAD: req.params.id
-                }
+                },
+                required:true
             }
         );
         res.status(201).json({ programa: programas });
