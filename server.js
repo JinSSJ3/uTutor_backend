@@ -7,6 +7,7 @@ const etiquetaXAlumno = require('./src/models/etiquetaXAlumno');
 const morgan = require("morgan");
 const tutor = require('./src/models/tutor');
 const asignacionTutoria = require('./src/models/asignacionTutoria');
+const procesoTutoria = require('./src/models/procesoTutoria');
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ etiquetaXAlumno.belongsTo(etiqueta,{foreignKey: "ID_ETIQUETA"});
 etiquetaXAlumno.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
 etiqueta.hasMany(etiquetaXAlumno,{foreignKey: "ID_ETIQUETA"});
 tutor.hasMany(asignacionTutoria, {foreignKey: "ID_TUTOR"});
-
+procesoTutoria.hasMany(asignacionTutoria, {foreignKey: "ID_PROCESO_TUTORIA"});
 
 app.use(morgan('dev'));
 
