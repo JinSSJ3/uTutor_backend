@@ -27,7 +27,8 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }]
-            }, { model: compromiso }]
+            }, { model: compromiso }],
+            order: [["FECHA","ASC"], ["HORA_INICIO","ASC"]]
         });
         res.status(201).json({ data: data });
     }
@@ -58,7 +59,7 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
             }
             ],
             order: [
-                ['FECHA', 'DESC']
+                ['FECHA', 'ASC']
             ]
 
         });
