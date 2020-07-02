@@ -225,6 +225,75 @@ controllers.modificar = async (req, res) => {
     
 };
      
-
+controllers.listarEstadoSolicitudTutorFijo = async (req, res) => { // lista el tutor asignado a un alumno en cierto proceso de tutoria
+    try{
+        const tutores = await tutor.findAll({
+            include: [{
+                model: usuario,
+                include: {
+                    model: rolXUsuarioXPrograma, 
+                    where: {
+                        ESTADO: 1
+                    },
+                    include: {
+                        model: rol,
+                        where: {DESCRIPCION: "Tutor"},
+                        attributes: []
+                    },
+                    attributes: []
+                }
+               },{
+                   model: asignacionTutoria,
+                   where: {
+                       ID_TUTOR: Sequelize.col("TUTOR.ID_TUTOR"),
+                       ID_PROCESO_TUTORIA: req.params.idTutoria
+                   },
+                   include: {
+                       model: asignacionTutoriaXAlumno,
+                       where: {
+                           ID_ALUMNO: req.params.idAlumno,
+                           ID_ASIGNACION: Sequelize.col("ASIGNACION_TUTORIA.ID_ASIGNACION")
+                       },
+                       attributes: ["SOLICITUD"]
+                   },
+                   //attributes: []
+               }], 
+        });
+        let mensaje = "Sin tutor asignado";
+        let tutorAsignado = null;
+        let estado = 0
+        if(tutores){
+            for (element of tutores){
+                for(element2 of element.ASIGNACION_TUTORIA){
+                    for (element3 of element2.ASIGNACION_TUTORIA_X_ALUMNOs){
+                        if(element3.SOLICITUD === 1){
+                            console.log("entree")
+                            mensaje = "Ya tiene un tutor asignado en este proceso de tutoria";
+                            tutorAsignado = element;
+                            estado = 1
+                            break;
+                        }else if(element3.SOLICITUD === 2){
+                            console.log("entree")
+                            mensaje = "Tiene una solicitud pendiente de respuesta";
+                            tutorAsignado = element;
+                            estado = 1
+                            break;
+                        }
+                    }
+                    if(tutorAsignado){
+                        break;
+                    }
+                }
+                if(tutorAsignado){
+                    break;
+                }
+            }
+        }
+        res.status(201).json({estado: estado, mensaje: mensaje, tutor: tutorAsignado});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
 
 module.exports = controllers;
