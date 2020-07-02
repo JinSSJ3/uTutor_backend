@@ -26,7 +26,9 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
                     model: usuario,
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }]
-            },{model: compromiso}]
+            },{model: compromiso},
+            {model: procesoTutoría,           
+            }]
         });
         res.status(201).json({data:data});         
     }    
