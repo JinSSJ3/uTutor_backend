@@ -7,6 +7,8 @@ let etiqueta = require('../models/etiqueta');
 let programa = require('../models/programa');
 let asignacionTutoria = require('../models/asignacionTutoria');
 let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
+const tutor = require("../models/tutor");
+const usuario = require("../models/usuario");
 
 
 controllers.listar = async (req, res) => { 
@@ -222,6 +224,12 @@ controllers.listarTutoriasFijasAsignadasAPorAlumno = async (req, res) => {
                         SOLICITUD:1
                     },
                     attributes: []
+                },{
+                    model:tutor,
+                    include:{
+                        model:usuario,
+                        attributes: ["NOMBRE", "APELLIDOS"]
+                    }
                 }],
                 attributes: ["ID_TUTOR"]
             }],
