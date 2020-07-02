@@ -6,6 +6,7 @@ let etiquetaXTutoria = require('../models/etiquetaXTutoria');
 let etiqueta = require('../models/etiqueta');
 let programa = require('../models/programa');
 let asignacionTutoria = require('../models/asignacionTutoria');
+let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
 
 
 controllers.listar = async (req, res) => { 
@@ -189,6 +190,52 @@ controllers.eliminar = async (req, res) => {
         res.json({error: error.message})
     }
     
+};
+
+controllers.listarTutoriasVariablesPorPrograma = async (req, res) => { 
+    try{
+        const tutorias = await tutoria.findAll({
+            include: [etiqueta],
+            where: {
+                ESTADO: 1,
+                ID_PROGRAMA: req.params.idPrograma,
+                TUTOR_FIJO:0
+            }
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarTutoriasFijasAsignadasAPorAlumno = async (req, res) => { 
+    try{
+        const tutorias = await tutoria.findAll({
+            include: [etiqueta,{
+                model: asignacionTutoria,
+                where: {ESTADO: 1},
+                include:[{
+                    model:asignacionTutoriaXAlumno,
+                    where: {
+                        ID_ALUMNO:req.params.idAlumno,
+                        SOLICITUD:1
+                    },
+                    attributes: []
+                }],
+                attributes: ["ID_TUTOR"]
+            }],
+            where: {
+                ESTADO: 1,
+                ID_PROGRAMA: req.params.idPrograma,
+                TUTOR_FIJO:1
+            }
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
 };
 
 module.exports = controllers;

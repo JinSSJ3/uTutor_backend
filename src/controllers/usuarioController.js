@@ -1,7 +1,6 @@
 const controllers = {}
 const Sequelize = require("sequelize");
 let sequelize = require('../models/database');
-let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma')
 let programa = require('../models/programa')
@@ -25,7 +24,7 @@ controllers.buscarPorCorreo = async (req, res) => {
                 }, rol]
             }]
         })
-        res.status(201).json({usuario:user});
+        res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
     }catch (error){
         res.json({error: error.message});    
     }
@@ -38,7 +37,7 @@ controllers.buscarPorCodigo = async (req, res) => {
             include: [{
                 model: rolXUsuarioXPrograma,
                 include: [programa, rol]
-            }]
+           }]
         })
         res.status(201).json({usuario:user});
     }catch (error){
@@ -85,10 +84,10 @@ controllers.asignarRol = async (req,res) => {
             transaction: transaccion            
         })
 
-        for (rol of ID_ROLES){
-            const nuevaAsignacion = await rolXUsuarioXPrograma.create({
+        for (role of ID_ROLES){
+            await rolXUsuarioXPrograma.create({
                 ID_USUARIO: ID_USUARIO,
-                ID_ROL: rol,
+                ID_ROL: role,
                 ID_PROGRAMA: ID_PROGRAMA,
                 ESTADO: 1
             }, {transaction: transaccion})

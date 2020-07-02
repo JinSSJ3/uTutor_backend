@@ -4,7 +4,12 @@ let sequelize = require('./src/models/database');
 const alumno = require('./src/models/alumno');
 const etiqueta = require('./src/models/etiqueta');
 const etiquetaXAlumno = require('./src/models/etiquetaXAlumno');
-const morgan = require("morgan")
+const areaApoyoXSesion = require('./src/models/areaApoyoXSesion');
+const sesion = require('./src/models/sesion');
+const morgan = require("morgan");
+const tutor = require('./src/models/tutor');
+const asignacionTutoria = require('./src/models/asignacionTutoria');
+const procesoTutoria = require('./src/models/procesoTutoria');
 
 dotenv.config();
 
@@ -30,7 +35,9 @@ alumno.belongsToMany(etiqueta, {through: etiquetaXAlumno, foreignKey: "ID_ALUMNO
 etiquetaXAlumno.belongsTo(etiqueta,{foreignKey: "ID_ETIQUETA"});
 etiquetaXAlumno.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
 etiqueta.hasMany(etiquetaXAlumno,{foreignKey: "ID_ETIQUETA"});
-
+sesion.hasMany(areaApoyoXSesion, {foreignKey: "ID_SESION"})
+tutor.hasMany(asignacionTutoria, {foreignKey: "ID_TUTOR"});
+procesoTutoria.hasMany(asignacionTutoria, {foreignKey: "ID_PROCESO_TUTORIA"});
 
 app.use(morgan('dev'));
 
