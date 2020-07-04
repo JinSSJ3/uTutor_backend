@@ -835,7 +835,7 @@ controllers.modificarCompromiso = async (req, res) => {
         );
 
         await transaccion.commit();
-        res.status(201).json({ modificacion: { ok: 1 } });
+        res.status(201).json({ modificacion: compormisoModificado });
     } catch (error) {
         await transaccion.rollback();
         res.json({ error: error.message })
