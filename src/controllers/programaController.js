@@ -435,7 +435,7 @@ controllers.registrarPrograma = async (req, res) => {
 controllers.modificarFacultad = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
-    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP } = req.body.facultad;
+    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP, DIAS_CITA } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const facultades = await programa.findAll(
@@ -461,7 +461,8 @@ controllers.modificarFacultad = async (req, res) => {
                 ID_INSTITUCION: ID_INSTITUCION,
                 NOMBRE: NOMBRE,
                 IMAGEN: IMAGEN,
-                ANTICIPACION_DISPONIBILIDAD: DIAS_DISP
+                ANTICIPACION_DISPONIBILIDAD: DIAS_DISP,
+                ANTICIPACION_CANCELAR_CITA: DIAS_CITA
             },
             { where: { ID_PROGRAMA: ID_PROGRAMA } },
             { transaction: transaccion }
