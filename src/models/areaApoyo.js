@@ -12,7 +12,8 @@ let areaApoyo = sequelize.define(nametable,{
     },
     NOMBRE: Sequelize.STRING,
     TELEFONO: Sequelize.STRING,
-    CORREO: Sequelize.STRING     
+    CORREO: Sequelize.STRING,
+    CONTACTO: Sequelize.STRING     
     },
     {
     timestamps :false,

@@ -20,12 +20,13 @@ controllers.listar = async (req, res) => {
  */
 controllers.registrar = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {NOMBRE, TELEFONO, CORREO} = req.body.areaApoyo; 
+    const {NOMBRE, TELEFONO, CORREO, CONTACTO} = req.body.areaApoyo; 
     try {
         const nuevaAreaApoyo = await areaApoyo.create({
             NOMBRE: NOMBRE,
             TELEFONO: TELEFONO,
-            CORREO: CORREO
+            CORREO: CORREO,
+            CONTACTO: CONTACTO
         }, {transaction: transaccion})
 
         await transaccion.commit();
@@ -41,12 +42,13 @@ controllers.registrar = async (req, res) => {
 controllers.modificar = async (req, res) => {  
     
     const transaccion = await sequelize.transaction();
-    const {ID_AREA_APOYO, NOMBRE, TELEFONO, CORREO} = req.body.areaApoyo;
+    const {ID_AREA_APOYO, NOMBRE, TELEFONO, CORREO, CONTACTO} = req.body.areaApoyo;
     try {
         const etiquetaModificada = await areaApoyo.update({
             NOMBRE: NOMBRE,
             TELEFONO: TELEFONO,
-            CORREO: CORREO
+            CORREO: CORREO,
+            CONTACTO: CONTACTO
         }, {
             where: {ID_AREA_APOYO: ID_AREA_APOYO},
             transaction: transaccion
