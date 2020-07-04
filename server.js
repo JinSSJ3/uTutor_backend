@@ -55,6 +55,7 @@ app.use(require('./src/routes/institucionRoutes'));
 app.use(require('./src/routes/usuarioRoutes'));
 app.use(require('./src/routes/encuestaRoutes'));
 app.use(require('./src/routes/notificacionRoutes'));
+app.use(require('./src/routes/areaApoyoRoutes'));
 
 
 
