@@ -457,7 +457,7 @@ controllers.eliminarCoordinadorFacultad = async (req, res) => {
         const idRol = await rol.findOne({
             attributes:["ID_ROL"],
             where: {DESCRIPCION: "Coordinador Facultad"}
-        }, {transaction: transaccion})
+        })
 
         const coordinadorModificado = await rolXUsuarioXPrograma.update({
             ESTADO: 0            
@@ -465,8 +465,9 @@ controllers.eliminarCoordinadorFacultad = async (req, res) => {
             where: {
                 ID_USUARIO: req.params.id,
                 ID_ROL: idRol.ID_ROL
-            }
-        }, {transaction: transaccion})   
+            },
+            transaction: transaccion
+        })   
         await transaccion.commit()    
         res.status(201).json({status: "success"}) 
     } catch (error) {

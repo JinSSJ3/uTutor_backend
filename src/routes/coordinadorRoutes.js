@@ -28,7 +28,7 @@ router.post("/api/coordinadorfacultad/modificar", coordinadorController.modifica
 
 router.post("/api/coordinador/eliminar/:id", coordinadorController.eliminarCoordinadorPrograma);
 
-router.post("/api/coordinadorfacultad/eliminar/:id", coordinadorController.eliminarCoordinadorPrograma);
+router.post("/api/coordinadorfacultad/eliminar/:id", coordinadorController.eliminarCoordinadorFacultad);
 
 
 module.exports = router;
