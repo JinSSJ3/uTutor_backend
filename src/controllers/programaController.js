@@ -565,4 +565,17 @@ controllers.listarProgramasDeUnAlumno = async (req, res) => {
     }
 }
 
+controllers.listarPoliticasPorFacultad = async (req, res) => {
+    try {        // lista las politicas de una facultad especifica
+        const politicas = await programa.findOne({
+            where: {ID_PROGRAMA: req.params.idFacultad},
+            attributes: ["ANTICIPACION_DISPONIBILIDAD", "ANTICIPACION_CANCELAR_CITA"]
+        });
+        res.status(201).json({ politicas: politicas });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
 module.exports = controllers;

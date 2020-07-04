@@ -41,4 +41,6 @@ router.get("/api/programa/tutor/:idTutor", programaController.listarProgramasDeU
 
 router.get("/api/programa/alumno/:idAlumno", programaController.listarProgramasDeUnAlumno);
 
+router.get("/api/facultad/politicas/:idFacultad", programaController.listarPoliticasPorFacultad);
+
 module.exports = router;
