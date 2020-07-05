@@ -315,6 +315,30 @@ controllers.listarFacultad = async (req, res) => {
     }
 };
 
+controllers.getFacultad = async (req, res) => { // devuelve los datos de una facultad (incluye coordinador) 
+    const {id} = req.params;
+    try {
+        const facultad = await programa.findOne(
+            {
+                where: {
+                    ID_PROGRAMA: id
+                },
+                include:{
+                    model: coordinador,
+                    include:{
+                        model: rol,
+                        where: {DESCRIPCION: "Coordinador Facultad"}
+                    }
+                    
+                }
+            }
+        );
+        res.status(201).json({ facultad: facultad });
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 
 /**
  * @returns El nuevo programa (facultad) creado en formato Json()

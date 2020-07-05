@@ -21,6 +21,8 @@ router.get("/api/facultad/tutor/:idTutor", programaController.listarFacultadesDe
 
 router.get("/api/facultad", programaController.listarFacultad);
 
+router.get("/api/facultad/:id", programaController.getFacultad);
+
 router.get("/api/programa/lista/:id", programaController.listarPorFacultad);
 
 router.get("/api/programa&facultad/coordinador/:id", programaController.listarProgramasYFacultadesPorCoordinador);
