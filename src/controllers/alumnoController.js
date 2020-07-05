@@ -242,7 +242,7 @@ controllers.registrar = async (req, res) => {
                 }else if(validacionCodigo){
                     res.json({error: "Codigo repetido", usuario: validacionCodigo})
                 }else if(validacionCorreo){
-                    res.json({error: "Correo repetido"})
+                    res.json({error: "Correo repetido", usuario: validacionCorreo})
                 }
             }
         });
@@ -334,7 +334,7 @@ controllers.modificar = async (req, res) => {
             }else if(validacionCodigo){
                 res.json({error: "Codigo repetido", usuario: validacionCodigo})
             }else if(validacionCorreo){
-                res.json({error: "Correo repetido"})
+                res.json({error: "Correo repetido", usuario: validacionCorreo})
             }
         }
     } catch (error) {
