@@ -4,7 +4,9 @@ let sequelize = require('../models/database');
 let usuario = require('../models/usuario');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma')
 let programa = require('../models/programa')
-let rol = require('../models/rol')
+let rol = require('../models/rol');
+const alumno = require("../models/alumno");
+const tutor = require("../models/tutor");
 
 const Op = Sequelize.Op;
 
@@ -92,6 +94,18 @@ controllers.asignarRol = async (req,res) => {
                 ESTADO: 1
             }, {transaction: transaccion})
 
+            let descripcionRol = await rol.findOne({
+                where:{ID_ROL: role}
+            })
+            if(descripcionRol.DESCRIPCION==="Alumno"){
+                await alumno.create({
+                    ID_ALUMNO: ID_USUARIO
+                })
+            } else if(descripcionRol.DESCRIPCION==="Tutor"){
+                await tutor.create({
+                    ID_TUTOR: ID_USUARIO
+                })
+            }
         }        
 
         await transaccion.commit();
