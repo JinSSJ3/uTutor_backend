@@ -5,18 +5,20 @@ let alumno = require("./alumno")
 let nametable = 'INFORMACION_RELEVANTE';
 
 let informacionRelevante = sequelize.define(nametable,{
-
-    ID_ALUMNO:{
+    ID_INFORMACION_RELEVANTE:{
         type: Sequelize.INTEGER,
         primaryKey: true,
+        autoIncrement: true
+    },
+    ID_ALUMNO:{
+        type: Sequelize.INTEGER,
         references: {
             model: "USUARIO",
             key: "ID_USUARIO"
           }
     },
     DESCRIPCION:{
-        type: Sequelize.STRING,
-        primaryKey: true,
+        type: Sequelize.STRING
     },
     ARCHIVO: Sequelize.STRING        
 },

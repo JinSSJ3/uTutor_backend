@@ -372,9 +372,9 @@ controllers.eliminar = async (req, res) => {
 controllers.registrarInformacionRelevante = async (req, res) => {  
     
     const transaccion = await sequelize.transaction();
-    const {ID_ALUMNO, ARCHIVO, DESCRIPCION} = req.body.archivo;
+    const {ID_ALUMNO, ARCHIVO, DESCRIPCION, EXTENSION} = req.body.archivo;
     try {
-        let ruta = ARCHIVO?path.join("..","Archivos","Alumnos",ID_ALUMNO.toString(), DESCRIPCION.replace(" ","_")+".pdf"):null;
+        let ruta = ARCHIVO?path.join("..","Archivos","Alumnos",ID_ALUMNO.toString(), DESCRIPCION.replace(" ","_")+"."+EXTENSION):null;
         if(ARCHIVO){
             let data = new Buffer(ARCHIVO, "base64");  
             fsPath.writeFile(ruta, data, function (err) {
@@ -386,7 +386,7 @@ controllers.registrarInformacionRelevante = async (req, res) => {
         console.log("ruta: ", ruta);
         const nuevaInformacionRelevante = await informacionRelevante.create({
             ID_ALUMNO: ID_ALUMNO,
-            DESCRIPCION: DESCRIPCION,
+            DESCRIPCION: DESCRIPCION+"."+EXTENSION,
             ARCHIVO: ruta
         }, {transaction: transaccion})
 
@@ -394,6 +394,36 @@ controllers.registrarInformacionRelevante = async (req, res) => {
         res.status(201).json({informacionRelevante: nuevaInformacionRelevante});
     }catch (error) {
         await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
+
+controllers.listarArchivosInfoRelevante = async (req, res) => {  // lista los archivos relevantes de un alumno
+    try {        
+    const infoRelevante = await informacionRelevante.findAll({
+        where: {ID_ALUMNO: req.params.idAlumno},
+        attributes: ["ID_INFORMACION_RELEVANTE", "DESCRIPCION"]   
+    })
+        res.status(201).json({informacionRelevante: infoRelevante});
+    }catch (error) {
+        res.json({error: error.message})
+    }
+    
+};
+
+controllers.devolverArchivoInfoRelevante = async (req, res) => {  // lista los archivos relevantes de un alumno
+    try {        
+        const infoRelevante = await informacionRelevante.findOne({
+            where: {ID_INFORMACION_RELEVANTE: req.params.idArchivo},
+            attributes: ["DESCRIPCION", "ARCHIVO"] 
+        })
+        if (infoRelevante.dataValues.ARCHIVO){
+            let cadena = infoRelevante.dataValues.ARCHIVO.split(".")
+            infoRelevante.dataValues.ARCHIVO = fs.readFileSync(infoRelevante.dataValues.ARCHIVO, "base64")
+        }
+        res.status(201).json({informacionRelevante: infoRelevante});
+    }catch (error) {
         res.json({error: error.message})
     }
     

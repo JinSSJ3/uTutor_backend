@@ -28,5 +28,9 @@ router.get("/api/alumno/:id", alumnoController.get);
 
 router.post("/api/alumno/informacionrelevante", alumnoController.registrarInformacionRelevante);
 
+router.get("/api/alumno/informacionrelevante/:idAlumno", alumnoController.listarArchivosInfoRelevante);
+
+router.get("/api/alumno/informacionrelevante/descargar/:idArchivo", alumnoController.devolverArchivoInfoRelevante);
+
 
 module.exports = router;
