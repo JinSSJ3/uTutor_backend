@@ -443,6 +443,7 @@ controllers.modificarFacultad = async (req, res) => {
                 where: {
                     [Op.or]: [
                         { ID_FACULTAD: null },
+                        {ID_PROGRAMA: {[Op.not]: ID_PROGRAMA}},
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
                     ]
                 }
