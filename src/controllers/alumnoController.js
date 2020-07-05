@@ -374,6 +374,16 @@ controllers.registrarInformacionRelevante = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const {ID_ALUMNO, ARCHIVO, DESCRIPCION, EXTENSION} = req.body.archivo;
     try {
+        let archivos = await informacionRelevante.findOne({
+            where: {ID_ALUMNO: ID_ALUMNO,
+                    DESCRIPCION: DESCRIPCION+"."+EXTENSION}
+        })
+
+        if(archivos){
+            res.status(201).json({error: "Nombre de archivo repetido"});
+            return;
+        }
+
         let ruta = ARCHIVO?path.join("..","Archivos","Alumnos",ID_ALUMNO.toString(), DESCRIPCION.replace(" ","_")+"."+EXTENSION):null;
         if(ARCHIVO){
             let data = new Buffer(ARCHIVO, "base64");  
