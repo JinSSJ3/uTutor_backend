@@ -857,11 +857,14 @@ controllers.listarSesionesPorAlumnoYProcesoTutoria = async (req, res) => {
                 {
                     model: procesoTutoría,
                     where: { ID_PROCESO_TUTORIA: idProcesoTutoria },
-                    attributes: []
+                    attributes: ["NOMBRE"]
                 },
                 {
                     model: tutor,
                     include: { model: usuario }
+                },{
+                    model: alumnoXSesion,
+                    attributes:["ASISTENCIA_ALUMNO"]
                 }
             ]
         });
