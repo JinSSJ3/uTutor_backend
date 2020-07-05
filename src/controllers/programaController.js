@@ -298,14 +298,6 @@ controllers.listarFacultad = async (req, res) => {
                         { ID_FACULTAD: null },
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
                     ]
-                },
-                include:{
-                    model: coordinador,
-                    include:{
-                        model: rol,
-                        where: {DESCRIPCION: "Coordinador Facultad"}
-                    }
-                    
                 }
             }
         );
