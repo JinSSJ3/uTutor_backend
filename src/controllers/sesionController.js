@@ -1,5 +1,7 @@
 const controllers = {}
 
+var nodemailer = require('nodemailer');
+
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let sesion = require('../models/sesion');
@@ -489,7 +491,32 @@ controllers.registrarResultados = async (req, res) => {
             }
         })
 
+        const alum = await usuario.findOne({
+            where: {
+                ID_USUARIO: ALUMNOS[0]
+            }
+        })
+
+        var mensaje = `Sr(a). ${alum.NOMBRE} ${alum.APELLIDOS}
+        Se le adjunta la información de las unidades de apoyo que se le han sido asignadas:
+        
+        `
+
         AREAS_APOYO.forEach(async area => {
+
+            const areaMail = await areaApoyo.findOne({
+                where: {
+                    ID_AREA_APOYO: area
+                }
+            })
+
+            mensaje += `
+                      Unidad: ${areaMail.NOMBRE}
+                      Contacto: ${areaMail.CONTACTO}
+                      Correo: ${areaMail.CORREO}
+                      
+                      `
+
             const newArea = await areaApoyoXSesion.create({
                 ID_SESION: ID_SESION,
                 ID_AREA_APOYO: area
@@ -508,6 +535,32 @@ controllers.registrarResultados = async (req, res) => {
 
         await transaccion.commit();
         res.status(201).json({ asist: req.body });
+
+        mensaje+= `Atentamente, el equipo de uTutor.`
+
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'ututor2020@gmail.com',
+              pass: 'SeniorMito'
+            }
+          });
+          
+          var mailOptions = {
+            from: 'ututor2020@gmail.com',
+            to: `${alum.CORREO}`,
+            subject: 'Asignación de áreas de apoyo',
+            text: mensaje
+          };
+          
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+
     } catch (error) {
         console.log(error);
         await transaccion.rollback();
