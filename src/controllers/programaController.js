@@ -435,15 +435,15 @@ controllers.registrarPrograma = async (req, res) => {
 controllers.modificarFacultad = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
-    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP, DIAS_CITA } = req.body.facultad;
+    const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP, DIAS_CITA, INDEPENDIENTE } = req.body.facultad;
     console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const facultades = await programa.findAll(
             {
                 where: {
+                    ID_PROGRAMA: {[Op.not]: ID_PROGRAMA},
                     [Op.or]: [
                         { ID_FACULTAD: null },
-                        {ID_PROGRAMA: {[Op.not]: ID_PROGRAMA}},
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
                     ]
                 }
@@ -456,14 +456,15 @@ controllers.modificarFacultad = async (req, res) => {
                 return
             };
         }
-
+        const ID_FACULTAD = INDEPENDIENTE?ID_PROGRAMA:null
         const facultadModificada = await programa.update(
             {
                 ID_INSTITUCION: ID_INSTITUCION,
                 NOMBRE: NOMBRE,
                 IMAGEN: IMAGEN,
                 ANTICIPACION_DISPONIBILIDAD: DIAS_DISP,
-                ANTICIPACION_CANCELAR_CITA: DIAS_CITA
+                ANTICIPACION_CANCELAR_CITA: DIAS_CITA,
+                ID_FACULTAD: ID_FACULTAD
             },
             { where: { ID_PROGRAMA: ID_PROGRAMA } },
             { transaction: transaccion }
