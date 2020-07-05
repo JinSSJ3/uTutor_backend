@@ -13,8 +13,10 @@ controllers.listar = async (req, res) => {  //lista las notificaciones activas d
                 model: sesion
             }, {
                 model: usuario,
-                as: "EMISOR"
-            }]
+                as: "EMISOR",
+                attributes: ["NOMBRE", "APELLIDOS", "CORREO"]
+            }],
+            attributes: []
         });
         res.status(201).json({notificaciones:notificaciones});         
     }    

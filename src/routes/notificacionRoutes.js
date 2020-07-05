@@ -10,5 +10,7 @@ router.get("/",(req, res)=>{
 })
 router.get("/api/notificacion/lista/:idUsuario", notificacionController.listar);
 
+router.get("/api/notificacion/actualizar/:idUsuario", notificacionController.modificar);
+
 
 module.exports = router;
