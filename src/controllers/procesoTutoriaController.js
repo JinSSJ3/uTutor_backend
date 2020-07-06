@@ -107,6 +107,15 @@ controllers.registrar = async (req, res) => {
     const {NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, DURACION} = req.body.tutoria; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
+        const repetido = await tutoria.findOne({
+            where: {NOMBRE: NOMBRE, ID_PROGRAMA: ID_PROGRAMA}
+        })
+        
+        if(repetido){
+            res.json({error: "Nombre repetido"});
+            return;
+        }
+
         const nuevaTutoria = await tutoria.create({
             NOMBRE: NOMBRE,
             DESCRIPCION: DESCRIPCION,
@@ -142,6 +151,16 @@ controllers.modificar = async (req, res) => {
     const {ID, NOMBRE, DESCRIPCION, OBLIGATORIO, TUTOR_FIJO, GRUPAL, TUTOR_ASIGNADO, PERMANENTE, ETIQUETA, PROGRAMA, DURACION} = req.body.tutoria; 
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
+        
+        const repetido = await tutoria.findOne({
+            where: {NOMBRE: NOMBRE, ID_PROGRAMA: ID_PROGRAMA, ID_PROCESO_TUTORIA: {[Op.not]: ID}}
+        })
+
+        if(repetido){
+            res.json({error: "Nombre repetido"});
+            return;
+        }
+
         const tutoriaModificada = await tutoria.update({
             NOMBRE: NOMBRE,
             DESCRIPCION: DESCRIPCION,
