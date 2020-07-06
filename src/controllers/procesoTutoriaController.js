@@ -108,7 +108,7 @@ controllers.registrar = async (req, res) => {
   //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
     try {
         const repetido = await tutoria.findOne({
-            where: {NOMBRE: NOMBRE, ID_PROGRAMA: ID_PROGRAMA}
+            where: {NOMBRE: NOMBRE, ID_PROGRAMA: PROGRAMA}
         })
         
         if(repetido){
@@ -153,7 +153,7 @@ controllers.modificar = async (req, res) => {
     try {
         
         const repetido = await tutoria.findOne({
-            where: {NOMBRE: NOMBRE, ID_PROGRAMA: ID_PROGRAMA, ID_PROCESO_TUTORIA: {[Op.not]: ID}}
+            where: {NOMBRE: NOMBRE, ID_PROGRAMA: PROGRAMA, ID_PROCESO_TUTORIA: {[Op.not]: ID}}
         })
 
         if(repetido){
