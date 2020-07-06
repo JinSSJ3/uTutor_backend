@@ -12,6 +12,7 @@ const asignacionTutoria = require('./src/models/asignacionTutoria');
 const procesoTutoria = require('./src/models/procesoTutoria');
 const alumnoXSesion = require('./src/models/alumnoXSesion');
 const usuario = require('./src/models/usuario');
+const bodyParser = require('body-parser');
 
 dotenv.config();
 
@@ -22,14 +23,15 @@ dotenv.config();
 
 app = express();
 
-app.use(express.json());
-
+//app.use(express.json());
+app.use(bodyParser.json({limit: '10MB', extended: true}))
 
 // Settings
 app.set("port", process.env.PORT);
 
 
 sequelize.sync();
+
 
 // relaciones que generan conflicto por el orden en el que se crean las tablas
 etiqueta.belongsToMany(alumno, {through: etiquetaXAlumno, foreignKey: "ID_ETIQUETA", otherKey: "ID_ALUMNO", as: "ETIQUETA"})

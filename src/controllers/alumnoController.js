@@ -394,19 +394,14 @@ controllers.registrarInformacionRelevante = async (req, res) => {
                 DESCRIPCION: nombreArchivo
             }
         })
-        if (archivos && DESCRIPCION.includes(".parte0")) {
+        if (archivos) {
             res.status(201).json({ error: "Nombre de archivo repetido" });
             return;
-        } else if (archivos) {
-            let partes = archivos.PARTES
-            archivos.PARTES = await parseInt(partes, 10) + 1;
-            await archivos.save({ transaction: transaccion })
-        }
-
+        } 
 
         let ruta = ARCHIVO ? path.join("..", "Archivos", "Alumnos", ID_ALUMNO.toString(), DESCRIPCION + "." + EXTENSION) : null;
         if (ARCHIVO) {
-            let data = new Buffer(ARCHIVO, "base64");
+            let data = new Buffer.from(ARCHIVO.split(";base64,")[1], "base64");
             fsPath.writeFile(ruta, data, function (err) {
                 if (err) {
                     return console.log(err);
@@ -414,18 +409,13 @@ controllers.registrarInformacionRelevante = async (req, res) => {
             })
         }
         console.log("ruta: ", ruta);
-        if (DESCRIPCION.includes(".parte0")) {
-            const nuevaInformacionRelevante = await informacionRelevante.create({
-                ID_ALUMNO: ID_ALUMNO,
-                DESCRIPCION: nombreArchivo,
-                ARCHIVO: ruta
-            }, { transaction: transaccion })
-
-
-            res.status(201).json({ informacionRelevante: nuevaInformacionRelevante });
-        } else {
-            res.status(201).json({ informacionRelevante: DESCRIPCION.split(".")[1] + " del archivo " + nombreArchivo + " guardada" });
-        }
+        
+        const nuevaInformacionRelevante = await informacionRelevante.create({
+            ID_ALUMNO: ID_ALUMNO,
+            DESCRIPCION: nombreArchivo,
+            ARCHIVO: ruta
+        }, { transaction: transaccion })
+        res.status(201).json({ informacionRelevante: nuevaInformacionRelevante });
         await transaccion.commit();
     } catch (error) {
         await transaccion.rollback();
@@ -448,30 +438,20 @@ controllers.listarArchivosInfoRelevante = async (req, res) => {  // lista los ar
 };
 
 controllers.devolverArchivoInfoRelevante = async (req, res) => {  // lista los archivos relevantes de un alumno
-    try {
+    try {        
         const infoRelevante = await informacionRelevante.findOne({
-            where: { ID_INFORMACION_RELEVANTE: req.params.idArchivo },
-            attributes: ["DESCRIPCION", "ARCHIVO", "PARTES"]
+            where: {ID_INFORMACION_RELEVANTE: req.params.idArchivo},
+            attributes: ["DESCRIPCION", "ARCHIVO"] 
         })
-        let archivoCompleto = "";
-        if (infoRelevante.ARCHIVO) {
-            let ruta = await infoRelevante.ARCHIVO;
-            let archivoBase = await infoRelevante.DESCRIPCION;
-            let rutaBase = await infoRelevante.ARCHIVO;
-            let nomArch = "";
-            for (cont = 0; cont < parseInt(infoRelevante.PARTES, 10); cont++) {
-                nomArch = await archivoBase.split('.')[0] + ".parte" + cont.toString() + "." + archivoBase.split(".")[1]
-                console.log("base: ", nomArch);
-                ruta = await rutaBase.slice(0, -(archivoBase.length + 7)) + nomArch;
-                archivoCompleto+= await fs.readFileSync(ruta, "base64");
-                console.log("ruta: ", ruta);
-            }
+        console.log(infoRelevante.ARCHIVO)
+        if (infoRelevante.ARCHIVO){
+            infoRelevante.ARCHIVO = fs.readFileSync(infoRelevante.ARCHIVO, "base64")
         }
-        infoRelevante.ARCHIVO = archivoCompleto
-        res.status(201).json({ informacionRelevante: infoRelevante });
-    } catch (error) {
-        res.json({ error: error.message })
+        res.status(201).json({informacionRelevante: infoRelevante});
+    }catch (error) {
+        res.json({error: error.message})
     }
+
 
 };
 
