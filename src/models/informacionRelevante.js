@@ -20,7 +20,8 @@ let informacionRelevante = sequelize.define(nametable,{
     DESCRIPCION:{
         type: Sequelize.STRING
     },
-    ARCHIVO: Sequelize.STRING        
+    ARCHIVO: Sequelize.STRING,
+    PARTES: Sequelize.INTEGER        
 },
 {
     timestamps :false,

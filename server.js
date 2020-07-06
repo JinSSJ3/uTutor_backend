@@ -11,6 +11,7 @@ const tutor = require('./src/models/tutor');
 const asignacionTutoria = require('./src/models/asignacionTutoria');
 const procesoTutoria = require('./src/models/procesoTutoria');
 const alumnoXSesion = require('./src/models/alumnoXSesion');
+const usuario = require('./src/models/usuario');
 
 dotenv.config();
 
@@ -40,7 +41,7 @@ sesion.hasMany(areaApoyoXSesion, {foreignKey: "ID_SESION"})
 tutor.hasMany(asignacionTutoria, {foreignKey: "ID_TUTOR"});
 procesoTutoria.hasMany(asignacionTutoria, {foreignKey: "ID_PROCESO_TUTORIA"});
 sesion.hasMany(alumnoXSesion, {foreignKey: "ID_SESION"});
-
+usuario.hasOne(alumno, {foreignKey: "ID_ALUMNO"});
 app.use(morgan('dev'));
 
 
