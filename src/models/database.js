@@ -1,7 +1,6 @@
 var Sequelize = require('sequelize');
 require('dotenv').config();
 
-
 const sequelize = new Sequelize( 
     {username: process.env.USR,
     password: process.env.PSSW,

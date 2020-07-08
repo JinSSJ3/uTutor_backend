@@ -28,6 +28,6 @@ let programa = sequelize.define(
     }
 );
 
-programa.belongsTo(institucion, {foreignKey:{name:"ID_INSTITUCION"}});
-programa.belongsTo(programa, {as: 'FACULTAD', foreignKey:'ID_FACULTAD'})
+// programa.belongsTo(institucion, {foreignKey:{name:"ID_INSTITUCION"}});
+// programa.belongsTo(programa, {as: 'FACULTAD', foreignKey:'ID_FACULTAD'})
 module.exports = programa;

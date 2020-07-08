@@ -13,11 +13,11 @@ let asignacionTutoriaXAlumno = sequelize.define(nametable,{
     freezeTableName: true,       
 });
 
-alumno.belongsToMany(asignacionTutoria, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ALUMNO", otherKey: "ID_ASIGNACION"});
-asignacionTutoria.belongsToMany(alumno, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ASIGNACION", otherKey: "ID_ALUMNO", as: "ALUMNOS"});
-asignacionTutoriaXAlumno.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
-asignacionTutoriaXAlumno.belongsTo(asignacionTutoria,{foreignKey: "ID_ASIGNACION"});
-alumno.hasMany(asignacionTutoriaXAlumno, {foreignKey: "ID_ALUMNO"});
-asignacionTutoria.hasMany(asignacionTutoriaXAlumno, {foreignKey: "ID_ASIGNACION"});
+// alumno.belongsToMany(asignacionTutoria, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ALUMNO", otherKey: "ID_ASIGNACION"});
+// asignacionTutoria.belongsToMany(alumno, {through: asignacionTutoriaXAlumno, foreignKey: "ID_ASIGNACION", otherKey: "ID_ALUMNO", as: "ALUMNOS"});
+// asignacionTutoriaXAlumno.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
+// asignacionTutoriaXAlumno.belongsTo(asignacionTutoria,{foreignKey: "ID_ASIGNACION"});
+// alumno.hasMany(asignacionTutoriaXAlumno, {foreignKey: "ID_ALUMNO"});
+// asignacionTutoria.hasMany(asignacionTutoriaXAlumno, {foreignKey: "ID_ASIGNACION"});
 
 module.exports = asignacionTutoriaXAlumno;

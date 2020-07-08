@@ -23,7 +23,10 @@ let procesoTutoria = sequelize.define(nametable,{
     TUTOR_ASIGNADO: Sequelize.TINYINT,
     PERMANENTE: Sequelize.TINYINT,
     DURACION: Sequelize.INTEGER,    
-    ESTADO: Sequelize.TINYINT    
+    ESTADO: {
+        type: Sequelize.TINYINT,
+        defaultValue: 1 
+    }    
     },
     {
     timestamps :false,

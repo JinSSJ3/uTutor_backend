@@ -24,7 +24,7 @@ let alumno = sequelize.define(nametable,{
 
 
 
-alumno.belongsTo(usuario, {foreignKey:{name:"ID_ALUMNO"}});
-alumno.hasMany(etiquetaXAlumno, {foreignKey:{name: "ID_ALUMNO"}});
+// alumno.belongsTo(usuario, {foreignKey:{name:"ID_ALUMNO"}});
+// alumno.hasMany(etiquetaXAlumno, {foreignKey:{name: "ID_ALUMNO"}});
 
 module.exports = alumno;

@@ -21,6 +21,6 @@ let tutor = sequelize.define(nametable,{
     freezeTableName: true
 });
 
-tutor.belongsTo(usuario, {foreignKey:{name:"ID_TUTOR"}});
+// tutor.belongsTo(usuario, {foreignKey:{name:"ID_TUTOR"}});
 
 module.exports = tutor;

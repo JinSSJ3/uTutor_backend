@@ -36,8 +36,8 @@ let asignacionTutoria = sequelize.define(nametable,
 );
 
 
-asignacionTutoria.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
-asignacionTutoria.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA", as: "PROCESO_TUTORIA"});
+// asignacionTutoria.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
+// asignacionTutoria.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA", as: "PROCESO_TUTORIA"});
 
 
 module.exports = asignacionTutoria;

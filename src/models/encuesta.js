@@ -35,8 +35,8 @@ let encuesta = sequelize.define(nametable,{
   });
 
 
-encuesta.belongsTo(alumnoXSesion,{foreignKey: "ID_SESION"});
-encuesta.belongsTo(alumnoXSesion,{foreignKey:"ID_ALUMNO"});
+// encuesta.belongsTo(alumnoXSesion,{foreignKey: "ID_SESION"});
+// encuesta.belongsTo(alumnoXSesion,{foreignKey:"ID_ALUMNO"});
 
 
 module.exports = encuesta;

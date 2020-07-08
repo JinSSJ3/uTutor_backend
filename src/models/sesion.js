@@ -43,8 +43,8 @@ let sesion = sequelize.define(nametable,{
     freezeTableName: true
 });
 
-sesion.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA"});
-sesion.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
+// sesion.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA"});
+// sesion.belongsTo(tutor,{foreignKey: "ID_TUTOR"});
 
 
 module.exports = sesion;
