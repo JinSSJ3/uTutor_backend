@@ -1,5 +1,7 @@
 const controllers = {}
 
+var nodemailer = require('nodemailer');
+
 let sequelize = require('../models/database');
 let tutor = require('../models/tutor');
 let usuario = require('../models/usuario');
@@ -295,5 +297,57 @@ controllers.listarEstadoSolicitudTutorFijo = async (req, res) => { // lista el t
         res.json({error: error.message});    
     }
 };
+
+controllers.citarAlumno = async (req, res) => {  
+    const {EMISOR, RAZON, RECEPTOR} = req.body.cita; 
+    console.log("GOT: ", req.body.cita);//solo para asegurarme de que el objeto llego al backend
+    
+    try {
+        const tut = await usuario.findOne({
+            where: {ID_USUARIO: EMISOR}
+        })
+
+        const alum = await usuario.findOne({
+            where: {ID_USUARIO: RECEPTOR}
+        })
+
+        res.status(201).json({cita: RAZON});
+
+        var correo = `Sr(a). ${alum.NOMBRE} ${alum.APELLIDOS}, ha recibido un mensaje del tutor ${tut.NOMBRE} ${tut.APELLIDOS}:
+        
+        ${RAZON}
+
+        Contacto: ${tut.CORREO}   
+        `
+
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'ututor2020@gmail.com',
+              pass: 'SeniorMito'
+            }
+          });
+          
+          var mailOptions = {
+            from: `${tut.CORREO}`,
+            to: `${alum.CORREO}`,
+            subject: 'Mensaje Sistema uTutor',
+            text: correo
+          };
+          
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+             
+    } catch (error) {
+        res.json({error: error.message})
+    }
+    
+};
+
 
 module.exports = controllers;

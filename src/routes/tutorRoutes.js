@@ -23,6 +23,6 @@ router.post("/api/tutor/modificar", tutorController.modificar);
 
 router.get("/api/tutor/estadosolicitud/:idAlumno/:idTutoria", tutorController.listarEstadoSolicitudTutorFijo);
 
-
+router.post("/api/citarAlumno", tutorController.citarAlumno);
 
 module.exports = router;
