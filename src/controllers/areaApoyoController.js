@@ -25,11 +25,19 @@ controllers.registrar = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const {NOMBRE, TELEFONO, CORREO, CONTACTO} = req.body.areaApoyo; 
     try {
-        const repetido = await areaApoyo.findOne({
+        const nombreRepetido = await areaApoyo.findOne({
             where: {NOMBRE: NOMBRE}
         })
-        if(repetido){
+        if(nombreRepetido){
             res.json({error: "Nombre repetido"})
+            return;
+        }
+
+        const correoRepetido = await areaApoyo.findOne({
+            where: {CORREO: CORREO}
+        })
+        if(correoRepetido){
+            res.json({error: "Correo repetido"})
             return;
         }
 
@@ -60,6 +68,14 @@ controllers.modificar = async (req, res) => {
         })
         if(repetido){
             res.json({error: "Área de apoyo repetida"})
+            return;
+        }
+
+        const correoRepetido = await areaApoyo.findOne({
+            where: {CORREO: CORREO, ID_AREA_APOYO: {[Op.not]: ID_AREA_APOYO}}
+        })
+        if(correoRepetido){
+            res.json({error: "Correo repetido"})
             return;
         }
 

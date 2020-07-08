@@ -480,10 +480,12 @@ controllers.modificar = async (req, res) => {
 controllers.listarDisponibilidadAcumulada = async (req, res) => {  // horas de disponibilidad de cada tutor por facultad
     try{
         const { QueryTypes } = require('sequelize');
-        const motivos = await sequelize.query("SELECT SUM(TIME_TO_SEC(TIMEDIFF(TIME(HORA_FIN), TIME(HORA_INICIO)))/3600) TIEMPO, DISPONIBILIDAD.ID_TUTOR" +
-        " FROM DISPONIBILIDAD, ROL_X_USUARIO_X_PROGRAMA, PROGRAMA" +
+        const motivos = await sequelize.query("SELECT SUM(TIME_TO_SEC(TIMEDIFF(TIME(HORA_FIN), TIME(HORA_INICIO)))/3600) TIEMPO, " +
+        " CONCAT(USUARIO.NOMBRE, ' ', USUARIO.APELLIDOS) NOMBRE" +
+        " FROM DISPONIBILIDAD, ROL_X_USUARIO_X_PROGRAMA, PROGRAMA, USUARIO" +
         " WHERE DISPONIBILIDAD.ID_TUTOR = ROL_X_USUARIO_X_PROGRAMA.ID_USUARIO AND ROL_X_USUARIO_X_PROGRAMA.ID_ROL = 3" +
         " AND PROGRAMA.ID_PROGRAMA = ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA AND PROGRAMA.ID_FACULTAD = DISPONIBILIDAD.ID_FACULTAD" +
+        " AND DISPONIBILIDAD.ID_TUTOR = USUARIO.ID_USUARIO" + 
         " AND ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA = " + req.params.idPrograma +
         " GROUP BY DISPONIBILIDAD.ID_TUTOR ", { type: QueryTypes.SELECT });
         

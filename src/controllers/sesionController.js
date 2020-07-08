@@ -823,7 +823,7 @@ controllers.cancelarCita = async (req, res) => {
     }
 }
 
-module.exports = controllers;
+
 
 
 //Listar compromisos
@@ -962,3 +962,27 @@ controllers.listarMotivosSolicitud = async (req, res) => {  // motivos de solici
         res.json({error: error.message});    
     }
 };
+
+controllers.listarTiempoTutoriasAcumulada = async (req, res) => {  // horas de tutoria brindadas por cada tutor
+    try{
+        const { QueryTypes } = require('sequelize');
+        const motivos = await sequelize.query("SELECT SUM(TIME_TO_SEC(TIMEDIFF(TIME(HORA_FIN), TIME(HORA_INICIO)))/3600) TIEMPO, CONCAT(USUARIO.NOMBRE, ' ', USUARIO.APELLIDOS) NOMBRE " +
+        " FROM SESION, ROL_X_USUARIO_X_PROGRAMA, PROGRAMA, USUARIO, PROCESO_TUTORIA " +
+        " WHERE SESION.ID_TUTOR = ROL_X_USUARIO_X_PROGRAMA.ID_USUARIO AND ROL_X_USUARIO_X_PROGRAMA.ID_ROL = 3 " +
+        " AND PROGRAMA.ID_PROGRAMA = ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA  " +
+        " AND SESION.ID_PROCESO_TUTORIA = PROCESO_TUTORIA.ID_PROCESO_TUTORIA " +
+        " AND ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA = PROCESO_TUTORIA.ID_PROGRAMA " +
+        " AND PROGRAMA.ID_PROGRAMA = PROCESO_TUTORIA.ID_PROGRAMA " +
+        " AND SESION.ID_TUTOR = USUARIO.ID_USUARIO " +
+        " AND SESION.ESTADO LIKE '%realizada%' " +
+        " AND ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA = " + req.params.idPrograma +
+        " GROUP BY SESION.ID_TUTOR ", { type: QueryTypes.SELECT });
+        
+        res.status(201).json({motivosSolicitud:motivos});         
+    }    
+    catch (error) { 
+        res.json({error: error.message});    
+    }
+};
+
+module.exports = controllers;
