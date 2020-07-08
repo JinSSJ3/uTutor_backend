@@ -43,4 +43,6 @@ router.get("/api/sesion/motivosolicitud/:idPrograma", sesionController.listarMot
 
 router.get("/api/sesion/horastutoria/:idPrograma", sesionController.listarTiempoTutoriasAcumulada);
 
+router.get("/api/sesion/estado/:idPrograma", sesionController.listarEstadoSesiones);
+
 module.exports = router;

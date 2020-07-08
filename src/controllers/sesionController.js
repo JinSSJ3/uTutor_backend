@@ -985,4 +985,21 @@ controllers.listarTiempoTutoriasAcumulada = async (req, res) => {  // horas de t
     }
 };
 
+controllers.listarEstadoSesiones = async (req, res) => {  
+    try{
+        const { QueryTypes } = require('sequelize');
+        const motivos = await sequelize.query("SELECT COUNT(*) CANTIDAD, TRIM(substring(SESION.ESTADO,4,9)) ESTADO" +
+        " FROM SESION, PROCESO_TUTORIA" +
+        " WHERE SESION.ID_PROCESO_TUTORIA = PROCESO_TUTORIA.ID_PROCESO_TUTORIA" +
+        " AND (substring(SESION.ESTADO,4,9) = 'cancelada' OR substring(SESION.ESTADO,4,9) = 'realizada')" +
+        " AND PROCESO_TUTORIA.ID_PROGRAMA = " + req.params.idPrograma +
+        " GROUP BY substring(SESION.ESTADO,4,9) ", { type: QueryTypes.SELECT });
+        
+        res.status(201).json({motivosSolicitud:motivos});         
+    }    
+    catch (error) { 
+        res.json({error: error.message});    
+    }
+};
+
 module.exports = controllers;
