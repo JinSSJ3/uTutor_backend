@@ -33,7 +33,7 @@ router.get("/api/disponibilidadporfacultad/:idtutor/:idFacultad", disponibilidad
 
 router.post("/api/disponibilidad/listarPrograma/:idprograma/:fecha", disponibilidadController.listarPorProgramaMultipleTutorFecha);
 
-
+router.get("/api/disponibilidadacumulada/:idPrograma", disponibilidadController.listarDisponibilidadAcumulada);
 
 
 module.exports = router;

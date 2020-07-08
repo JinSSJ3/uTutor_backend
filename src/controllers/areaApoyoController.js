@@ -1,7 +1,10 @@
 const controllers = {}
-
+const Sequelize = require('sequelize')
 let sequelize = require('../models/database');
 let areaApoyo = require('../models/areaApoyo');
+
+Op = Sequelize.Op;
+
 
 controllers.listar = async (req, res) => { 
     try{
@@ -22,6 +25,14 @@ controllers.registrar = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const {NOMBRE, TELEFONO, CORREO, CONTACTO} = req.body.areaApoyo; 
     try {
+        const repetido = await areaApoyo.findOne({
+            where: {NOMBRE: NOMBRE}
+        })
+        if(repetido){
+            res.json({error: "Nombre repetido"})
+            return;
+        }
+
         const nuevaAreaApoyo = await areaApoyo.create({
             NOMBRE: NOMBRE,
             TELEFONO: TELEFONO,
@@ -44,6 +55,14 @@ controllers.modificar = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const {ID_AREA_APOYO, NOMBRE, TELEFONO, CORREO, CONTACTO} = req.body.areaApoyo;
     try {
+        const repetido = await areaApoyo.findOne({
+            where: {NOMBRE: NOMBRE, ID_AREA_APOYO: {[Op.not]: ID_AREA_APOYO}}
+        })
+        if(repetido){
+            res.json({error: "Área de apoyo repetida"})
+            return;
+        }
+
         const etiquetaModificada = await areaApoyo.update({
             NOMBRE: NOMBRE,
             TELEFONO: TELEFONO,

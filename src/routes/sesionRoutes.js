@@ -39,4 +39,6 @@ router.get("/api/listaSesionRealizada/:idalumno", sesionController.listarPorAlum
 
 router.post("/api/compromiso/modificar", sesionController.modificarCompromiso);
 
+router.get("/api/sesion/motivosolicitud/:idPrograma", sesionController.listarMotivosSolicitud);
+
 module.exports = router;

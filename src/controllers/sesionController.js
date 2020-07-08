@@ -948,3 +948,17 @@ controllers.modificarCompromiso = async (req, res) => {
     }
 
 };
+
+controllers.listarMotivosSolicitud = async (req, res) => {  // motivos de solicitud por programa
+    try{
+        const { QueryTypes } = require('sequelize');
+        const motivos = await sequelize.query("SELECT COUNT(*) CANTIDAD, MOTIVO FROM SESION, PROCESO_TUTORIA " +
+        " WHERE SESION.ID_PROCESO_TUTORIA = PROCESO_TUTORIA.ID_PROCESO_TUTORIA AND PROCESO_TUTORIA.ID_PROGRAMA = " + req.params.idPrograma +
+        " GROUP BY MOTIVO ", { type: QueryTypes.SELECT });
+        
+        res.status(201).json({motivosSolicitud:motivos});         
+    }    
+    catch (error) { 
+        res.json({error: error.message});    
+    }
+};
