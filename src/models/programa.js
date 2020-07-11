@@ -19,8 +19,14 @@ let programa = sequelize.define(
         },
         NOMBRE: Sequelize.STRING,
         IMAGEN: Sequelize.BLOB,
-        ANTICIPACION_DISPONIBILIDAD: Sequelize.INTEGER,
-        ANTICIPACION_CANCELAR_CITA: Sequelize.INTEGER
+        ANTICIPACION_DISPONIBILIDAD: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0 
+        },
+        ANTICIPACION_CANCELAR_CITA: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0 
+        }
     },
     {
         timestamps: false,

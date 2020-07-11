@@ -13,6 +13,32 @@ let rolXUsuarioXPrograma = sequelize.define(nametable,{
         primaryKey: true,
         autoIncrement: true
     },
+    ID_USUARIO: {
+        type: Sequelize.INTEGER,
+        foreignKey: true,
+        primaryKey: true,
+        references: {
+            model: "USUARIO",
+            key: "ID_USUARIO"
+          }
+    },
+    ID_ROL: {
+        type: Sequelize.INTEGER,
+        foreignKey: true,
+        primaryKey: true,
+        references: {
+            model: "ROL",
+            key: "ID_ROL"
+          }
+    },
+    ID_PROGRAMA: {
+        type: Sequelize.INTEGER,
+        foreignKey: true,
+        references: {
+            model: "PROGRAMA",
+            key: "ID_PROGRAMA"
+          }
+    },
     ESTADO: {
         type: Sequelize.TINYINT,
         defaultValue: 1 

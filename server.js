@@ -26,6 +26,7 @@ const compromiso = require('./src/models/compromiso');
 const asignacionTutoriaXAlumno = require('./src/models/asignacionTutoriaXAlumno');
 const areaApoyo = require('./src/models/areaApoyo');
 const mysql = require('mysql2/promise');
+const { QueryInterface, Sequelize } = require('sequelize');
 
 dotenv.config();
 
@@ -57,53 +58,63 @@ mysql.createConnection({
             try {
                 if (!datos) {
                     const nuevaInstitucion = await institucion.create({
-                        NOMBRE: "Pontificia Universidad Católica del Perú",
-                        INICIALES: "PUCP",
+                        NOMBRE: "",
+                        INICIALES: "",
                         IMAGEN: null,
-                        TELEFONO: "200100",
-                        PAGINA_WEB: "www.pucp.edu.pe",
-                        UBICACION: "Av. Universitaria 198",
-                        DOMINIO: "pucp.edu.pe",
-                        DOMINIO2: "pucp.pe"
+                        TELEFONO: "",
+                        PAGINA_WEB: "",
+                        UBICACION: "",
+                        DOMINIO: "",
+                        DOMINIO2: ""
                     }, { transaction: tran })
 
-                    const { QueryTypes } = require('sequelize');
+                    
                     await rol.create({
                         ID_ROL: 1,
                         DESCRIPCION: "Administrador"
-                    })
+                    }, { transaction: tran })
 
                     await rol.create({
                         ID_ROL: 2,
                         DESCRIPCION: "Coordinador Programa"
-                    })
+                    }, { transaction: tran })
 
                     await rol.create({
                         ID_ROL: 3,
                         DESCRIPCION: "Tutor"
-                    })
+                    }, { transaction: tran })
 
                     await rol.create({
                         ID_ROL: 4,
                         DESCRIPCION: "Alumno"
-                    })
+                    }, { transaction: tran })
 
                     await rol.create({
                         ID_ROL: 5,
                         DESCRIPCION: "Usuario de soporte"
-                    })
+                    }, { transaction: tran })
 
                     await rol.create({
                         ID_ROL: 6,
                         DESCRIPCION: "Coordinador Facultad"
-                    })
+                    }, { transaction: tran })
+
+                    await etiqueta.create({
+                        ID_ETIQUETA: 1,
+                        DESCRIPCION: "Permanencia"
+                    }, { transaction: tran })
+
+                    await etiqueta.create({
+                        ID_ETIQUETA: 2,
+                        DESCRIPCION: "Tercera matrícula"
+                    }, { transaction: tran })
 
                     const admin = await usuario.create({
                         USUARIO: "luis.miguel",
-                        CONTRASENHA: "contra",
+                        CONTRASENHA: "admin",
                         NOMBRE: "Luis Miguel",
                         APELLIDOS: "Guanira Contreras",
-                        CORREO: "luis.miguel@pucp.edu.pe",
+                        CORREO: "luis.miguel@pucp.pe",
                         CODIGO: "19996532",
                         TELEFONO: "932147863",
                         DIRECCION: "Jr. Las flores 131",
@@ -131,6 +142,18 @@ mysql.createConnection({
 
 
 // relaciones que generan conflicto por el orden en el que se crean las tablas
+usuario.belongsToMany(rol, { through: {model: rolXUsuarioXPrograma, unique: false}, foreignKey: "ID_USUARIO", otherKey: "ID_ROL" });
+usuario.belongsToMany(programa, { through: {model: rolXUsuarioXPrograma, unique: false}, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA" });
+rol.belongsToMany(usuario, { through: {model: rolXUsuarioXPrograma, unique: false}, foreignKey: "ID_ROL", otherKey: "ID_USUARIO" });
+rol.belongsToMany(programa, { through: {model: rolXUsuarioXPrograma, unique: false}, foreignKey: "ID_ROL", otherKey: "ID_PROGRAMA" });
+programa.belongsToMany(usuario, { through: {model: rolXUsuarioXPrograma, unique: false}, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO" });
+programa.belongsToMany(rol, { through: {model: rolXUsuarioXPrograma, unique: false}, foreignKey: "ID_PROGRAMA", otherKey: "ID_ROL" });
+rolXUsuarioXPrograma.belongsTo(usuario, { foreignKey: "ID_USUARIO" });
+rolXUsuarioXPrograma.belongsTo(rol, { foreignKey: "ID_ROL" });
+rolXUsuarioXPrograma.belongsTo(programa, { foreignKey: "ID_PROGRAMA" });
+usuario.hasMany(rolXUsuarioXPrograma, { foreignKey: "ID_USUARIO" });
+programa.hasMany(rolXUsuarioXPrograma, { foreignKey: "ID_PROGRAMA" });
+rol.hasMany(rolXUsuarioXPrograma, { foreignKey: "ID_ROL" });
 etiqueta.belongsToMany(alumno, { through: etiquetaXAlumno, foreignKey: "ID_ETIQUETA", otherKey: "ID_ALUMNO", as: "ETIQUETA" })
 alumno.belongsToMany(etiqueta, { through: etiquetaXAlumno, foreignKey: "ID_ALUMNO", otherKey: "ID_ETIQUETA" })
 etiquetaXAlumno.belongsTo(etiqueta, { foreignKey: "ID_ETIQUETA" });
@@ -176,18 +199,7 @@ notificacion.belongsTo(usuario, { as: 'EMISOR', foreignKey: "ID_EMISOR" });
 notificacion.belongsTo(usuario, { as: 'RECEPTOR', foreignKey: "ID_RECEPTOR" });
 programa.belongsTo(institucion, { foreignKey: { name: "ID_INSTITUCION" } });
 programa.belongsTo(programa, { as: 'FACULTAD', foreignKey: 'ID_FACULTAD' })
-usuario.belongsToMany(rol, { through: rolXUsuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_ROL" });
-usuario.belongsToMany(programa, { through: rolXUsuarioXPrograma, foreignKey: "ID_USUARIO", otherKey: "ID_PROGRAMA" });
-rol.belongsToMany(usuario, { through: rolXUsuarioXPrograma, foreignKey: "ID_ROL", otherKey: "ID_USUARIO" });
-rol.belongsToMany(programa, { through: rolXUsuarioXPrograma, foreignKey: "ID_ROL", otherKey: "ID_PROGRAMA" });
-programa.belongsToMany(usuario, { through: rolXUsuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_USUARIO" });
-programa.belongsToMany(rol, { through: rolXUsuarioXPrograma, foreignKey: "ID_PROGRAMA", otherKey: "ID_ROL" });
-usuario.hasMany(rolXUsuarioXPrograma, { foreignKey: "ID_USUARIO" });
-rolXUsuarioXPrograma.belongsTo(usuario, { foreignKey: "ID_USUARIO" });
-rolXUsuarioXPrograma.belongsTo(rol, { foreignKey: "ID_ROL" });
-rolXUsuarioXPrograma.belongsTo(programa, { foreignKey: "ID_PROGRAMA" });
-programa.hasMany(rolXUsuarioXPrograma, { foreignKey: "ID_PROGRAMA" });
-rol.hasMany(rolXUsuarioXPrograma, { foreignKey: "ID_ROL" });
+procesoTutoria.belongsTo(programa, {foreignKey:{name:"ID_PROGRAMA"}});
 sesion.belongsTo(procesoTutoria, { foreignKey: "ID_PROCESO_TUTORIA" });
 sesion.belongsTo(tutor, { foreignKey: "ID_TUTOR" });
 tutor.belongsTo(usuario, { foreignKey: { name: "ID_TUTOR" } });
