@@ -26,7 +26,11 @@ let programa = sequelize.define(
         ANTICIPACION_CANCELAR_CITA: {
             type: Sequelize.INTEGER,
             defaultValue: 0 
-        }
+        },
+        ESTADO: {
+            type: Sequelize.TINYINT,
+            defaultValue: 1 
+        } 
     },
     {
         timestamps: false,
