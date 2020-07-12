@@ -6,11 +6,20 @@ let sesion = require("./sesion");
 let nametable = 'NOTIFICACION';
 
 let notificacion = sequelize.define(nametable,{
-    ID_SESION: {
+    ID_NOTIFICACION: {
         type: Sequelize.INTEGER,
         primaryKey: true,
+        autoIncrement: true
     },
-    ESTADO: Sequelize.INTEGER  
+    ID_SESION: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: "SESION",
+            key: "ID_SESION"
+          }
+    },
+    ESTADO: Sequelize.INTEGER,
+    MENSAJE: Sequelize.STRING  
     },
     {
     timestamps :false,

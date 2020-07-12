@@ -16,7 +16,7 @@ controllers.listar = async (req, res) => {  //lista las notificaciones activas d
                 as: "EMISOR",
                 attributes: ["NOMBRE", "APELLIDOS", "CORREO"]
             }],
-            attributes: []
+            attributes: ["MENSAJE"]
         });
         res.status(201).json({notificaciones:notificaciones});         
     }    
