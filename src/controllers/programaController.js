@@ -597,4 +597,27 @@ controllers.listarPoliticasPorFacultad = async (req, res) => {
     }
 }
 
+controllers.listarProgramasDeUnTutorSegunFacultad = async (req, res) => {
+    try {        // lista los programas de un tutor segun una facultad
+        const programas = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idTutor, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Tutor" },
+                    attributes: []
+                }],
+                attributes: []
+            }],
+            where: { ID_FACULTAD: req.params.idFacultad },
+            attributes: ["ID_PROGRAMA", "NOMBRE"]
+        });
+        res.status(201).json({ programas: programas });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
 module.exports = controllers;

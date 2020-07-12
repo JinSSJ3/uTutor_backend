@@ -1002,4 +1002,45 @@ controllers.listarEstadoSesiones = async (req, res) => {
     }
 };
 
+controllers.listarSesionesRealizadasPorAlumnoYProcesoTutoria = async (req, res) => {
+    const idAlumno = req.params.idAlumno;
+    const idProcesoTutoria = req.params.idProcesoTutoria;
+    try {
+        const data = await sesion.findAll({
+            include: [
+                {
+                    model: compromiso
+                },
+                {
+                    model: alumno,
+                    where: { ID_ALUMNO: idAlumno },
+                    attributes: []
+                },
+                {
+                    model: procesoTutoría,
+                    where: { ID_PROCESO_TUTORIA: idProcesoTutoria },
+                    attributes: ["NOMBRE"]
+                },
+                {
+                    model: tutor,
+                    include: { model: usuario }
+                },{
+                    model: alumnoXSesion,
+                    attributes:["ASISTENCIA_ALUMNO"]
+                }
+            ],
+            where: {
+                [Op.or]: [
+                    { ESTADO: "01-realizada_sin_cita" },
+                    { ESTADO: "00-realizada_cita" }
+                ],
+             }
+        });
+        res.status(201).json({ sesiones: data });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 module.exports = controllers;

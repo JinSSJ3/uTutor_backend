@@ -45,4 +45,6 @@ router.get("/api/sesion/horastutoria/:idPrograma", sesionController.listarTiempo
 
 router.get("/api/sesion/estado/:idPrograma", sesionController.listarEstadoSesiones);
 
+router.get("/api/listaSesionRealizadaAlumnoProcesoTutoria/:idAlumno/:idProcesoTutoria", sesionController.listarSesionesRealizadasPorAlumnoYProcesoTutoria);
+
 module.exports = router;
