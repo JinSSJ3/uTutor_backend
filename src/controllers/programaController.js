@@ -58,19 +58,19 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
                     },
                     {
                         model: rolXUsuarioXPrograma,
-                        include:[{
+                        include: [{
                             model: rol,
-                            where: {DESCRIPCION: "Coordinador Programa"},
+                            where: { DESCRIPCION: "Coordinador Programa" },
                             attributes: []
-                        },{
+                        }, {
                             model: coordinador,
                             attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
-                        }]    
+                        }]
                     }],
                 where: {
                     ID_FACULTAD: req.params.id
                 },
-                required:true
+                required: true
             }
         );
         res.status(201).json({ programa: programas });
@@ -308,20 +308,20 @@ controllers.listarFacultad = async (req, res) => {
 };
 
 controllers.getFacultad = async (req, res) => { // devuelve los datos de una facultad (incluye coordinador) 
-    const {id} = req.params;
+    const { id } = req.params;
     try {
         const facultad = await programa.findOne(
             {
                 where: {
                     ID_PROGRAMA: id
                 },
-                include:{
+                include: {
                     model: coordinador,
-                    include:{
+                    include: {
                         model: rol,
-                        where: {DESCRIPCION: "Coordinador Facultad"}
+                        where: { DESCRIPCION: "Coordinador Facultad" }
                     }
-                    
+
                 }
             }
         );
@@ -457,7 +457,7 @@ controllers.modificarFacultad = async (req, res) => {
         const facultades = await programa.findAll(
             {
                 where: {
-                    ID_PROGRAMA: {[Op.not]: ID_PROGRAMA},
+                    ID_PROGRAMA: { [Op.not]: ID_PROGRAMA },
                     [Op.or]: [
                         { ID_FACULTAD: null },
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
@@ -472,7 +472,7 @@ controllers.modificarFacultad = async (req, res) => {
                 return
             };
         }
-        const ID_FACULTAD = INDEPENDIENTE?ID_PROGRAMA:null
+        const ID_FACULTAD = INDEPENDIENTE ? ID_PROGRAMA : null
         const facultadModificada = await programa.update(
             {
                 ID_INSTITUCION: ID_INSTITUCION,
@@ -587,7 +587,7 @@ controllers.listarProgramasDeUnAlumno = async (req, res) => {
 controllers.listarPoliticasPorFacultad = async (req, res) => {
     try {        // lista las politicas de una facultad especifica
         const politicas = await programa.findOne({
-            where: {ID_PROGRAMA: req.params.idFacultad},
+            where: { ID_PROGRAMA: req.params.idFacultad },
             attributes: ["ANTICIPACION_DISPONIBILIDAD", "ANTICIPACION_CANCELAR_CITA"]
         });
         res.status(201).json({ politicas: politicas });
@@ -619,5 +619,41 @@ controllers.listarProgramasDeUnTutorSegunFacultad = async (req, res) => {
         res.json({ error: error.message });
     }
 }
+
+controllers.eliminarFacultad = async (req, res) => {
+    const transaccion = await sequelize.transaction();
+    const { id } = req.params;
+
+    try {
+        const programasAsociados = await programa.findOne(
+            { 
+                where: { 
+                    ID_FACULTAD: id,
+                    ESTADO: 1,
+                    [Op.not]: [
+                        sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
+                    ]
+                } 
+            }
+        );
+        if (programasAsociados) {
+            res.json({ eliminacion: { ok: 0 } });
+            return;
+        }
+
+        const programaModificado = await programa.update(
+            { ESTADO: 0 },
+            { where: { ID_PROGRAMA: id } },
+            { transaction: transaccion }
+        );
+
+        await transaccion.commit();
+        res.status(201).json({ eliminacion: { ok: 1 } });
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
+};
 
 module.exports = controllers;

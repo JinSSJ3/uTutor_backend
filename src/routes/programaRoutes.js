@@ -47,4 +47,6 @@ router.get("/api/facultad/politicas/:idFacultad", programaController.listarPolit
 
 router.get("/api/programa/lista/tutor/:idTutor/:idFacultad", programaController.listarProgramasDeUnTutorSegunFacultad);
 
+router.post("/api/facultad/eliminar/:id", programaController.eliminarFacultad);
+
 module.exports = router;
