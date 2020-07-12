@@ -7,6 +7,7 @@ let alumno = require('../models/alumno');
 let usuario = require('../models/usuario');
 let procesoTutoria = require('../models/procesoTutoria');
 let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
+const notificacion = require("../models/notificacion");
 
 controllers.listarPorTutoria = async (req, res) => {
     const idTutoria = req.query.tutoria;
@@ -160,6 +161,27 @@ controllers.responderSolicitud = async (req, res) => {
             transaction: transaccion
         })
 
+        let tut = await asignacionTutoria.findOne({
+            where: {ID_ASIGNACION: ID_ASIGNACION},
+            include:{
+                model:tutor,
+                include:{
+                    model: usuario,
+                    attributes: ["NOMBRE", "APELLIDOS"]
+                }
+            },
+            attributes: []
+        })
+
+        let mensaje = "El tutor " + tut.TUTOR.USUARIO.NOMBRE + " " + tut.TUTOR.USUARIO.APELLIDOS + " ha " + (RESPUESTA? "aceptado": "rechazado") + " su solicitud de tutoría";
+
+        await notificacion.create({
+            ID_EMISOR: tut.TUTOR.ID_TUTOR,
+            ID_RECEPTOR: ID_ALUMNO,
+            MENSAJE: mensaje,
+            ESTADO: 1
+        }, { transaction: transaccion })
+
         await transaccion.commit();
         console.log(date + date.getTimezoneOffset())
         res.status(201).json({solicitud: req.body.solicitud});
@@ -185,6 +207,25 @@ controllers.mandarSolicitudTutoria = async (req, res) => {
                     ID_ASIGNACION: result.ID_ASIGNACION,
                     ID_ALUMNO: ID_ALUMNO,
                     SOLICITUD: 2  // pendiente
+                }, { transaction: transaccion })
+
+                let al = await usuario.findOne({
+                    where: {ID_USUARIO: ID_ALUMNO},
+                    attributes: ["NOMBRE", "APELLIDOS"]
+                })
+
+                let proceso = await procesoTutoria.findOne({
+                    where: {ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA},
+                    attributes: ["NOMBRE"]
+                })
+
+                let mensaje = "El alumno " + al.NOMBRE + " " + al.APELLIDOS + " le ha mandado una solicitud de tutoría para el proceso " + proceso.NOMBRE;
+
+                await notificacion.create({
+                    ID_EMISOR: ID_ALUMNO,
+                    ID_RECEPTOR: ID_TUTOR,
+                    MENSAJE: mensaje,
+                    ESTADO: 1
                 }, { transaction: transaccion })
                 await transaccion.commit();
                 res.status(201).json({ solicitud: result });
@@ -292,6 +333,48 @@ controllers.eliminar = async (req, res) => {
         res.json({ error: error.message })
     }
 
+};
+
+controllers.listarPorTutoriaYTutor = async (req, res) => {
+    try {
+        const dataAsignaciones = await asignacionTutoria.findAll({
+            include: [{
+                model: tutor,
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }]
+            },
+            {
+                model: alumno,
+                as: "ALUMNOS",
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }],
+                through:{
+                    attributes: []
+                }
+            },{
+                model: asignacionTutoriaXAlumno,
+                where: {SOLICITUD: 1}, // aceptada
+                attributes: []
+            },{
+                model: procesoTutoria,
+                as: "PROCESO_TUTORIA",
+                attributes: ["ID_PROCESO_TUTORIA", "NOMBRE"]
+            }],
+            where: {
+                ESTADO: 1,
+                ID_PROCESO_TUTORIA: req.params.idTutoria,
+                ID_TUTOR: req.params.idTutor
+            }
+        });
+        res.status(201).json({ asignaciones: dataAsignaciones });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
 };
 
 module.exports = controllers;

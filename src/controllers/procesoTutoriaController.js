@@ -265,4 +265,21 @@ controllers.listarTutoriasFijasAsignadasAPorAlumno = async (req, res) => {
     }
 };
 
+controllers.listarTutoriasGrupalesPorPrograma = async (req, res) => { 
+    try{
+        const tutorias = await tutoria.findAll({
+            include: [etiqueta],
+            where: {
+                ESTADO: 1,
+                ID_PROGRAMA: req.params.idPrograma,
+                GRUPAL:1
+            }
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
 module.exports = controllers;
