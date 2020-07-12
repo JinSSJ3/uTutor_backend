@@ -98,22 +98,23 @@ controllers.asignarRol = async (req,res) => {
                 where:{ID_ROL: role}
             })
             if(descripcionRol.DESCRIPCION==="Alumno"){
-                let alu = alumno.findOne({
+                let alu = await alumno.findOne({
                     where: {ID_ALUMNO: ID_USUARIO}
                 })
                 if (!alu){
                     await alumno.create({
                         ID_ALUMNO: ID_USUARIO
-                    })
+                    }, {transaction: transaccion})
                 }
             } else if(descripcionRol.DESCRIPCION==="Tutor"){
-                let tut = tutor.findOne({
+                let tut = await tutor.findOne({
                     where: {ID_TUTOR: ID_USUARIO}
                 })
+                console.log("tut: ", tut)
                 if(!tut){
                     await tutor.create({
                         ID_TUTOR: ID_USUARIO
-                    })
+                    }, {transaction: transaccion})
                 }
             }
         }        
@@ -155,6 +156,7 @@ controllers.login = async (req, res) => {
             let user = null
             if(result){
                 if(await result.validPassword(CONTRASENHA)){
+                    console.log("correcto")
                     user = await usuario.findOne({
                         where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
                         include: [{
@@ -172,6 +174,7 @@ controllers.login = async (req, res) => {
                     })                
                 }
             }
+            console.log(CONTRASENHA)
             res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
         })
     }catch (error){

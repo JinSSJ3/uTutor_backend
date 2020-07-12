@@ -17,8 +17,8 @@ let notificacion = sequelize.define(nametable,{
     freezeTableName: true
 });
 
-notificacion.belongsTo(sesion,{foreignKey: "ID_SESION"});
-notificacion.belongsTo(usuario,{as: 'EMISOR',foreignKey: "ID_EMISOR"});
-notificacion.belongsTo(usuario,{as: 'RECEPTOR',foreignKey: "ID_RECEPTOR"});
+// notificacion.belongsTo(sesion,{foreignKey: "ID_SESION"});
+// notificacion.belongsTo(usuario,{as: 'EMISOR',foreignKey: "ID_EMISOR"});
+// notificacion.belongsTo(usuario,{as: 'RECEPTOR',foreignKey: "ID_RECEPTOR"});
 
 module.exports = notificacion;

@@ -13,9 +13,9 @@ let etiquetaXTutoria = sequelize.define(nametable,
     freezeTableName: true,       
 });
 
-etiqueta.belongsToMany(procesoTutoria, {through: etiquetaXTutoria, foreignKey: "ID_ETIQUETA", otherKey: "ID_PROCESO_TUTORIA"})
-procesoTutoria.belongsToMany(etiqueta, {through: etiquetaXTutoria, foreignKey: "ID_PROCESO_TUTORIA", otherKey: "ID_ETIQUETA"})
-etiquetaXTutoria.belongsTo(etiqueta,{foreignKey: "ID_ETIQUETA"});
-etiquetaXTutoria.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA"});
+// etiqueta.belongsToMany(procesoTutoria, {through: etiquetaXTutoria, foreignKey: "ID_ETIQUETA", otherKey: "ID_PROCESO_TUTORIA"})
+// procesoTutoria.belongsToMany(etiqueta, {through: etiquetaXTutoria, foreignKey: "ID_PROCESO_TUTORIA", otherKey: "ID_ETIQUETA"})
+// etiquetaXTutoria.belongsTo(etiqueta,{foreignKey: "ID_ETIQUETA"});
+// etiquetaXTutoria.belongsTo(procesoTutoria,{foreignKey: "ID_PROCESO_TUTORIA"});
 
 module.exports = etiquetaXTutoria;

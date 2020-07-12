@@ -39,7 +39,7 @@ let disponibilidad = sequelize.define(nametable,{
     freezeTableName: true
 });
 
-disponibilidad.belongsTo(tutor, {foreignKey:{name:"ID_TUTOR"}});
-disponibilidad.belongsTo(programa, {foreignKey:{name:"ID_FACULTAD"}});
+// disponibilidad.belongsTo(tutor, {foreignKey:{name:"ID_TUTOR"}});
+// disponibilidad.belongsTo(programa, {foreignKey:{name:"ID_FACULTAD"}});
 
 module.exports = disponibilidad;

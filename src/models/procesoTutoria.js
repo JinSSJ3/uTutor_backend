@@ -13,7 +13,11 @@ let procesoTutoria = sequelize.define(nametable,{
     },
     ID_PROGRAMA:{
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        references: {
+            model: "PROGRAMA",
+            key: "ID_PROGRAMA"
+          }
     },
     NOMBRE: Sequelize.STRING,
     DESCRIPCION: Sequelize.STRING,
@@ -23,13 +27,16 @@ let procesoTutoria = sequelize.define(nametable,{
     TUTOR_ASIGNADO: Sequelize.TINYINT,
     PERMANENTE: Sequelize.TINYINT,
     DURACION: Sequelize.INTEGER,    
-    ESTADO: Sequelize.TINYINT    
+    ESTADO: {
+        type: Sequelize.TINYINT,
+        defaultValue: 1 
+    }    
     },
     {
     timestamps :false,
     freezeTableName: true,       
 });
 
-procesoTutoria.belongsTo(programa, {foreignKey:{name:"ID_PROGRAMA"}});
+// procesoTutoria.belongsTo(programa, {foreignKey:{name:"ID_PROGRAMA"}});
 
 module.exports = procesoTutoria;

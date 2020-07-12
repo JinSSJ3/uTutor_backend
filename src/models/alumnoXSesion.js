@@ -14,9 +14,9 @@ let alumnoXSesion = sequelize.define(nametable,{
   });
 
 
-alumno.belongsToMany(sesion, {through: alumnoXSesion, foreignKey: "ID_ALUMNO", otherKey: "ID_SESION"})
-sesion.belongsToMany(alumno, {through: alumnoXSesion, foreignKey: "ID_SESION", otherKey: "ID_ALUMNO"})
-alumnoXSesion.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
-alumnoXSesion.belongsTo(sesion,{foreignKey: "ID_SESION"});
+// alumno.belongsToMany(sesion, {through: alumnoXSesion, foreignKey: "ID_ALUMNO", otherKey: "ID_SESION"})
+// sesion.belongsToMany(alumno, {through: alumnoXSesion, foreignKey: "ID_SESION", otherKey: "ID_ALUMNO"})
+// alumnoXSesion.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
+// alumnoXSesion.belongsTo(sesion,{foreignKey: "ID_SESION"});
 
 module.exports = alumnoXSesion;
