@@ -209,7 +209,7 @@ controllers.modificar = async (req, res) => {
 
             for(element of PROGRAMA){
                 const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                    ID_USUARIO: result.ID_USUARIO,
+                    ID_USUARIO: ID_TUTOR,
                     ID_PROGRAMA: element,
                     ESTADO: '1',
                     ID_ROL: idRol.ID_ROL
