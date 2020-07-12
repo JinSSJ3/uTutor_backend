@@ -28,6 +28,8 @@ router.get("/api/tutoriavariable/:idPrograma", tutoriaController.listarTutoriasV
 
 router.get("/api/tutoriaasignada/:idPrograma/:idAlumno", tutoriaController.listarTutoriasFijasAsignadasAPorAlumno);
 
+router.get("/api/tutoriagrupal/:idPrograma", tutoriaController.listarTutoriasGrupalesPorPrograma);
+
 
 
 
