@@ -98,22 +98,23 @@ controllers.asignarRol = async (req,res) => {
                 where:{ID_ROL: role}
             })
             if(descripcionRol.DESCRIPCION==="Alumno"){
-                let alu = alumno.findOne({
+                let alu = await alumno.findOne({
                     where: {ID_ALUMNO: ID_USUARIO}
                 })
                 if (!alu){
                     await alumno.create({
                         ID_ALUMNO: ID_USUARIO
-                    })
+                    }, {transaction: transaccion})
                 }
             } else if(descripcionRol.DESCRIPCION==="Tutor"){
-                let tut = tutor.findOne({
+                let tut = await tutor.findOne({
                     where: {ID_TUTOR: ID_USUARIO}
                 })
+                console.log("tut: ", tut)
                 if(!tut){
                     await tutor.create({
                         ID_TUTOR: ID_USUARIO
-                    })
+                    }, {transaction: transaccion})
                 }
             }
         }        
