@@ -47,4 +47,6 @@ router.get("/api/sesion/estado/:idPrograma", sesionController.listarEstadoSesion
 
 router.get("/api/listaSesionRealizadaAlumnoProcesoTutoria/:idAlumno/:idProcesoTutoria", sesionController.listarSesionesRealizadasPorAlumnoYProcesoTutoria);
 
+router.post("/api/crearSesionGrupal", sesionController.crearSesionGrupal);
+
 module.exports = router;
