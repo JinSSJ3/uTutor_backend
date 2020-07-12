@@ -1043,4 +1043,145 @@ controllers.listarSesionesRealizadasPorAlumnoYProcesoTutoria = async (req, res) 
     }
 };
 
+// Esto crea una sesión grupal, lo hace el tutor.
+controllers.crearSesionGrupal = async (req, res) => {
+    const transaccion = await sequelize.transaction();
+    const { ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS } = req.body.sesion;
+    try {
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        let yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;
+
+
+        const { Op } = require("sequelize");
+        //Revisa que el tutor no tenga otra sesión a esa hora
+        const valid = await sesion.findAll({
+            where: {
+                ID_TUTOR: ID_TUTOR,
+                FECHA: FECHA,
+                ESTADO: {
+                    [Op.not]: "02-cancelada"
+                },
+                [Op.or]: [
+                    {
+                        HORA_FIN: {
+                            [Op.gte]: HORA_FIN,
+                        },
+                        HORA_INICIO: {
+                            [Op.lt]: HORA_FIN,
+                        }
+                    },
+                    {
+                        HORA_INICIO: {
+                            [Op.lte]: HORA_INICIO,
+                        },
+                        HORA_FIN: {
+                            [Op.gt]: HORA_INICIO,
+                        }
+                    },
+                    {
+                        HORA_INICIO: {
+                            [Op.gte]: HORA_INICIO,
+                        },
+                        HORA_FIN: {
+                            [Op.lte]: HORA_FIN,
+                        }
+                    }
+                ]
+            }
+        })
+        if (valid.length != 0) {
+            let message = "La hora ya está ocupada";
+            res.status(400).json({ message: message });
+            return;
+        }
+        // Revisa que el alumno no tenga otra sesión a esa hora
+        ALUMNOS.forEach(async alumId => {
+            const findAlumSesiones = await alumnoXSesion.findAll({
+                where: {
+                    ID_ALUMNO: alumId,
+                    ASISTENCIA_ALUMNO: {
+                        [Op.not]: 2
+                    }
+                }
+            }, { transaction: transaccion })
+            if (findAlumSesiones.length != 0) {
+                for (let i = 0; i < findAlumSesiones.length; i++) {
+                    const valid2 = await sesion.findAll({
+                        where: {
+                            ID_SESION: findAlumSesiones[i].ID_SESION,
+                            FECHA: FECHA,
+                            [Op.or]: [
+                                {
+                                    HORA_FIN: {
+                                        [Op.gte]: HORA_FIN,
+                                    },
+                                    HORA_INICIO: {
+                                        [Op.lt]: HORA_FIN,
+                                    }
+                                },
+                                {
+                                    HORA_INICIO: {
+                                        [Op.lte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.gt]: HORA_INICIO,
+                                    }
+                                },
+                                {
+                                    HORA_INICIO: {
+                                        [Op.gte]: HORA_INICIO,
+                                    },
+                                    HORA_FIN: {
+                                        [Op.lte]: HORA_FIN,
+                                    }
+                                }
+                            ]
+                        }
+                    })
+                    if (valid2.length != 0) {
+                        let message = "El alumno ya tiene una sesión a esa hora";
+                        res.status(400).json({ message: message });
+                        return;
+                    }
+                }
+            }
+        });
+
+        const newSesion = await sesion.create({
+            ID_TUTOR: ID_TUTOR,
+            ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
+            LUGAR: LUGAR,
+            FECHA: FECHA,
+            HORA_INICIO: HORA_INICIO,
+            HORA_FIN: HORA_FIN,
+            ESTADO: "04-futura"
+        }, { transaction: transaccion }).then(async result => {
+
+            for (element of COMPROMISOS) {
+                const newCompromiso = await compromiso.create({
+                    ID_SESION: result.ID_SESION,
+                    DESCRIPCION: element.campo,
+                    ESTADO: element.check
+                }, { transaction: transaccion })
+            }
+
+            for (element of ALUMNOS) {
+                const newAlumnoSesion = await alumnoXSesion.create({
+                    ID_SESION: result.ID_SESION,
+                    ID_ALUMNO: element
+                }, { transaction: transaccion })
+            }
+            await transaccion.commit();
+            res.status(201).json({ sesion: result });
+        });
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+};
+
 module.exports = controllers;
