@@ -28,4 +28,6 @@ router.post("/api/asignacion", asignacionTutoriaController.registrar);
 
 router.post("/api/asignacion/eliminar/:id", asignacionTutoriaController.eliminar);
 
+router.get("/api/asignacion/tutoria/tutor/:idTutoria/:idTutor", asignacionTutoriaController.listarPorTutoriaYTutor);
+
 module.exports = router;
