@@ -335,4 +335,46 @@ controllers.eliminar = async (req, res) => {
 
 };
 
+controllers.listarPorTutoriaYTutor = async (req, res) => {
+    try {
+        const dataAsignaciones = await asignacionTutoria.findAll({
+            include: [{
+                model: tutor,
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }]
+            },
+            {
+                model: alumno,
+                as: "ALUMNOS",
+                include:[{
+                    model: usuario,
+                    attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                }],
+                through:{
+                    attributes: []
+                }
+            },{
+                model: asignacionTutoriaXAlumno,
+                where: {SOLICITUD: 1}, // aceptada
+                attributes: []
+            },{
+                model: procesoTutoria,
+                as: "PROCESO_TUTORIA",
+                attributes: ["ID_PROCESO_TUTORIA", "NOMBRE"]
+            }],
+            where: {
+                ESTADO: 1,
+                ID_PROCESO_TUTORIA: req.params.idTutoria,
+                ID_TUTOR: req.params.idTutor
+            }
+        });
+        res.status(201).json({ asignaciones: dataAsignaciones });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 module.exports = controllers;
