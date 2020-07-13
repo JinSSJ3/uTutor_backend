@@ -46,9 +46,166 @@ app.set("port", process.env.PORT);
 
 app.use(express.static(path.join(__dirname,'ututor-front','build')));
 
-app.get('/*', function (req, res) {
+app.get('/', function (req, res) {
    res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
  });
+
+
+
+
+
+app.get('/administrador', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/alumno', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+
+
+////////PERFILES
+app.get('/administrador/perfil', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/perfil', function (req, res) { ////// ADMIN+
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor/perfil', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/alumno/perfil', function (req, res) {////// COORDINADOR
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+////// admin
+
+
+
+
+
+
+app.get('/administrador/institucion', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/administrador/facultades', function (req, res) { ////// TUTOR
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/administrador/coordinadores', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/administrador/unidadesdeapoyo', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+
+///COORDINADOR
+ app.get('/coordinador/facultades', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/registrarTutores', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/registrarAlumnos', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/asignaciondeTutor', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/procesosdetutoria', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/programas', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/registrardisponibilidades', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/registrarcoordinadoresdeprograma', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/reportes', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html')); ///TUTOR
+});
+app.get('/coordinador/asignarroles', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/coordinador/alumno/:idAlumno/:fullname', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+
+
+
+
+
+////TUTOR
+ app.get('/tutor/misalumnos', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+/////// TUTOR
+app.get('/tutor/midisponibilidad', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor/sesiones', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor/solicitudes', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor/sesionesgrupales', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor/misCitas', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/tutor/mialumno/:idAlumno/:fullname', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+
+///
+
+
+app.get('/alumno/solicitarTutorFijo', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+app.get('/alumno/agendarCita', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+app.get('/alumno/misCitas', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const dbName = process.env.DATABASE;
 mysql.createConnection({
