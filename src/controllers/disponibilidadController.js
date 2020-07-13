@@ -413,7 +413,8 @@ controllers.eliminar = async (req, res) => {
 
 controllers.modificar = async (req, res) => {  
     const transaccion = await sequelize.transaction();
-    const {ID_DISPONIBILIDAD, HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR} = req.body.disponibilidad; 
+    const transaccion2 = await sequelize.transaction();
+    const {ID_DISPONIBILIDAD, HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION} = req.body.disponibilidad; 
     console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     
     try {
@@ -473,6 +474,86 @@ controllers.modificar = async (req, res) => {
     } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
+    }
+
+    if(REPETICION==2){
+        try {
+            let fec = moment(FECHA, "YYYY-MM-DD", true);
+            fec.format();
+            let mes = fec.month();
+            let dia = fec.day();
+            console.log(mes);
+            console.log(fec);
+            console.log(dia);
+            let dias = [];
+            fec = moment(fec).add(7, 'days');
+            while (fec.month() === mes) {
+                let nuevaFecha = moment(fec);
+                dias.push(moment(nuevaFecha).format('YYYY-MM-DD'));
+                fec = moment(fec).add(7, 'days');
+                console.log(fec);
+            }
+            console.log(dias);
+
+            const dispOrigin = await disponibilidad.findOne({
+                where: {ID_DISPONIBILIDAD: ID_DISPONIBILIDAD}
+            })
+
+            dias.forEach(async fechaRep => {
+                const { Op } = require("sequelize");
+                const valid = await disponibilidad.findAll({
+                    where:{
+                        ID_TUTOR: ID_TUTOR,
+                        FECHA: fechaRep,
+                        ESTADO: 1,
+                        [Op.or]: [
+                            {
+                                HORA_FIN: {
+                                    [Op.gte]: HORA_FIN,
+                                },
+                                HORA_INICIO: {
+                                    [Op.lt]: HORA_FIN,
+                                }
+                            },
+                            {
+                                HORA_INICIO: {
+                                    [Op.lte]: HORA_INICIO,
+                                },
+                                HORA_FIN: {
+                                    [Op.gt]: HORA_INICIO,
+                                }
+                            },
+                            {
+                                HORA_INICIO: {
+                                    [Op.gte]: HORA_INICIO,
+                                },
+                                HORA_FIN: {
+                                    [Op.lte]: HORA_FIN,
+                                }
+                            }
+                        ]
+                      }
+                })
+                if(valid.length != 0){
+                    let message = "Una de las horas ya está ocupada";
+                    res.status(400).json({message: message});
+                    return;
+                }
+                const newDisp = await disponibilidad.create({
+                    HORA_INICIO: HORA_INICIO,
+                    HORA_FIN: HORA_FIN,
+                    FECHA: fechaRep,
+                    ESTADO: 1,
+                    LUGAR: LUGAR,
+                    ID_TUTOR: ID_TUTOR,
+                    ID_FACULTAD: dispOrigin.ID_FACULTAD
+                }, {transaction: transaccion2});
+                await transaccion2.commit();
+            }) 
+        }
+        catch (error) {
+            
+        }
     }
     
 };

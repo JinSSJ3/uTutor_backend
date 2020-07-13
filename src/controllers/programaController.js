@@ -5,6 +5,7 @@ let programa = require('../models/programa');
 let coordinador = require('../models/usuario');
 let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 let rol = require('../models/rol');
+let tutoria = require('../models/procesoTutoria');
 //let institucion = require('../models/institucion')
 
 Op = Sequelize.Op;
@@ -626,14 +627,14 @@ controllers.eliminarFacultad = async (req, res) => {
 
     try {
         const programasAsociados = await programa.findOne(
-            { 
-                where: { 
+            {
+                where: {
                     ID_FACULTAD: id,
                     ESTADO: 1,
                     [Op.not]: [
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
                     ]
-                } 
+                }
             }
         );
         if (programasAsociados) {
@@ -649,6 +650,62 @@ controllers.eliminarFacultad = async (req, res) => {
 
         await transaccion.commit();
         res.status(201).json({ eliminacion: { ok: 1 } });
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
+};
+
+controllers.eliminarPrograma = async (req, res) => {
+    const transaccion = await sequelize.transaction();
+    const { id } = req.params;
+
+    try {
+        const usuariosAsociados = await rolXUsuarioXPrograma.findOne(
+            {
+                where: {
+                    ID_PROGRAMA: id,
+                    ESTADO: 1
+                }
+            }
+        );
+
+        const procesosTutoriaAsociados = await tutoria.findOne(
+            {
+                where: {
+                    ID_PROGRAMA: id,
+                    ESTADO: 1
+                }
+            }
+        );
+
+        if (procesosTutoriaAsociados || usuariosAsociados) {
+            if (procesosTutoriaAsociados) {
+                boolTutoria = 1;
+            }
+            else {
+                boolTutoria = 0;
+            }
+
+            if (usuariosAsociados) {
+                boolUsuario = 1;
+            } else {
+                boolUsuario = 0;
+            }
+
+            res.json({ eliminacion: { ok: 0, tutoriasAsociadas: boolTutoria, usuariosAsociados: boolUsuario } });
+            return;
+        }
+
+        const programaModificado = await programa.update(
+            { ESTADO: 0 },
+            { where: { ID_PROGRAMA: id } },
+            { transaction: transaccion }
+        );
+
+        await transaccion.commit();
+        res.status(201).json({ eliminacion: { ok: 1, tutoriasAsociadas: 0, usuariosAsociados: 0 } });
     } catch (error) {
         await transaccion.rollback();
         res.json({ error: error.message })
