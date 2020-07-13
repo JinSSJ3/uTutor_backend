@@ -134,6 +134,7 @@ controllers.registrarCoordinadorPrograma = async (req, res) => {
                 include:[{
                     model: rolXUsuarioXPrograma,
                     attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
                     include: [{
                         model:programa,
                         attributes: ["ID_PROGRAMA", "NOMBRE"],
@@ -147,7 +148,21 @@ controllers.registrarCoordinadorPrograma = async (req, res) => {
             })
 
             const validacionCorreo = await coordinador.findOne({
-                where:{CORREO: CORREO}
+                where:{CORREO: CORREO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
             })
 
             if (!validacionCodigo && !validacionCorreo){
@@ -210,6 +225,7 @@ controllers.registrarCoordinadorFacultad = async (req, res) => {
                 include:[{
                     model: rolXUsuarioXPrograma,
                     attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
                     include: [{
                         model:programa,
                         attributes: ["ID_PROGRAMA", "NOMBRE"],
@@ -223,7 +239,21 @@ controllers.registrarCoordinadorFacultad = async (req, res) => {
             })
 
             const validacionCorreo = await coordinador.findOne({
-                where:{CORREO: CORREO}
+                where:{CORREO: CORREO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
             })
 
             if (!validacionCodigo && !validacionCorreo){
@@ -288,6 +318,7 @@ controllers.modificarCoordinadorPrograma = async (req, res) => {
                 include:[{
                     model: rolXUsuarioXPrograma,
                     attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
                     include: [{
                         model:programa,
                         attributes: ["ID_PROGRAMA", "NOMBRE"],
@@ -301,7 +332,21 @@ controllers.modificarCoordinadorPrograma = async (req, res) => {
             })
 
             const validacionCorreo = await coordinador.findOne({
-                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
+                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
             })
 
             if (!validacionCodigo && !validacionCorreo){
@@ -370,6 +415,7 @@ controllers.modificarCoordinadorFacultad = async (req, res) => {
                 include:[{
                     model: rolXUsuarioXPrograma,
                     attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
                     include: [{
                         model:programa,
                         attributes: ["ID_PROGRAMA", "NOMBRE"],
@@ -383,7 +429,21 @@ controllers.modificarCoordinadorFacultad = async (req, res) => {
             })
 
             const validacionCorreo = await coordinador.findOne({
-                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO}
+                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
             })
 
             if (!validacionCodigo && !validacionCorreo){
