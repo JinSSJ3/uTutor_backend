@@ -13,7 +13,7 @@ let alumno = require('../models/alumno');
 let procesoTutoría = require('../models/procesoTutoria');
 let notificacion = require('../models/notificacion');
 let areaApoyo = require('../models/areaApoyo');
-const procesoTutoria = require('../models/procesoTutoria');
+let procesoTutoria = require('../models/procesoTutoria');
 
 //sequelize.sync();
 
@@ -123,6 +123,8 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                 include: [
                     areaApoyo
                 ]
+            },{
+                model: procesoTutoria
             }
             ]
         });
