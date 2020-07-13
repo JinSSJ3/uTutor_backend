@@ -196,14 +196,14 @@ controllers.register = async (req, res) => {
                     ID_ROL: idRol.ID_ROL
                 }, {transaction: transaccion}) */
 
-                PROGRAMA.forEach(async element => {
+                for(ele of PROGRAMA) {
                     const programaDeUsuario = await rolXUsuarioXPrograma.create({
                         ID_USUARIO: result.ID_USUARIO,
-                        ID_PROGRAMA: element,
+                        ID_PROGRAMA: ele,
                         ESTADO: '1',
                         ID_ROL: idRol.ID_ROL
                     }, {transaction: transaccion})
-                })
+                }
                 await transaccion.commit();
                 res.status(201).json({tutor: newUser});
             }else{
@@ -243,8 +243,8 @@ controllers.modificar = async (req, res) => {
             where: {ID_USUARIO: ID_TUTOR}
         }, {transaction: transaccion})
         .then(async result => {      
-            const validacionCodigo = await coordinador.findOne({
-                where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
+            const validacionCodigo = await usuario.findOne({
+                where: {ID_USUARIO: {[Op.not]: ID_TUTOR}, CODIGO: CODIGO},
                 include:[{
                     model: rolXUsuarioXPrograma,
                     attributes: ["ESTADO"],
@@ -261,8 +261,8 @@ controllers.modificar = async (req, res) => {
                 }]
             })
 
-            const validacionCorreo = await coordinador.findOne({
-                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO},
+            const validacionCorreo = await usuario.findOne({
+                where:{ID_USUARIO: {[Op.not]: ID_TUTOR}, CORREO: CORREO},
                 include:[{
                     model: rolXUsuarioXPrograma,
                     attributes: ["ESTADO"],
