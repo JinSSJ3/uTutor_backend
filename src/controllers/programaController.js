@@ -637,8 +637,47 @@ controllers.eliminarFacultad = async (req, res) => {
                 }
             }
         );
-        if (programasAsociados) {
-            res.json({ eliminacion: { ok: 0 } });
+
+        const usuariosAsociados = await rolXUsuarioXPrograma.findOne(
+            {
+                where: {
+                    ID_PROGRAMA: id,
+                    ESTADO: 1
+                }
+            }
+        );
+
+        const procesosTutoriaAsociados = await tutoria.findOne(
+            {
+                where: {
+                    ID_PROGRAMA: id,
+                    ESTADO: 1
+                }
+            }
+        );
+
+        if (programasAsociados || procesosTutoriaAsociados || usuariosAsociados) {
+            if (programasAsociados) {
+                boolProgramas = 1;
+            }
+            else {
+                boolProgramas = 0;
+            }
+
+            if (procesosTutoriaAsociados) {
+                boolTutoria = 1;
+            }
+            else {
+                boolTutoria = 0;
+            }
+
+            if (usuariosAsociados) {
+                boolUsuario = 1;
+            } else {
+                boolUsuario = 0;
+            }
+
+            res.json({ eliminacion: { ok: 0, programasAsociados: boolProgramas, tutoriasAsociadas: boolTutoria, usuariosAsociados: boolUsuario } });
             return;
         }
 
@@ -649,7 +688,7 @@ controllers.eliminarFacultad = async (req, res) => {
         );
 
         await transaccion.commit();
-        res.status(201).json({ eliminacion: { ok: 1 } });
+        res.status(201).json({ eliminacion: { ok: 1, programasAsociados: 0, tutoriasAsociadas: 0, usuariosAsociados: 0 } });
     } catch (error) {
         await transaccion.rollback();
         res.json({ error: error.message })
