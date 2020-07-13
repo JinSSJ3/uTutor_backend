@@ -19,7 +19,10 @@ controllers.listar = async (req, res) => { //listar todos los programas
                     model: programa,
                     as: 'FACULTAD'
                 },
-                where: { ID_FACULTAD: { [Op.ne]: null } }
+                where: {
+                    ID_FACULTAD: { [Op.ne]: null },
+                    ESTADO: 1
+                }
             }
 
         );
@@ -38,7 +41,8 @@ controllers.listarProgramasYFacultades = async (req, res) => {
                 include: {
                     model: programa,
                     as: 'FACULTAD'
-                }
+                },
+                where: { ESTADO: 1 }
             }
         );
         res.status(201).json({ programa: programas });
@@ -59,17 +63,21 @@ controllers.listarPorFacultad = async (req, res) => {// listar programas por fac
                     },
                     {
                         model: rolXUsuarioXPrograma,
-                        include: [{
-                            model: rol,
-                            where: { DESCRIPCION: "Coordinador Programa" },
-                            attributes: []
-                        }, {
-                            model: coordinador,
-                            attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
-                        }]
+                        include: [
+                            {
+                                model: rol,
+                                where: { DESCRIPCION: "Coordinador Programa" },
+                                attributes: []
+                            }, {
+                                model: coordinador,
+                                attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
+                            }
+                        ],
+                        where: { ESTADO: 1 }
                     }],
                 where: {
-                    ID_FACULTAD: req.params.id
+                    ID_FACULTAD: req.params.id,
+                    ESTADO: 1
                 },
                 required: true
             }
@@ -93,6 +101,7 @@ controllers.listarFacultadesDeUnCoordinador = async (req, res) => {
                 }],
                 attributes: []
             }],
+            where: { ESTADO: 1 }
         });
         res.status(201).json({ facultades: facultades });
     }
@@ -119,7 +128,8 @@ controllers.listarFacultadesDeUnCoordinadorPrograma = async (req, res) => {
                 attributes: ["ID_PROGRAMA", "NOMBRE"]
             }],
             attributes: [],
-            group: ["PROGRAMA.ID_FACULTAD"]
+            group: ["PROGRAMA.ID_FACULTAD"],
+            where: { ESTADO: 1 }
         });
         res.status(201).json({ facultades: facultades });
     }
@@ -146,7 +156,8 @@ controllers.listarFacultadesDeUnTutor = async (req, res) => {
                 attributes: ["ID_PROGRAMA", "NOMBRE", "ANTICIPACION_DISPONIBILIDAD"]
             }],
             attributes: [],
-            group: ["PROGRAMA.ID_FACULTAD"]
+            group: ["PROGRAMA.ID_FACULTAD"],
+            where: { ESTADO: 1 }
         });
         res.status(201).json({ facultades: facultades });
     }
@@ -168,7 +179,10 @@ controllers.listarProgramasDeUnCoordinador = async (req, res) => {
                 }],
                 attributes: []
             }],
-            where: { ID_FACULTAD: req.params.idFacultad },
+            where: {
+                ID_FACULTAD: req.params.idFacultad,
+                ESTADO: 1
+            },
             attributes: ["ID_PROGRAMA", "NOMBRE"]
         });
         res.status(201).json({ programas: programas });
@@ -185,11 +199,13 @@ controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // 
             {
                 //include: [institucion]
                 include: {
-                    model: programa
+                    model: programa,
+                    where: { ESTADO: 1 }
                 },
                 where: {
                     ID_USUARIO: req.params.id,
-                    ID_ROL: 2
+                    ID_ROL: 2,
+                    ESTADO: 1
                 }
             }
         );
@@ -209,7 +225,8 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
                 include: {
                     model: programa,
                     where: {
-                        ID_FACULTAD: { [Op.ne]: null }
+                        ID_FACULTAD: { [Op.ne]: null },
+                        ESTADO: 1
                     },
                     include: {
                         model: programa,
@@ -218,7 +235,8 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
                 },
                 where: {
                     ID_USUARIO: idCoordinador,
-                    ID_ROL: 2
+                    ID_ROL: 2,
+                    ESTADO: 1
                 }
             }
         );
@@ -239,7 +257,8 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
                 include: {
                     model: programa,
                     where: {
-                        ID_FACULTAD: { [Op.ne]: null }
+                        ID_FACULTAD: { [Op.ne]: null },
+                        ESTADO: 1
                     },
                     include: {
                         model: programa,
@@ -248,7 +267,8 @@ controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // l
                 },
                 where: {
                     ID_USUARIO: idCoordinador,
-                    ID_ROL: 2
+                    ID_ROL: 2,
+                    ESTADO: 1
                 }
             }
         );
@@ -298,7 +318,8 @@ controllers.listarFacultad = async (req, res) => {
                     [Op.or]: [
                         { ID_FACULTAD: null },
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
-                    ]
+                    ],
+                    ESTADO: 1
                 }
             }
         );
@@ -314,7 +335,8 @@ controllers.getFacultad = async (req, res) => { // devuelve los datos de una fac
         const facultad = await programa.findOne(
             {
                 where: {
-                    ID_PROGRAMA: id
+                    ID_PROGRAMA: id,
+                    ESTADO: 1
                 },
                 include: {
                     model: coordinador,
@@ -354,7 +376,8 @@ controllers.registrarFacultad = async (req, res) => {
                     [Op.or]: [
                         { ID_FACULTAD: null },
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
-                    ]
+                    ],
+                    ESTADO: 1
                 }
             }
         );
@@ -421,7 +444,8 @@ controllers.registrarPrograma = async (req, res) => {
                     as: 'FACULTAD',
                 },
                 where: {
-                    ID_FACULTAD: ID_FACULTAD
+                    ID_FACULTAD: ID_FACULTAD,
+                    ESTADO: 1
                 }
             }
         );
@@ -462,7 +486,8 @@ controllers.modificarFacultad = async (req, res) => {
                     [Op.or]: [
                         { ID_FACULTAD: null },
                         sequelize.where(sequelize.col('PROGRAMA.ID_FACULTAD'), '=', sequelize.col('PROGRAMA.ID_PROGRAMA'))
-                    ]
+                    ],
+                    ESTADO: 1
                 }
             }
         );
@@ -510,7 +535,8 @@ controllers.modificarPrograma = async (req, res) => {
                     as: 'FACULTAD',
                 },
                 where: {
-                    ID_FACULTAD: ID_FACULTAD
+                    ID_FACULTAD: ID_FACULTAD,
+                    ESTADO: 1
                 }
             }
         );
@@ -554,7 +580,8 @@ controllers.listarProgramasDeUnTutor = async (req, res) => {
                 }],
                 attributes: []
             }],
-            attributes: ["ID_PROGRAMA", "NOMBRE"]
+            attributes: ["ID_PROGRAMA", "NOMBRE"],
+            where: { ESTADO: 1 }
         });
         res.status(201).json({ programas: programas });
     }
@@ -576,7 +603,8 @@ controllers.listarProgramasDeUnAlumno = async (req, res) => {
                 }],
                 attributes: []
             }],
-            attributes: ["ID_PROGRAMA", "NOMBRE"]
+            attributes: ["ID_PROGRAMA", "NOMBRE"],
+            where: { ESTADO: 1 }
         });
         res.status(201).json({ programas: programas });
     }
@@ -588,7 +616,10 @@ controllers.listarProgramasDeUnAlumno = async (req, res) => {
 controllers.listarPoliticasPorFacultad = async (req, res) => {
     try {        // lista las politicas de una facultad especifica
         const politicas = await programa.findOne({
-            where: { ID_PROGRAMA: req.params.idFacultad },
+            where: {
+                ID_PROGRAMA: req.params.idFacultad,
+                ESTADO: 1
+            },
             attributes: ["ANTICIPACION_DISPONIBILIDAD", "ANTICIPACION_CANCELAR_CITA"]
         });
         res.status(201).json({ politicas: politicas });
@@ -611,7 +642,10 @@ controllers.listarProgramasDeUnTutorSegunFacultad = async (req, res) => {
                 }],
                 attributes: []
             }],
-            where: { ID_FACULTAD: req.params.idFacultad },
+            where: {
+                ID_FACULTAD: req.params.idFacultad,
+                ESTADO: 1
+            },
             attributes: ["ID_PROGRAMA", "NOMBRE"]
         });
         res.status(201).json({ programas: programas });
