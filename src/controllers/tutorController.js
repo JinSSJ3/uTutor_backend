@@ -146,31 +146,77 @@ controllers.register = async (req, res) => {
             DIRECCION: DIRECCION,
             IMAGEN: IMAGEN
         }, {transaction: transaccion}).then(async result  => {
-            const newTutor = await tutor.create({
-                ID_TUTOR: result.ID_USUARIO
-            }, {transaction: transaccion})
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Tutor"}
+            const validacionCodigo = await usuario.findOne({
+                where: {CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
             })
-/*             const newRolUsuario = await rolXUsuario.create({
-                ID_USUARIO: result.ID_USUARIO,
-                ESTADO: '1',
-                ID_ROL: idRol.ID_ROL
-            }, {transaction: transaccion}) */
 
-            PROGRAMA.forEach(async element => {
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
+            const validacionCorreo = await usuario.findOne({
+                where:{CORREO: CORREO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
+
+            if (!validacionCodigo && !validacionCorreo){
+                const newTutor = await tutor.create({
+                    ID_TUTOR: result.ID_USUARIO
+                }, {transaction: transaccion})
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Tutor"}
+                })
+        /*             const newRolUsuario = await rolXUsuario.create({
                     ID_USUARIO: result.ID_USUARIO,
-                    ID_PROGRAMA: element,
                     ESTADO: '1',
                     ID_ROL: idRol.ID_ROL
-                }, {transaction: transaccion})
-            })
+                }, {transaction: transaccion}) */
+
+                PROGRAMA.forEach(async element => {
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: result.ID_USUARIO,
+                        ID_PROGRAMA: element,
+                        ESTADO: '1',
+                        ID_ROL: idRol.ID_ROL
+                    }, {transaction: transaccion})
+                })
+                await transaccion.commit();
+                res.status(201).json({tutor: newUser});
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido", usuario: validacionCorreo})
+                }
+            }
         });
-        await transaccion.commit();
-        res.status(201).json({tutor: newUser});
-        
     } catch (error) {
         await transaccion.rollback();
         res.json({error: error.message})
@@ -196,29 +242,75 @@ controllers.modificar = async (req, res) => {
         },{
             where: {ID_USUARIO: ID_TUTOR}
         }, {transaction: transaccion})
-        .then(async result => {                   
-            
-            const idRol = await rol.findOne({
-                attributes:["ID_ROL"],
-                where: {DESCRIPCION: "Tutor"}
+        .then(async result => {      
+            const validacionCodigo = await coordinador.findOne({
+                where: {ID_USUARIO: {[Op.not]: ID}, CODIGO: CODIGO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
             })
 
-            await rolXUsuarioXPrograma.destroy({
-                where:{ID_USUARIO: ID_TUTOR}            
-            }, {transaction: transaccion})
+            const validacionCorreo = await coordinador.findOne({
+                where:{ID_USUARIO: {[Op.not]: ID}, CORREO: CORREO},
+                include:[{
+                    model: rolXUsuarioXPrograma,
+                    attributes: ["ESTADO"],
+                    where: {ESTADO: 1},
+                    include: [{
+                        model:programa,
+                        attributes: ["ID_PROGRAMA", "NOMBRE"],
+                        include: {
+                            model: programa,
+                            as: "FACULTAD",
+                            attributes: ["ID_FACULTAD", "NOMBRE"]
+                        }
+                    }, rol]
+                }]
+            })
 
-            for(element of PROGRAMA){
-                const programaDeUsuario = await rolXUsuarioXPrograma.create({
-                    ID_USUARIO: ID_TUTOR,
-                    ID_PROGRAMA: element,
-                    ESTADO: '1',
-                    ID_ROL: idRol.ID_ROL
-                }, {transaction: transaccion})
-            }
-
-            await transaccion.commit();
-            res.status(201).json({alumno: req.body.alumno}); 
+            if (!validacionCodigo && !validacionCorreo){             
             
+                const idRol = await rol.findOne({
+                    attributes:["ID_ROL"],
+                    where: {DESCRIPCION: "Tutor"}
+                })
+
+                await rolXUsuarioXPrograma.destroy({
+                    where:{ID_USUARIO: ID_TUTOR}            
+                }, {transaction: transaccion})
+
+                for(element of PROGRAMA){
+                    const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                        ID_USUARIO: ID_TUTOR,
+                        ID_PROGRAMA: element,
+                        ESTADO: '1',
+                        ID_ROL: idRol.ID_ROL
+                    }, {transaction: transaccion})
+                }
+
+                await transaccion.commit();
+                res.status(201).json({alumno: req.body.alumno}); 
+            }else{
+                await transaccion.rollback();
+                if(validacionCodigo && validacionCorreo){
+                    res.json({error: "Codigo y correo repetido", usuario: validacionCodigo})
+                }else if(validacionCodigo){
+                    res.json({error: "Codigo repetido", usuario: validacionCodigo})
+                }else if(validacionCorreo){
+                    res.json({error: "Correo repetido", usuario: validacionCorreo})
+                }
+            }   
         }); 
     } catch (error) {
         await transaccion.rollback();
