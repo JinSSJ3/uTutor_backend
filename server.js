@@ -27,7 +27,7 @@ const asignacionTutoriaXAlumno = require('./src/models/asignacionTutoriaXAlumno'
 const areaApoyo = require('./src/models/areaApoyo');
 const mysql = require('mysql2/promise');
 const { QueryInterface, Sequelize } = require('sequelize');
-
+const path = require('path');
 dotenv.config();
 
 /* sample draft server 
@@ -42,6 +42,13 @@ app.use(bodyParser.json({ limit: '10MB', extended: true }))
 
 // Settings
 app.set("port", process.env.PORT);
+
+
+app.use(express.static(path.join(__dirname,'ututor-front','build')));
+
+app.get('/*', function (req, res) {
+   res.sendFile(path.join(__dirname,'ututor-front','build', 'index.html'));
+ });
 
 const dbName = process.env.DATABASE;
 mysql.createConnection({

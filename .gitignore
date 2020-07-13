@@ -7,4 +7,5 @@ database.config
 
 # production
 /build
-
+/ututor-front
+.env
