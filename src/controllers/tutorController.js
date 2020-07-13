@@ -205,7 +205,7 @@ controllers.register = async (req, res) => {
                     }, {transaction: transaccion})
                 }
                 await transaccion.commit();
-                res.status(201).json({tutor: newUser});
+                res.status(201).json({tutor: result});
             }else{
                 await transaccion.rollback();
                 if(validacionCodigo && validacionCorreo){
