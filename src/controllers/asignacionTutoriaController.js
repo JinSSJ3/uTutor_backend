@@ -275,7 +275,6 @@ controllers.registrar = async (req, res) => {
 
 };
 
-// No se estan modificando alumnos
 controllers.modificar = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
