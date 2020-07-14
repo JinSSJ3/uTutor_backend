@@ -309,7 +309,7 @@ controllers.modificar = async (req, res) => {
         })
 
         await transaccion.commit();
-        res.status(201).json({ asignacion: 1 });
+        res.status(201).json({ modificacion: 1 });
     } catch (error) {
         await transaccion.rollback();
         res.json({ error: error.message })
