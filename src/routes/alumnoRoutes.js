@@ -32,5 +32,7 @@ router.get("/api/alumno/informacionrelevante/:idAlumno", alumnoController.listar
 
 router.get("/api/alumno/informacionrelevante/descargar/:idArchivo", alumnoController.devolverArchivoInfoRelevante);
 
+router.get("/api/alumno/noasignados/:idTutoria", alumnoController.listarNoAsignadosPorProgramaYTutoria);
+
 
 module.exports = router;

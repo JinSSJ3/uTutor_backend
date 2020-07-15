@@ -455,4 +455,18 @@ controllers.devolverArchivoInfoRelevante = async (req, res) => {  // lista los a
 
 };
 
+controllers.listarNoAsignadosPorProgramaYTutoria = async (req, res) => { // Lista a los alumnos de un programa determinado
+    try {
+        const { QueryTypes } = require('sequelize');
+        const alumnos = await sequelize.query("SELECT ID_USUARIO, NOMBRE,APELLIDOS, CORREO from USUARIO, ALUMNO " +
+        " WHERE USUARIO.ID_USUARIO NOT IN (SELECT ID_ALUMNO FROM ASIGNACION_TUTORIA_X_ALUMNO, ASIGNACION_TUTORIA " + 
+        " WHERE ASIGNACION_TUTORIA.ID_ASIGNACION = ASIGNACION_TUTORIA_X_ALUMNO.ID_ASIGNACION AND ASIGNACION_TUTORIA.ID_PROCESO_TUTORIA = " + req.params.idTutoria + 
+        " AND SOLICITUD = 1 AND ESTADO = 1) AND ID_USUARIO = ID_ALUMNO", { type: QueryTypes.SELECT });
+        res.status(201).json({ alumnos: alumnos });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 module.exports = controllers;
