@@ -10,6 +10,8 @@ let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
 const tutor = require("../models/tutor");
 const usuario = require("../models/usuario");
 
+const Op = Sequelize.Op;
+
 
 controllers.listar = async (req, res) => { 
     try{
@@ -31,7 +33,7 @@ controllers.listarTutoriasFijasPorPrograma = async (req, res) => {
             where: {
                 ESTADO: 1,
                 ID_PROGRAMA: req.params.idPrograma,
-                TUTOR_FIJO:1
+                [Op.or]: [{TUTOR_FIJO:1}, {TUTOR_FIJO:2}]
             }
         });
         res.status(201).json({tutoria:tutorias});         
@@ -255,7 +257,7 @@ controllers.listarTutoriasFijasAsignadasAPorAlumno = async (req, res) => {
             where: {
                 ESTADO: 1,
                 ID_PROGRAMA: req.params.idPrograma,
-                TUTOR_FIJO:1
+                [Op.or]: [{TUTOR_FIJO:1}, {TUTOR_FIJO:2}]
             }
         });
         res.status(201).json({tutoria:tutorias});         
@@ -273,6 +275,42 @@ controllers.listarTutoriasGrupalesPorPrograma = async (req, res) => {
                 ESTADO: 1,
                 ID_PROGRAMA: req.params.idPrograma,
                 GRUPAL:1
+            }
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarTutoriasFijasYAsignadasPorPrograma = async (req, res) => { 
+    try{
+        const tutorias = await tutoria.findAll({
+            include: [etiqueta],
+            where: {
+                ESTADO: 1,
+                ID_PROGRAMA: req.params.idPrograma,
+                [Op.or]: [{TUTOR_FIJO:1}, {TUTOR_FIJO:2}],
+                TUTOR_ASIGNADO: 1
+            }
+        });
+        res.status(201).json({tutoria:tutorias});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+}; 
+
+controllers.listarTutoriasFijasYSolicitadasPorPrograma = async (req, res) => { 
+    try{
+        const tutorias = await tutoria.findAll({
+            include: [etiqueta],
+            where: {
+                ESTADO: 1,
+                ID_PROGRAMA: req.params.idPrograma,
+                [Op.or]: [{TUTOR_FIJO:1}, {TUTOR_FIJO:2}],
+                TUTOR_ASIGNADO: 0
             }
         });
         res.status(201).json({tutoria:tutorias});         
