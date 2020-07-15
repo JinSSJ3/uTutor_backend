@@ -489,6 +489,14 @@ controllers.registrarCita = async (req, res) => {
             ESTADO: "04-futura"
         }, { transaction: transaccion }).then(async result => {
 
+            const newNotif = await notificacion.create({
+                ID_SESION: result.ID_SESION,
+                ID_EMISOR: ID_TUTOR,
+                ID_RECEPTOR: ALUMNOS[0],
+                ESTADO: 1,
+                MENSAJE: "Tiene una nueva solicitud de cita de parte de un alumno"
+            }, { transaction: transaccion })
+
             for (element of ALUMNOS) {
                 const newAlumnoSesion = await alumnoXSesion.create({
                     ID_SESION: result.ID_SESION,
