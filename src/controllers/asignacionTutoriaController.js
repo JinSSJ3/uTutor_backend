@@ -15,7 +15,7 @@ controllers.listarPorTutoria = async (req, res) => {
         const dataAsignaciones = await asignacionTutoria.findAll({
             include: [{
                 model: tutor,
-                include:[{
+                include: [{
                     model: usuario,
                     attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
                 }]
@@ -23,18 +23,18 @@ controllers.listarPorTutoria = async (req, res) => {
             {
                 model: alumno,
                 as: "ALUMNOS",
-                include:[{
+                include: [{
                     model: usuario,
                     attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
                 }],
-                through:{
+                through: {
                     attributes: []
                 }
-            },{
+            }, {
                 model: asignacionTutoriaXAlumno,
-                where: {SOLICITUD: 1}, // aceptada
+                where: { SOLICITUD: 1 }, // aceptada
                 attributes: []
-            },{
+            }, {
                 model: procesoTutoria,
                 as: "PROCESO_TUTORIA",
                 attributes: ["ID_PROCESO_TUTORIA", "NOMBRE"]
@@ -55,7 +55,7 @@ controllers.get = async (req, res) => { // devuelve los datos de una asignacion
     try {
         const idAsignacion = req.params.id;
         const dataAsignacion = await asignacionTutoria.findOne({
-            where:{
+            where: {
                 ID_ASIGNACION: idAsignacion,
                 ESTADO: 1
             },
@@ -80,7 +80,7 @@ controllers.get = async (req, res) => { // devuelve los datos de una asignacion
 controllers.lista = async (req, res) => { // devuelve los datos de todas las asignaciones
     try {
         const dataAsignacion = await asignacionTutoria.findAll({
-            where:{
+            where: {
                 ESTADO: 1
             },
             include: [tutor,
@@ -94,7 +94,7 @@ controllers.lista = async (req, res) => { // devuelve los datos de todas las asi
                 },
                 {
                     model: asignacionTutoriaXAlumno,
-                    where: {SOLICITUD: 1} // aceptada
+                    where: { SOLICITUD: 1 } // aceptada
                 }
             ]
         })
@@ -109,8 +109,8 @@ controllers.lista = async (req, res) => { // devuelve los datos de todas las asi
 controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve las solicitudes pendientes de un tutor
     try {
         const dataSolicitud = await asignacionTutoriaXAlumno.findAll({
-            where:{ SOLICITUD: 2},  //pendiente
-            include: [                
+            where: { SOLICITUD: 2 },  //pendiente
+            include: [
                 {
                     model: alumno,
                     as: "ALUMNO",
@@ -125,8 +125,8 @@ controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve las soli
                         ID_TUTOR: req.params.idTutor,
                         ID_PROCESO_TUTORIA: req.params.idTutoria
                     },
-                    attributes: ["ID_TUTOR"]                                       
-                }], 
+                    attributes: ["ID_TUTOR"]
+                }],
             attributes: ["ID_ASIGNACION"]
         })
         res.status(201).json({ solicitudes: dataSolicitud });
@@ -137,11 +137,11 @@ controllers.listarSolicitudesXTutor = async (req, res) => { // devuelve las soli
 }
 
 
-controllers.responderSolicitud = async (req, res) => {  
-    
+controllers.responderSolicitud = async (req, res) => {
+
     const transaccion = await sequelize.transaction();
-    const {ID_ASIGNACION, ID_ALUMNO, RESPUESTA} = req.body.solicitud;
-    try {        
+    const { ID_ASIGNACION, ID_ALUMNO, RESPUESTA } = req.body.solicitud;
+    try {
         let date = new Date()
         const solicitudModificada = await asignacionTutoriaXAlumno.update({
             SOLICITUD: RESPUESTA
@@ -154,18 +154,18 @@ controllers.responderSolicitud = async (req, res) => {
         })
 
         await asignacionTutoria.update({
-            ESTADO: 1,            
+            ESTADO: 1,
             FECHA_ASIGNACION: date + date.getTimezoneOffset(),
         }, {
-            where: {ID_ASIGNACION: ID_ASIGNACION},
+            where: { ID_ASIGNACION: ID_ASIGNACION },
             transaction: transaccion
         })
 
         let tut = await asignacionTutoria.findOne({
-            where: {ID_ASIGNACION: ID_ASIGNACION},
-            include:{
-                model:tutor,
-                include:{
+            where: { ID_ASIGNACION: ID_ASIGNACION },
+            include: {
+                model: tutor,
+                include: {
                     model: usuario,
                     attributes: ["NOMBRE", "APELLIDOS"]
                 }
@@ -173,7 +173,7 @@ controllers.responderSolicitud = async (req, res) => {
             attributes: []
         })
 
-        let mensaje = "El tutor " + tut.TUTOR.USUARIO.NOMBRE + " " + tut.TUTOR.USUARIO.APELLIDOS + " ha " + (RESPUESTA? "aceptado": "rechazado") + " su solicitud de tutoría";
+        let mensaje = "El tutor " + tut.TUTOR.USUARIO.NOMBRE + " " + tut.TUTOR.USUARIO.APELLIDOS + " ha " + (RESPUESTA ? "aceptado" : "rechazado") + " su solicitud de tutoría";
 
         await notificacion.create({
             ID_EMISOR: tut.TUTOR.ID_TUTOR,
@@ -184,18 +184,18 @@ controllers.responderSolicitud = async (req, res) => {
 
         await transaccion.commit();
         console.log(date + date.getTimezoneOffset())
-        res.status(201).json({solicitud: req.body.solicitud});
-    }catch (error) {
+        res.status(201).json({ solicitud: req.body.solicitud });
+    } catch (error) {
         await transaccion.rollback();
-        res.json({error: error.message})
+        res.json({ error: error.message })
     }
-    
+
 };
 
 
 controllers.mandarSolicitudTutoria = async (req, res) => {
     const transaccion = await sequelize.transaction();
-    const { ID_PROCESO_TUTORIA, ID_TUTOR, ID_ALUMNO} = req.body.solicitud;
+    const { ID_PROCESO_TUTORIA, ID_TUTOR, ID_ALUMNO } = req.body.solicitud;
     try {
         const nuevaSolicitud = await asignacionTutoria.create({
             ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA,
@@ -210,12 +210,12 @@ controllers.mandarSolicitudTutoria = async (req, res) => {
                 }, { transaction: transaccion })
 
                 let al = await usuario.findOne({
-                    where: {ID_USUARIO: ID_ALUMNO},
+                    where: { ID_USUARIO: ID_ALUMNO },
                     attributes: ["NOMBRE", "APELLIDOS"]
                 })
 
                 let proceso = await procesoTutoria.findOne({
-                    where: {ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA},
+                    where: { ID_PROCESO_TUTORIA: ID_PROCESO_TUTORIA },
                     attributes: ["NOMBRE"]
                 })
 
@@ -275,41 +275,46 @@ controllers.registrar = async (req, res) => {
 
 };
 
-// No se estan modificando alumnos
-// controllers.modificar = async (req, res) => {
+controllers.modificar = async (req, res) => {
 
-//     const transaccion = await sequelize.transaction();
-//     const { ID, PROCESO_TUTORIA, TUTOR, ALUMNOS, FECHA_ASIGNACION } = req.body.asignacionTutoria;
-//     //  console.log("GOT: ", PROGRAMA);//solo para asegurarme de que el objeto llego al backend
-//     try {
-//         const asignacionTutoriaModificada = await asignacionTutoria.update({
-//             ID_PROCESO_TUTORIA: PROCESO_TUTORIA,
-//             ID_TUTOR: TUTOR,
-//             FECHA_ASIGNACION: FECHA_ASIGNACION,
-//             ESTADO: 1
-//         }, {
-//             where: { ID_ASIGNACION: ID }
-//         }, { transaction: transaccion })
-//             .then(async result => {
-//                 await asignacionTutoriaXAlumno.destroy({
-//                     where: { ID_ASIGNACION: ID }
-//                 }, { transaction: transaccion });
+    const transaccion = await sequelize.transaction();
+    const { ID, PROCESO_TUTORIA, TUTOR, ALUMNOS, FECHA_ASIGNACION } = req.body.asignacionTutoria;
+    console.log("GOT: ", req.body.asignacionTutoria);//solo para asegurarme de que el objeto llego al backend
+    try {
+        const asignacionTutoriaModificada = await asignacionTutoria.update(
+            {
+                ID_PROCESO_TUTORIA: PROCESO_TUTORIA,
+                ID_TUTOR: TUTOR,
+                FECHA_ASIGNACION: FECHA_ASIGNACION,
+                ESTADO: 1
+            },
+            {
+                where: { ID_ASIGNACION: ID }
+            },
+            { transaction: transaccion }
+        ).then(async result => {
+            await asignacionTutoriaXAlumno.destroy({
+                where: { ID_ASIGNACION: ID }
+            }, { transaction: transaccion });
 
-//                 for (element of ALUMNOS) {
-//                     const nuevaAsignacionTutoriaXAlumno = await asignacionTutoriaXAlumno.create({
-//                         ID_ALUMNO: element,
-//                         ID_ASIGNACION: ID
-//                     }, { transaction: transaccion })
-//                 };
-//                 await transaccion.commit();
-//                 res.status(201).json({ asignacion: result });
-//             })
-//     } catch (error) {
-//         await transaccion.rollback();
-//         res.json({ error: error.message })
-//     }
+            for (element of ALUMNOS) {
+                const nuevaAsignacionTutoriaXAlumno = await asignacionTutoriaXAlumno.create({
+                    ID_ALUMNO: element,
+                    ID_ASIGNACION: ID,
+                    SOLICITUD: 1
+                }, { transaction: transaccion })
+            };
 
-// };
+        })
+
+        await transaccion.commit();
+        res.status(201).json({ modificacion: 1 });
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
+};
 
 controllers.eliminar = async (req, res) => {
 
@@ -318,12 +323,12 @@ controllers.eliminar = async (req, res) => {
         const asignacionTutoriaEliminada = await asignacionTutoria.update(
             {
                 ESTADO: 0
-            }, 
+            },
             {
                 where: { ID_ASIGNACION: req.params.id }
-            }, 
-            { 
-                transaction: transaccion 
+            },
+            {
+                transaction: transaccion
             }
         );
         await transaccion.commit();
@@ -340,7 +345,7 @@ controllers.listarPorTutoriaYTutor = async (req, res) => {
         const dataAsignaciones = await asignacionTutoria.findAll({
             include: [{
                 model: tutor,
-                include:[{
+                include: [{
                     model: usuario,
                     attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
                 }]
@@ -348,18 +353,18 @@ controllers.listarPorTutoriaYTutor = async (req, res) => {
             {
                 model: alumno,
                 as: "ALUMNOS",
-                include:[{
+                include: [{
                     model: usuario,
                     attributes: ["ID_USUARIO", "NOMBRE", "APELLIDOS"]
                 }],
-                through:{
+                through: {
                     attributes: []
                 }
-            },{
+            }, {
                 model: asignacionTutoriaXAlumno,
-                where: {SOLICITUD: 1}, // aceptada
+                where: { SOLICITUD: 1 }, // aceptada
                 attributes: []
-            },{
+            }, {
                 model: procesoTutoria,
                 as: "PROCESO_TUTORIA",
                 attributes: ["ID_PROCESO_TUTORIA", "NOMBRE"]

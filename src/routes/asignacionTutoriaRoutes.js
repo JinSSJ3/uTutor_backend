@@ -24,7 +24,7 @@ router.get("/api/asignacion/:id", asignacionTutoriaController.get);
 
 router.post("/api/asignacion", asignacionTutoriaController.registrar);
 
-// router.post("/api/asignacion/modificar", asignacionTutoriaController.modificar);
+router.post("/api/asignacion/modificar", asignacionTutoriaController.modificar);
 
 router.post("/api/asignacion/eliminar/:id", asignacionTutoriaController.eliminar);
 

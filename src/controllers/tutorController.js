@@ -11,6 +11,7 @@ let rolXUsuarioXPrograma = require('../models/rolXUsuarioXPrograma');
 let programa = require('../models/programa')
 let asignacionTutoria = require('../models/asignacionTutoria')
 let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
+let notificacion = require('../models/notificacion');
 const { Sequelize } = require('sequelize');
 
 //sequelize.sync();
@@ -390,7 +391,8 @@ controllers.listarEstadoSolicitudTutorFijo = async (req, res) => { // lista el t
     }
 };
 
-controllers.citarAlumno = async (req, res) => {  
+controllers.citarAlumno = async (req, res) => { 
+    const transaccion = await sequelize.transaction();
     const {EMISOR, RAZON, RECEPTOR} = req.body.cita; 
     console.log("GOT: ", req.body.cita);//solo para asegurarme de que el objeto llego al backend
     
@@ -402,6 +404,15 @@ controllers.citarAlumno = async (req, res) => {
         const alum = await usuario.findOne({
             where: {ID_USUARIO: RECEPTOR}
         })
+
+        const newNotif = await notificacion.create({
+            ID_EMISOR: EMISOR,
+            ID_RECEPTOR: RECEPTOR,
+            ESTADO: 1,
+            MENSAJE: RAZON
+        }, { transaction: transaccion })
+
+        await transaccion.commit();
 
         res.status(201).json({cita: RAZON});
 
@@ -433,9 +444,9 @@ controllers.citarAlumno = async (req, res) => {
             } else {
               console.log('Email sent: ' + info.response);
             }
-          });
-             
+          });      
     } catch (error) {
+        await transaccion.rollback();
         res.json({error: error.message})
     }
     
