@@ -8,6 +8,6 @@ const logController = require('../controllers/logController');
 router.get("/",(req, res)=>{
     res.end(`express running on the server ${app.get("port")}`);
 })
-router.get("/api/auditoria", logController.logDeAuditoria);
+router.post("/api/auditoria", logController.logDeAuditoria);
 
 module.exports = router;
