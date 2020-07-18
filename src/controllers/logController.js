@@ -2,14 +2,15 @@ const controllers = {}
 
 const path = require('path');
 const fsPath =  require('fs-path');
+const fs =  require('fs');
 
 controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
     const {usuario, transaccion} = req.body.auditoria;
     try{
         let dia=new Date();
         let ruta = await path.join("..","Auditoria","Auditoria"+dia.getDay()+"-"+dia.getMonth()+"-"+dia.getFullYear()+".txt");
-        let data = await usuario + "-" + transaccion;
-        fsPath.writeFile(ruta, data, function (err) {
+        let data = await usuario + "-" + transaccion+'\n';
+        fs.appendFile(ruta, data, function (err) {
             if (err) {
                 return console.log(err);
             }
