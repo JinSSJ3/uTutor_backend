@@ -9,7 +9,16 @@ controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
     try{
         let dia=new Date();
         let ruta = await path.join("..","Auditoria","Auditoria"+dia.getDay()+"-"+dia.getMonth()+"-"+dia.getFullYear()+".txt");
-        let data = await usuario + "-" + transaccion+'\n';
+        let output = ''
+        console.log(transaccion)
+        for (property in transaccion) {
+            output += property + ": {"
+            for(prop in transaccion[property]){
+                output += prop + ': ' + transaccion[property][prop]+', ';
+            }
+        }
+        output+="}";
+        let data = await usuario + "-" + output+'\n';
         fs.appendFile(ruta, data, function (err) {
             if (err) {
                 return console.log(err);
