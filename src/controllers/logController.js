@@ -1,25 +1,25 @@
 const controllers = {}
 
 const path = require('path');
+const fsPath =  require('fs-path');
 
 controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
     const {usuario, transaccion} = req.body.auditoria;
     try{
-        let fso, f, r;
-        let ForReading = 1, ForWriting = 2;
         let dia=new Date();
-        fso = new ActiveXObject("Scripting.FileSystemObject"); 
-        f = fso.OpenTextFile(path.join("..","Auditoria","Auditoria"+dia.getDay()+"-"+dia.getMonth()+"-"+dia.getFullYear()+"-"+".txt", ForWriting, true));
-        f.Write(usuario+"   "+transaccion);
-        f.Close();       
+        let ruta = await path.join("..","Auditoria","Auditoria"+dia.getDay()+"-"+dia.getMonth()+"-"+dia.getFullYear()+".txt");
+        let data = await usuario + "-" + transaccion;
+        fsPath.writeFile(ruta, data, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+        }) 
+        res.status(201).json({estado: "Registro exitoso"});       
     }    
     catch (error) {
         res.json({error: error.message});    
     }
 };
-
-
-
 
 
 module.exports = controllers;
