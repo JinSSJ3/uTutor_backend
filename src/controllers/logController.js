@@ -18,7 +18,7 @@ controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
             }
         }
         output+="}";
-        let data = await usuario + "-" + output+'\n';
+        let data = await usuario + output+'\n';
         fs.appendFile(ruta, data, function (err) {
             if (err) {
                 return console.log(err);
