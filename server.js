@@ -221,6 +221,7 @@ app.use(require('./src/routes/usuarioRoutes'));
 app.use(require('./src/routes/encuestaRoutes'));
 app.use(require('./src/routes/notificacionRoutes'));
 app.use(require('./src/routes/areaApoyoRoutes'));
+app.use(require('./src/routes/logRoutes'));
 
 
 
