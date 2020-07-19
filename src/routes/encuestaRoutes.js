@@ -14,6 +14,8 @@ router.get("/api/encuesta/:id", encuestaController.get);
 
 router.post("/api/encuesta", encuestaController.registrar);
 
+router.get("/api/encuesta/programa/:idPrograma", encuestaController.listarPorPrograma);
+
 
 
 

@@ -5,12 +5,14 @@ let encuesta = require('../models/encuesta');
 const alumnoXSesion = require('../models/alumnoXSesion');
 const sesion = require('../models/sesion');
 const { Sequelize } = require('sequelize');
-
+const procesoTutoria = require('../models/procesoTutoria');
+const programa = require('../models/programa');
+const { QueryTypes } = require('sequelize');
 
 
 controllers.listarPorTutoria = async (req, res) => { 
-    try{
-        const { QueryTypes } = require('sequelize');
+    try{  // devuelve el promedio de c/campo de las encuestas wn cada proceso de tutoria de un programa 
+        
         const encuestas = await sequelize.query("SELECT PROCESO_TUTORIA.NOMBRE PROCESO_TUTORIA,  AVG(SATISFACCION) SATISFACCION, AVG(UTILIDAD) UTILIDAD, SUM(UTILIZO_RECOMENDACIONES) UTILIZO_RECOMENDACIONES," +
         "SUM(SOLUCIONO_SITUACION) SOLUCIONO_SITUACION, SUM(RECOMENDARIA) RECOMENDARIA, COUNT(*) CANTIDAD" +
         " FROM ENCUESTA, ALUMNO_X_SESION, SESION, PROCESO_TUTORIA " +
@@ -18,6 +20,24 @@ controllers.listarPorTutoria = async (req, res) => {
          "AND SESION.ID_SESION = ENCUESTA.ID_SESION AND ALUMNO_X_SESION.ID_SESION = SESION.ID_SESION AND PROCESO_TUTORIA.ID_PROCESO_TUTORIA = SESION.ID_PROCESO_TUTORIA " +
          "AND PROCESO_TUTORIA.ID_PROGRAMA = " + req.params.idPrograma +
         " GROUP BY PROCESO_TUTORIA.  ID_PROCESO_TUTORIA", { type: QueryTypes.SELECT });
+        
+        res.status(201).json({encuestas:encuestas});         
+    }    
+    catch (error) {
+        res.json({error: error.message});    
+    }
+};
+
+controllers.listarPorPrograma = async (req, res) => { 
+    try{  // devuelve las encuestas de un programa
+        const encuestas = await sequelize.query("SELECT CODIGO, CONCAT(USUARIO.NOMBRE,' ',USUARIO.APELLIDOS) NOMBRE, " +
+        " UTILIDAD,CASE WHEN UTILIZO_RECOMENDACIONES=1 THEN 'SI' ELSE 'NO' END UTILIZO_RECOMENDACIONES, " +
+        " CASE WHEN SOLUCIONO_SITUACION=1 THEN 'SI' ELSE 'NO' END SOLUCIONO_SITUACION," +
+        " CASE WHEN RECOMENDARIA=1 THEN 'SI' ELSE 'NO' END RECOMENDARIA, " +
+        " PROCESO_TUTORIA.NOMBRE PROCESO, PROGRAMA.NOMBRE PROGRAMA FROM ENCUESTA, SESION, PROCESO_TUTORIA, PROGRAMA, USUARIO " +
+        " WHERE ENCUESTA.ID_SESION = SESION.ID_SESION AND SESION.ID_PROCESO_TUTORIA = PROCESO_TUTORIA.ID_PROCESO_TUTORIA " +
+        " AND ID_USUARIO = ID_ALUMNO " +
+        " AND PROCESO_TUTORIA.ID_PROGRAMA = PROGRAMA.ID_PROGRAMA AND PROGRAMA.ID_PROGRAMA =  " + req.params.idPrograma , { type: QueryTypes.SELECT });
         
         res.status(201).json({encuestas:encuestas});         
     }    
