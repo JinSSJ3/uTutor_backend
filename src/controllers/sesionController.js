@@ -1043,7 +1043,7 @@ controllers.listarSesionesRealizadasPorAlumnoYProcesoTutoria = async (req, res) 
                     include: { model: usuario }
                 },{
                     model: alumnoXSesion,
-                    attributes:["ASISTENCIA_ALUMNO", "RESULTADO"]
+                    attributes:["ASISTENCIA_ALUMNO", "RESULTADO", "ID_ALUMNO"]
                 }
             ],
             where: {
