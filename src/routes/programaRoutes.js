@@ -51,4 +51,6 @@ router.post("/api/facultad/eliminar/:id", programaController.eliminarFacultad);
 
 router.post("/api/programa/eliminar/:id", programaController.eliminarPrograma);
 
+router.get("/api/facultad/alumno/:idAlumno", programaController.listarFacultadesDeUnAlumno);
+
 module.exports = router;
