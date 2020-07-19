@@ -30,8 +30,7 @@ controllers.listar = async (req, res) => { // lista sesiones de un tutor
                     attributes: ['NOMBRE', 'APELLIDOS']
                 }]
             }, { model: compromiso },
-            {model: procesoTutoría,},
-            {model: alumnoXSesion}
+            {model: procesoTutoría,}
         ],
             order: [["FECHA","ASC"], ["HORA_INICIO","ASC"]]
         });
