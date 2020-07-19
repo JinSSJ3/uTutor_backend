@@ -128,9 +128,6 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                 ]
             },{
                 model: procesoTutoria
-            },
-            {
-                model: alumnoXSesion
             }
             ]
         });
