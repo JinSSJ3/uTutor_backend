@@ -60,9 +60,6 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
             },
             {
                 model: procesoTutoría,
-            },
-            {
-                model: alumnoXSesion,
             }
             ],
             order: [
