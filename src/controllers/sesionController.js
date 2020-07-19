@@ -593,10 +593,10 @@ controllers.registrarResultados = async (req, res) => {
                 where: {
                     ID_SESION: ID_SESION,
                     ID_ALUMNO: ALUMNOS[i],
-                    RESULTADO: RESULTADO
                 }
             })
             asist.ASISTENCIA_ALUMNO = ASISTENCIA[i];
+            asist.RESULTADO =  RESULTADO;
             await asist.save({ transaction: transaccion });
         }
 
