@@ -6,6 +6,7 @@ let tutor = require('../models/tutor');
 let disponibilidad = require('../models/disponibilidad');
 let usuario = require('../models/usuario');
 let rolXUsuarioXPrograma = require("../models/rolXUsuarioXPrograma");
+const sesion = require('../models/sesion');
 
 //sequelize.sync();
 
@@ -616,5 +617,80 @@ controllers.listarDisponibilidadVSSesiones = async (req, res) => {  // horas de 
         res.json({error: error.message});    
     }
 };
+
+controllers.intervalos = async (req, res) => {
+    const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR} = req.body.disponibilidad; 
+    console.log("GOT: ", req.body.disponibilidad);
+    try{
+        const { Op } = require("sequelize");
+        const data = await sesion.findAll({
+            where: {ID_TUTOR: ID_TUTOR,
+                    FECHA: FECHA,
+                    [Op.or]: [
+                        {
+                            HORA_FIN: {
+                                [Op.gte]: HORA_FIN,
+                            },
+                            HORA_INICIO: {
+                                [Op.lt]: HORA_FIN,
+                            }
+                        },
+                        {
+                            HORA_INICIO: {
+                                [Op.lte]: HORA_INICIO,
+                            },
+                            HORA_FIN: {
+                                [Op.gt]: HORA_INICIO,
+                            }
+                        },
+                        {
+                            HORA_INICIO: {
+                                [Op.gte]: HORA_INICIO,
+                            },
+                            HORA_FIN: {
+                                [Op.lte]: HORA_FIN,
+                            }
+                        }
+                    ]},
+            order:[
+                    ['HORA_INICIO', 'ASC']
+            ]
+        }).then(async result => {
+
+            if(result.length == 0){
+                let mensaje = `Horas disponibles: ${HORA_INICIO} - ${HORA_FIN}`;
+                res.status(201).json({message: mensaje});
+                return;
+            }
+
+
+            var dateS = 'Horas disponibles: ';
+
+            if( HORA_INICIO != result[0].HORA_INICIO){
+                dateS+=`${HORA_INICIO} - ${result[0].HORA_INICIO}; `
+            }
+            var i;
+            for (i = 0; i < result.length-1; i++){
+                dateS+=`${result[i].HORA_FIN} - ${result[i+1].HORA_INICIO}; `
+            }
+
+            if(HORA_FIN != result[i].HORA_FIN){
+                dateS+=`${result[i].HORA_FIN} - ${HORA_FIN}`
+            }
+
+            res.status(201).json({ message: dateS });
+        })
+    }
+    catch{
+        res.json({ error: error.message })
+    }
+}
+
+
+
+
+
+
+
 
 module.exports = controllers;

@@ -37,5 +37,7 @@ router.get("/api/disponibilidadacumulada/:idPrograma", disponibilidadController.
 
 router.get("/api/disponibilidadvssesiones/:idPrograma", disponibilidadController.listarDisponibilidadVSSesiones);
 
+router.post("/api/disponibilidadIntervalos", disponibilidadController.intervalos);
+
 
 module.exports = router;
