@@ -663,19 +663,32 @@ controllers.intervalos = async (req, res) => {
                 return;
             }
 
+            if(HORA_INICIO == result[0].HORA_INICIO && HORA_FIN == result[0].HORA_FIN){
+                let mensaje = `Esta disponibilidad se encuentra totalmente ocupada`;
+                res.status(201).json({message: mensaje});
+                return;
+            }
 
             var dateS = 'Horas disponibles: ';
 
-            if( HORA_INICIO != result[0].HORA_INICIO){
+            if(HORA_INICIO != result[0].HORA_INICIO){
                 dateS+=`${HORA_INICIO} - ${result[0].HORA_INICIO}; `
             }
             var i;
             for (i = 0; i < result.length-1; i++){
-                dateS+=`${result[i].HORA_FIN} - ${result[i+1].HORA_INICIO}; `
+                if(result[i].HORA_FIN != result[i+1].HORA_INICIO){
+                    dateS+=`${result[i].HORA_FIN} - ${result[i+1].HORA_INICIO}; `
+                }
             }
 
             if(HORA_FIN != result[i].HORA_FIN){
                 dateS+=`${result[i].HORA_FIN} - ${HORA_FIN}`
+            }
+
+            if(dateS == 'Horas disponibles: '){
+                let mensaje = `Esta disponibilidad se encuentra totalmente ocupada`;
+                res.status(201).json({message: mensaje});
+                return;
             }
 
             res.status(201).json({ message: dateS });
