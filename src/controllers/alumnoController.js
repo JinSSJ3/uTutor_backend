@@ -458,7 +458,7 @@ controllers.devolverArchivoInfoRelevante = async (req, res) => {  // lista los a
 controllers.listarNoAsignadosPorProgramaYTutoria = async (req, res) => { // Lista a los alumnos de un programa determinado
     try {
         const { QueryTypes } = require('sequelize');
-        const alumnos = await sequelize.query("SELECT ID_USUARIO, NOMBRE,APELLIDOS, CORREO from USUARIO, ALUMNO " +
+        const alumnos = await sequelize.query("SELECT ID_USUARIO, NOMBRE,APELLIDOS, CORREO, CODIGO from USUARIO, ALUMNO " +
         " WHERE USUARIO.ID_USUARIO NOT IN (SELECT ID_ALUMNO FROM ASIGNACION_TUTORIA_X_ALUMNO, ASIGNACION_TUTORIA " + 
         " WHERE ASIGNACION_TUTORIA.ID_ASIGNACION = ASIGNACION_TUTORIA_X_ALUMNO.ID_ASIGNACION AND ASIGNACION_TUTORIA.ID_PROCESO_TUTORIA = " + req.params.idTutoria + 
         " AND SOLICITUD = 1 AND ESTADO = 1) AND ID_USUARIO = ID_ALUMNO", { type: QueryTypes.SELECT });
@@ -467,6 +467,91 @@ controllers.listarNoAsignadosPorProgramaYTutoria = async (req, res) => { // List
     catch (error) {
         res.json({ error: error.message });
     }
+};
+
+controllers.registroMasivo = async (req, res) => {
+    /**
+     * Aqui deberia haber una validacion (un middleware) para validar
+     * que se envio un "student" en el cuerpo ("body") del request ("req")
+     *  */
+    const transaccion = await sequelize.transaction();
+    console.log(">>>>>>GOT: ", req.body.alumnos);//solo para asegurarme de que el objeto llego al backend
+    try {
+        let repetidos = []
+        let errores = false
+        for(registro of req.body.alumnos){
+            const validacionCodigo = await usuario.findOne({
+                where: { CODIGO: registro.CODIGO }
+            })
+
+            const validacionCorreo = await usuario.findOne({
+                where: { CORREO: registro.CORREO }
+            })
+
+            if(validacionCodigo && validacionCorreo){
+                repetidos.push("Código y correo repetidos");
+                errores = true;
+            }else if(validacionCodigo){
+                repetidos.push("Código repetido");
+                errores = true;
+            }else if(validacionCorreo){
+                repetidos.push("Correo repetido");
+                errores = true;
+            }else{
+                repetidos.push("Sin errores");
+                const nuevoAlumno = await usuario.create({
+                    USUARIO: registro.USUARIO,
+                    CONTRASENHA: registro.CONTRASENHA,
+                    NOMBRE: registro.NOMBRE,
+                    APELLIDOS: registro.APELLIDOS,
+                    CORREO: registro.CORREO,
+                    CODIGO: registro.CODIGO,
+                    TELEFONO: registro.TELEFONO,
+                    DIRECCION: registro.DIRECCION,
+                    IMAGEN: registro.IMAGEN
+                }, { transaction: transaccion })
+                .then(async result => {
+
+                        const nuevo = await alumno.create({
+                            ID_ALUMNO: result.ID_USUARIO
+                        }, { transaction: transaccion })
+
+                        const idRol = await rol.findOne({
+                            attributes: ["ID_ROL"],
+                            where: { DESCRIPCION: "Alumno" }
+                        }, { transaction: transaccion })
+
+                      
+                        for (element of registro.PROGRAMA) {
+                            const programaDeUsuario = await rolXUsuarioXPrograma.create({
+                                ID_USUARIO: result.ID_USUARIO,
+                                ID_PROGRAMA: element,
+                                ID_ROL: idRol.ID_ROL,
+                                ESTADO: '1'
+                            }, { transaction: transaccion })
+                        }
+
+                        for (element of registro.ETIQUETA) {
+                            const etiquetaDeAlumno = await etiquetaXAlumno.create({
+                                ID_ALUMNO: result.ID_USUARIO,
+                                ID_ETIQUETA: element
+                            }, { transaction: transaccion })
+                        }
+                    });
+                }
+            }
+            if (errores) {
+                await transaccion.rollback();
+                res.json({ errores: repetidos})
+            } else{
+                await transaccion.commit();
+                res.status(201).json({ mensaje: "Alumnos registrados satisfactoriamente" });
+            } 
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
 };
 
 module.exports = controllers;

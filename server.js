@@ -334,10 +334,15 @@ alumno.belongsToMany(sesion, { through: alumnoXSesion, foreignKey: "ID_ALUMNO", 
 sesion.belongsToMany(alumno, { through: alumnoXSesion, foreignKey: "ID_SESION", otherKey: "ID_ALUMNO" })
 alumnoXSesion.belongsTo(alumno, { foreignKey: "ID_ALUMNO" });
 alumnoXSesion.belongsTo(sesion, { foreignKey: "ID_SESION" });
-areaApoyo.belongsToMany(sesion, { through: areaApoyoXSesion, foreignKey: "ID_AREA_APOYO", otherKey: "ID_SESION" })
-sesion.belongsToMany(areaApoyo, { through: areaApoyoXSesion, foreignKey: "ID_SESION", otherKey: "ID_AREA_APOYO" })
-areaApoyoXSesion.belongsTo(areaApoyo, { foreignKey: "ID_AREA_APOYO" });
-areaApoyoXSesion.belongsTo(sesion, { foreignKey: "ID_SESION" });
+areaApoyo.belongsToMany(sesion, {through: areaApoyoXSesion, foreignKey: "ID_AREA_APOYO", otherKey: "ID_SESION"})
+areaApoyo.belongsToMany(alumno, {through: areaApoyoXSesion, foreignKey: "ID_AREA_APOYO", otherKey: "ID_ALUMNO"})
+sesion.belongsToMany(areaApoyo, {through: areaApoyoXSesion, foreignKey: "ID_SESION", otherKey: "ID_AREA_APOYO"})
+//sesion.belongsToMany(alumno, {through: areaApoyoXSesion, foreignKey: "ID_SESION", otherKey: "ID_ALUMNO"})
+//alumno.belongsToMany(sesion, {through: areaApoyoXSesion, foreignKey: "ID_ALUMNO", otherKey: "ID_SESION"})
+alumno.belongsToMany(areaApoyo, {through: areaApoyoXSesion, foreignKey: "ID_ALUMNO", otherKey: "ID_AREA_APOYO"})
+areaApoyoXSesion.belongsTo(areaApoyo,{foreignKey: "ID_AREA_APOYO"});
+areaApoyoXSesion.belongsTo(sesion,{foreignKey: "ID_SESION"});
+areaApoyoXSesion.belongsTo(alumno,{foreignKey: "ID_ALUMNO"});
 asignacionTutoria.belongsTo(tutor, { foreignKey: "ID_TUTOR" });
 asignacionTutoria.belongsTo(procesoTutoria, { foreignKey: "ID_PROCESO_TUTORIA", as: "PROCESO_TUTORIA" });
 alumno.belongsToMany(asignacionTutoria, { through: asignacionTutoriaXAlumno, foreignKey: "ID_ALUMNO", otherKey: "ID_ASIGNACION" });
@@ -347,7 +352,9 @@ asignacionTutoriaXAlumno.belongsTo(asignacionTutoria, { foreignKey: "ID_ASIGNACI
 alumno.hasMany(asignacionTutoriaXAlumno, { foreignKey: "ID_ALUMNO" });
 asignacionTutoria.hasMany(asignacionTutoriaXAlumno, { foreignKey: "ID_ASIGNACION" });
 compromiso.belongsTo(sesion, { foreignKey: { name: "ID_SESION" } });
+compromiso.belongsTo(alumno, { foreignKey: { name: "ID_ALUMNO" } });
 sesion.hasMany(compromiso, { foreignKey: { name: "ID_SESION" } });
+alumno.hasMany(compromiso, { foreignKey: { name: "ID_ALUMNO" } });
 disponibilidad.belongsTo(tutor, { foreignKey: { name: "ID_TUTOR" } });
 disponibilidad.belongsTo(programa, { foreignKey: { name: "ID_FACULTAD" } });
 encuesta.belongsTo(alumnoXSesion, { foreignKey: "ID_SESION" });
@@ -368,6 +375,7 @@ sesion.belongsTo(procesoTutoria, { foreignKey: "ID_PROCESO_TUTORIA" });
 sesion.belongsTo(tutor, { foreignKey: "ID_TUTOR" });
 tutor.belongsTo(usuario, { foreignKey: { name: "ID_TUTOR" } });
 
+
 app.use(morgan('dev'));
 
 
@@ -385,6 +393,7 @@ app.use(require('./src/routes/usuarioRoutes'));
 app.use(require('./src/routes/encuestaRoutes'));
 app.use(require('./src/routes/notificacionRoutes'));
 app.use(require('./src/routes/areaApoyoRoutes'));
+app.use(require('./src/routes/logRoutes'));
 
 
 

@@ -34,5 +34,7 @@ router.get("/api/alumno/informacionrelevante/descargar/:idArchivo", alumnoContro
 
 router.get("/api/alumno/noasignados/:idTutoria", alumnoController.listarNoAsignadosPorProgramaYTutoria);
 
+router.post("/api/alumno/registromasivo", alumnoController.registroMasivo);
+
 
 module.exports = router;

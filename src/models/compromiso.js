@@ -19,6 +19,14 @@ let compromiso = sequelize.define(nametable,{
             key: "ID_SESION"
           }
     },
+    ID_ALUMNO:{
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        references: {
+            model: "ALUMNO",
+            key: "ID_ALUMNO"
+          }
+    },
     DESCRIPCION: Sequelize.STRING,
     ESTADO: Sequelize.INTEGER 
     },
@@ -27,7 +35,9 @@ let compromiso = sequelize.define(nametable,{
     freezeTableName: true
 });
 
-// compromiso.belongsTo(sesion, {foreignKey:{name:"ID_SESION"}});
-// sesion.hasMany(compromiso, {foreignKey:{name:"ID_SESION"}});
+/* compromiso.belongsTo(sesion, { foreignKey: { name: "ID_SESION" } });
+compromiso.belongsTo(alumno, { foreignKey: { name: "ID_ALUMNO" } });
+sesion.hasMany(compromiso, { foreignKey: { name: "ID_SESION" } });
+alumno.hasMany(compromiso, { foreignKey: { name: "ID_ALUMNO" } }); */
 
 module.exports = compromiso;
