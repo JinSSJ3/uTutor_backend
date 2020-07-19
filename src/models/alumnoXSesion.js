@@ -6,7 +6,8 @@ let sesion = require("./sesion");
 let nametable = 'ALUMNO_X_SESION';
 
 let alumnoXSesion = sequelize.define(nametable,{
-  ASISTENCIA_ALUMNO: Sequelize.TINYINT
+  ASISTENCIA_ALUMNO: Sequelize.TINYINT,
+  RESULTADO: Sequelize.STRING
   },
   {
       timestamps :false,

@@ -273,7 +273,7 @@ controllers.registrarSesionInesperada = async (req, res) => {
             FECHA: FECHA,
             HORA_INICIO: HORA_INICIO,
             HORA_FIN: HORA_FIN,
-            RESULTADO: RESULTADO,
+            //RESULTADO: RESULTADO,
             ESTADO: "01-realizada_sin_cita"
         }, { transaction: transaccion }).then(async result => {
 
@@ -281,7 +281,8 @@ controllers.registrarSesionInesperada = async (req, res) => {
                 const newCompromiso = await compromiso.create({
                     ID_SESION: result.ID_SESION,
                     DESCRIPCION: element.campo,
-                    ESTADO: element.check
+                    ESTADO: element.check,
+                    ID_ALUMNO: ALUMNOS[0]
                 }, { transaction: transaccion })
             }
 
@@ -313,7 +314,8 @@ controllers.registrarSesionInesperada = async (req, res) => {
 
                 const newArea = await areaApoyoXSesion.create({
                     ID_SESION: result.ID_SESION,
-                    ID_AREA_APOYO: element
+                    ID_AREA_APOYO: element,
+                    ID_ALUMNO: ALUMNOS[0]
                 }, { transaction: transaccion })
             }
 
@@ -321,7 +323,8 @@ controllers.registrarSesionInesperada = async (req, res) => {
                 const newAlumnoSesion = await alumnoXSesion.create({
                     ID_SESION: result.ID_SESION,
                     ID_ALUMNO: element,
-                    ASISTENCIA_ALUMNO: 1
+                    ASISTENCIA_ALUMNO: 1,
+                    RESULTADO: RESULTADO
                 }, { transaction: transaccion })
             }
             await transaccion.commit();
@@ -524,7 +527,7 @@ controllers.registrarResultados = async (req, res) => {
                 ID_SESION: ID_SESION,
             }
         }, { transaction: transaccion })
-        miSesion.RESULTADO = RESULTADO;
+        //miSesion.RESULTADO = RESULTADO;
         if (miSesion.ESTADO != "01-realizada_sin_cita") {
             miSesion.ESTADO = "00-realizada_cita";
         }
@@ -535,7 +538,8 @@ controllers.registrarResultados = async (req, res) => {
             const miCompromiso = await compromiso.findOne({
                 where: {
                     ID_SESION: ID_SESION,
-                    DESCRIPCION: comp.campo
+                    DESCRIPCION: comp.campo,
+                    ID_ALUMNO: ALUMNOS[0]
                 }
             }, { transaction: transaccion })
             console.log("AAAAAAAAAAAAAa" + miCompromiso);
@@ -543,7 +547,8 @@ controllers.registrarResultados = async (req, res) => {
                 const newCompromiso = await compromiso.create({
                     ID_SESION: ID_SESION,
                     DESCRIPCION: comp.campo,
-                    ESTADO: comp.check
+                    ESTADO: comp.check,
+                    ID_ALUMNO: ALUMNOS[0]
                 }, { transaction: transaccion })
             } else if (comp.campo != "") {
                 miCompromiso.ESTADO = comp.check;
@@ -579,14 +584,16 @@ controllers.registrarResultados = async (req, res) => {
 
             const newArea = await areaApoyoXSesion.create({
                 ID_SESION: ID_SESION,
-                ID_AREA_APOYO: area
+                ID_AREA_APOYO: area,
+                ID_ALUMNO: ALUMNOS[0]
             }, { transaction: transaccion })
         })
         for (let i = 0; i < ALUMNOS.length; i++) {
             const asist = await alumnoXSesion.findOne({
                 where: {
                     ID_SESION: ID_SESION,
-                    ID_ALUMNO: ALUMNOS[i]
+                    ID_ALUMNO: ALUMNOS[i],
+                    RESULTADO: RESULTADO
                 }
             })
             asist.ASISTENCIA_ALUMNO = ASISTENCIA[i];

@@ -33,7 +33,6 @@ let sesion = sequelize.define(nametable,{
     DESCRIPCION: Sequelize.STRING,
     HORA_INICIO: Sequelize.STRING,
     HORA_FIN: Sequelize.STRING,
-    RESULTADO: Sequelize.STRING,
     ESTADO: Sequelize.STRING,
     FECHA:  Sequelize.DATEONLY,
     RAZON_MANTENIMIENTO: Sequelize.STRING  
