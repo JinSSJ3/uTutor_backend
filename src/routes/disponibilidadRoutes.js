@@ -35,5 +35,7 @@ router.post("/api/disponibilidad/listarPrograma/:idprograma/:fecha", disponibili
 
 router.get("/api/disponibilidadacumulada/:idPrograma", disponibilidadController.listarDisponibilidadAcumulada);
 
+router.get("/api/disponibilidadvssesiones/:idPrograma", disponibilidadController.listarDisponibilidadVSSesiones);
+
 
 module.exports = router;

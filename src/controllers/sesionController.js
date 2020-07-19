@@ -1175,7 +1175,8 @@ controllers.crearSesionGrupal = async (req, res) => {
             FECHA: FECHA,
             HORA_INICIO: HORA_INICIO,
             HORA_FIN: HORA_FIN,
-            ESTADO: "04-futura"
+            ESTADO: "04-futura",
+            MOTIVO: "Grupal"
         }, { transaction: transaccion }).then(async result => {
             for (element of ALUMNOS) {
                 const newAlumnoSesion = await alumnoXSesion.create({
