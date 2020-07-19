@@ -787,4 +787,32 @@ controllers.eliminarPrograma = async (req, res) => {
 
 };
 
+controllers.listarFacultadesDeUnAlumno = async (req, res) => {
+    try {        // lista las facultades de un alumno
+        const facultades = await programa.findAll({
+            include: [{
+                model: rolXUsuarioXPrograma,
+                where: { ID_USUARIO: req.params.idAlumno, ESTADO: 1 },
+                include: [{
+                    model: rol,
+                    where: { DESCRIPCION: "Alumno" },
+                    attributes: []
+                }],
+                attributes: []
+            }, {
+                model: programa,
+                as: "FACULTAD",
+                attributes: ["ID_PROGRAMA", "NOMBRE"]
+            }],
+            attributes: [],
+            group: ["PROGRAMA.ID_FACULTAD"],
+            where: { ESTADO: 1 }
+        });
+        res.status(201).json({ facultades: facultades });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+}
+
 module.exports = controllers;
