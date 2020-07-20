@@ -688,11 +688,11 @@ controllers.intervalos = async (req, res) => {
                 dateS+=`${result[i].HORA_FIN} - ${HORA_FIN}`
             }
 
-/*             if(dateS == 'Horas disponibles: '){
+            if(dateS == 'Horas disponibles: '){
                 let mensaje = `Esta disponibilidad se encuentra totalmente ocupada`;
                 res.status(201).json({message: mensaje});
                 return;
-            } */
+            }
 
             res.status(201).json({ message: dateS });
         })
