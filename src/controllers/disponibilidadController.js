@@ -626,6 +626,9 @@ controllers.intervalos = async (req, res) => {
         const data = await sesion.findAll({
             where: {ID_TUTOR: ID_TUTOR,
                     FECHA: FECHA,
+                    ESTADO: {
+                        [Op.not]: "02-cancelada"
+                    },
                     [Op.or]: [
                         {
                             HORA_FIN: {
@@ -685,11 +688,11 @@ controllers.intervalos = async (req, res) => {
                 dateS+=`${result[i].HORA_FIN} - ${HORA_FIN}`
             }
 
-            if(dateS == 'Horas disponibles: '){
+/*             if(dateS == 'Horas disponibles: '){
                 let mensaje = `Esta disponibilidad se encuentra totalmente ocupada`;
                 res.status(201).json({message: mensaje});
                 return;
-            }
+            } */
 
             res.status(201).json({ message: dateS });
         })
