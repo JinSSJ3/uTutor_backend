@@ -497,7 +497,7 @@ controllers.registrarCita = async (req, res) => {
                 ID_EMISOR: ALUMNOS[0],
                 ID_RECEPTOR: ID_TUTOR,
                 ESTADO: 1,
-                MENSAJE: "Tiene una nueva solicitud de cita de parte de un alumno"
+                MENSAJE: "Se le ha agendado una nueva cita"
             }, { transaction: transaccion })
 
             for (element of ALUMNOS) {
