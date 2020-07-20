@@ -365,7 +365,7 @@ controllers.eliminar = async (req, res) => {
             where: { DESCRIPCION: "Alumno" }
         }, { transaction: transaccion })
 
-        const coordinadorModificado = await rolXUsuarioxPrograma.update({
+        const coordinadorModificado = await rolXUsuarioXPrograma.update({
             ESTADO: 0
         }, {
             where: {
