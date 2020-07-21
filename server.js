@@ -30,9 +30,9 @@ const { QueryInterface, Sequelize } = require("sequelize");
 const path = require("path");
 dotenv.config();
 
-/* sample draft server
- * Author: Jin Jose Manuel
- * Date: 20/04/2020
+/* Deployable server
+ * Author: Jin, Tys, Yeri, Daniel, Jennifer, Luis, Gabriel, Renzo
+ * Date: 20/07/2020
  **/
 
 app = express();
