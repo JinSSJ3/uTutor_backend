@@ -42,9 +42,9 @@ app.use(bodyParser.json({ limit: "10MB", extended: true }));
 
 // Settings
 app.set("port", process.env.PORT);
-
 app.use(express.static(path.join(__dirname, "ututor-front", "build")));
 
+//ututor.net
 app.get("/", function (req, res) {
   try {
     res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
@@ -52,29 +52,232 @@ app.get("/", function (req, res) {
     res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
   }
 });
+app.get("/administrador/", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/alumno/", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
 
-app.get("/administrador/*", function (req, res) {
+//ADMIN
+app.get("/administrador/perfil", function (req, res) {
   try {
     res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
   } catch (error) {
     res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
   }
 });
-app.get("/coordinador/*", function (req, res) {
+app.get("/administrador/institucion", function (req, res) {
   try {
     res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
   } catch (error) {
     res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
   }
 });
-app.get("/tutor/*", function (req, res) {
+app.get("/administrador/facultades", function (req, res) {
   try {
     res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
   } catch (error) {
     res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
   }
 });
-app.get("/alumno/*", function (req, res) {
+app.get("/administrador/coordinadores", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/administrador/unidadesdeapoyo", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+
+//COORDINADOR
+app.get("/coordinador/perfil", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/facultades", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/alumnos", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/asignaciondeTutor", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/procesosdetutoria", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/programas", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/disponibilidades", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/coordinadoresdeprograma", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/reportes", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/asignarroles", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/coordinador/alumno/:idAlumno/:fullname", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+
+//TUTOR
+app.get("/tutor/perfil", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/misalumnos", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/midisponibilidad", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/sesiones", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/solicitudes", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/sesionesgrupales", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/misCitas", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/tutor/mialumno/:idAlumno/:fullname", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+
+//ALUMNO
+app.get("/alumno/solicitarTutorFijo", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/alumno/perfil", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/alumno/agendarCita", function (req, res) {
+  try {
+    res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
+  } catch (error) {
+    res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
+  }
+});
+app.get("/alumno/misCitas", function (req, res) {
   try {
     res.sendFile(path.join(__dirname, "ututor-front", "build", "index.html"));
   } catch (error) {
