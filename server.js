@@ -584,11 +584,11 @@ app.use(require("./src/routes/encuestaRoutes"));
 app.use(require("./src/routes/notificacionRoutes"));
 app.use(require("./src/routes/areaApoyoRoutes"));
 app.use(require("./src/routes/logRoutes"));
-
+/*
 app.get("*", function (req, res) {
   res.status(404).sendFile(path.join(__dirname, "404", "index.html"));
 });
-
+*/
 app.listen(app.get("port"), () =>
   console.log(`Server running on port ${app.get("port")}`)
 );
