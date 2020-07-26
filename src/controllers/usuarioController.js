@@ -156,7 +156,7 @@ controllers.login = async (req, res) => {
             let user = null
             if(result){
                 if(await result.validPassword(CONTRASENHA)){
-                    console.log("correcto")
+                    // console.log("correcto")
                     user = await usuario.findOne({
                         where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
                         include: [{
@@ -174,7 +174,7 @@ controllers.login = async (req, res) => {
                     })                
                 }
             }
-            console.log(CONTRASENHA)
+            // console.log(CONTRASENHA)
             res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
         })
     }catch (error){

@@ -28,6 +28,7 @@ const areaApoyo = require("./src/models/areaApoyo");
 const mysql = require("mysql2/promise");
 const { QueryInterface, Sequelize } = require("sequelize");
 const path = require("path");
+const compression = require('compression');
 dotenv.config();
 
 /* Deployable server
@@ -36,6 +37,7 @@ dotenv.config();
  **/
 
 app = express();
+app.use(compression());
 
 //app.use(express.json());
 app.use(bodyParser.json({ limit: "10MB", extended: true }));

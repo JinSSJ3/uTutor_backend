@@ -22,7 +22,7 @@ controllers.guardarImagen = async (req, res) => {
                 // si uno declara una variable arriba de la funcion, la manipula dentro y la quiere usar
                 // despues afuera, se corre el riezgo de que nunca se realice la manipulacion.
                 
-                console.log(path.join(".","archivoImagenes",id.toString()+".png"));
+                // console.log(path.join(".","archivoImagenes",id.toString()+".png"));
                 res.status(201).json({estado: "exito"}); 
             })
         })          

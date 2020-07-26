@@ -56,7 +56,6 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
                 ID_PROCESO_TUTORIA: req.params.tutoria
             },
         });
-        console.log("dsfds")
         res.status(201).json({ alumnos: alumnos });
     }
     catch (error) {
@@ -180,7 +179,7 @@ controllers.registrar = async (req, res) => {
      *  */
     const transaccion = await sequelize.transaction();
     const { NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, CONTRASENHA, IMAGEN, PROGRAMA, ETIQUETA } = req.body.alumno;
-    console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
+    //console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevoAlumno = await usuario.create({
             USUARIO: USUARIO,
@@ -270,7 +269,7 @@ controllers.modificar = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
     const { ID, NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, IMAGEN, PROGRAMA, ETIQUETA } = req.body.alumno;
-    console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
+   // console.log(">>>>>>GOT: ", req.body.alumno);//solo para asegurarme de que el objeto llego al backend
     try {
         const nuevoAlumno = await usuario.update({
             USUARIO: USUARIO,
@@ -408,7 +407,7 @@ controllers.registrarInformacionRelevante = async (req, res) => {
                 }
             })
         }
-        console.log("ruta: ", ruta);
+        //console.log("ruta: ", ruta);
         
         const nuevaInformacionRelevante = await informacionRelevante.create({
             ID_ALUMNO: ID_ALUMNO,
@@ -443,7 +442,7 @@ controllers.devolverArchivoInfoRelevante = async (req, res) => {  // lista los a
             where: {ID_INFORMACION_RELEVANTE: req.params.idArchivo},
             attributes: ["DESCRIPCION", "ARCHIVO"] 
         })
-        console.log(infoRelevante.ARCHIVO)
+        //console.log(infoRelevante.ARCHIVO)
         if (infoRelevante.ARCHIVO){
             infoRelevante.ARCHIVO = fs.readFileSync(infoRelevante.ARCHIVO, "base64")
         }
@@ -475,7 +474,7 @@ controllers.registroMasivo = async (req, res) => {
      * que se envio un "student" en el cuerpo ("body") del request ("req")
      *  */
     const transaccion = await sequelize.transaction();
-    console.log(">>>>>>GOT: ", req.body.alumnos);//solo para asegurarme de que el objeto llego al backend
+    //console.log(">>>>>>GOT: ", req.body.alumnos);//solo para asegurarme de que el objeto llego al backend
     try {
         let repetidos = []
         let errores = false

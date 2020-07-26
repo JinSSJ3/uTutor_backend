@@ -367,7 +367,7 @@ controllers.registrarSesionInesperada = async (req, res) => {
 controllers.registrarCita = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const { ID_TUTOR, ID_PROCESO_TUTORIA, LUGAR, MOTIVO, DESCRIPCION, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS } = req.body.sesion;
-    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
 
         let today = new Date();
@@ -520,7 +520,7 @@ controllers.registrarCita = async (req, res) => {
 controllers.registrarResultados = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const { ID_SESION, RESULTADO, COMPROMISOS, AREAS_APOYO, ALUMNOS, ASISTENCIA } = req.body.sesion;
-    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
         const miSesion = await sesion.findOne({
             where: {
@@ -542,7 +542,7 @@ controllers.registrarResultados = async (req, res) => {
                     ID_ALUMNO: ALUMNOS[0]
                 }
             }, { transaction: transaccion })
-            console.log("AAAAAAAAAAAAAa" + miCompromiso);
+            // console.log("AAAAAAAAAAAAAa" + miCompromiso);
             if ((miCompromiso == null) && (comp.campo != "")) {
                 const newCompromiso = await compromiso.create({
                     ID_SESION: ID_SESION,
@@ -639,7 +639,7 @@ controllers.registrarResultados = async (req, res) => {
 controllers.posponerCita = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const { ID_SESION, ID_TUTOR, FECHA, HORA_INICIO, HORA_FIN, ALUMNOS, RAZON, EMISOR, RECEPTOR } = req.body.sesion;
-    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
 
         let today = new Date();
@@ -796,7 +796,7 @@ controllers.posponerCita = async (req, res) => {
 controllers.cancelarCita = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const { ID_SESION, ALUMNOS, RAZON, EMISOR, RECEPTOR } = req.body.sesion;
-    console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.sesion);//solo para asegurarme de que el objeto llego al backend
     try {
         const miSesion = await sesion.findOne({
             where: {
@@ -917,8 +917,8 @@ controllers.listarCompromisosPorAlumnoYProcesoTutoria = async (req, res) => {
 
         var compromisos = [];
         for (var i = 0; i < data.length; i++) {
-            console.log(data[i]);
-            console.log("hola", data[i].COMPROMISOs);
+            // console.log(data[i]);
+            // console.log("hola", data[i].COMPROMISOs);
             compromisos = compromisos.concat(data[i].COMPROMISOs);
         }
 
@@ -944,7 +944,7 @@ controllers.modificarCompromiso = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
     const { ID_COMPROMISO, ID_SESION, DESCRIPCION, ESTADO } = req.body.compromiso;
-    console.log("GOT: ", req.body.compromiso);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.compromiso);//solo para asegurarme de que el objeto llego al backend
     try {
 
         const compormisoModificado = await compromiso.update(

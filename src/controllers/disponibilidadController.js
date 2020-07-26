@@ -202,7 +202,7 @@ controllers.listarPorProgramaMultipleTutorFecha = async (req, res) => { //listar
     try{
         const {idprograma, fecha} = req.params;
         const {tutores} = req.body.tutores; 
-        console.log("GOT: ", req.body.tutores);//solo para asegurarme de que el objeto llego al backend
+        //console.log("GOT: ", req.body.tutores);//solo para asegurarme de que el objeto llego al backend
 
         const data = await disponibilidad.findAll({
             where: {ID_TUTOR: tutores,
@@ -259,7 +259,7 @@ controllers.get = async (req, res) =>{ // devuelve una disponibilidad
 controllers.register = async (req, res) => {  
     const transaccion = await sequelize.transaction();
     const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION, ID_FACULTAD} = req.body.disponibilidad; 
-    console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
+   // console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     if (REPETICION == 1){
          try {
             const { Op } = require("sequelize");
@@ -322,17 +322,17 @@ controllers.register = async (req, res) => {
         fec.format();
         let mes = fec.month();
         let dia = fec.day();
-        console.log(mes);
-        console.log(fec);
-        console.log(dia);
+        // console.log(mes);
+        // console.log(fec);
+        // console.log(dia);
         let dias = [];
         while (fec.month() === mes) {
             let nuevaFecha = moment(fec);
             dias.push(moment(nuevaFecha).format('YYYY-MM-DD'));
             fec = moment(fec).add(7, 'days');
-            console.log(fec);
+            // console.log(fec);
         }
-        console.log(dias)
+        // console.log(dias)
         try {
             const { Op } = require("sequelize");
             dias.forEach(async fechaRep => {
@@ -416,7 +416,7 @@ controllers.modificar = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const transaccion2 = await sequelize.transaction();
     const {ID_DISPONIBILIDAD, HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR, LUGAR, REPETICION} = req.body.disponibilidad; 
-    console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.disponibilidad);//solo para asegurarme de que el objeto llego al backend
     
     try {
         const { Op } = require("sequelize");
@@ -483,18 +483,18 @@ controllers.modificar = async (req, res) => {
             fec.format();
             let mes = fec.month();
             let dia = fec.day();
-            console.log(mes);
-            console.log(fec);
-            console.log(dia);
+            // console.log(mes);
+            // console.log(fec);
+            // console.log(dia);
             let dias = [];
             fec = moment(fec).add(7, 'days');
             while (fec.month() === mes) {
                 let nuevaFecha = moment(fec);
                 dias.push(moment(nuevaFecha).format('YYYY-MM-DD'));
                 fec = moment(fec).add(7, 'days');
-                console.log(fec);
+                // console.log(fec);
             }
-            console.log(dias);
+            // console.log(dias);
 
             const dispOrigin = await disponibilidad.findOne({
                 where: {ID_DISPONIBILIDAD: ID_DISPONIBILIDAD}
@@ -620,7 +620,7 @@ controllers.listarDisponibilidadVSSesiones = async (req, res) => {  // horas de 
 
 controllers.intervalos = async (req, res) => {
     const {HORA_INICIO, HORA_FIN, FECHA, ID_TUTOR} = req.body.disponibilidad; 
-    console.log("GOT: ", req.body.disponibilidad);
+    // console.log("GOT: ", req.body.disponibilidad);
     try{
         const { Op } = require("sequelize");
         const data = await sesion.findAll({
