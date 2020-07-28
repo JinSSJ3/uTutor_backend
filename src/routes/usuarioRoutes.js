@@ -22,5 +22,7 @@ router.post("/api/usuario/actualizarperfil", usuarioController.modificarPerfil);
 
 router.post("/api/usuario/asignarrol", usuarioController.asignarRol);
 
+router.post("/api/usuario/guardarimagen", usuarioController.guardarImagen);
+
 
 module.exports = router;

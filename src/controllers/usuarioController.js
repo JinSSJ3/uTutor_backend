@@ -136,9 +136,9 @@ controllers.asignarRol = async (req,res) => {
     }
 }
 
-controllers.modificarPerfil = async (req,res) => {
+controllers.guardarImagen = async (req,res) => {
     const transaccion = await sequelize.transaction();
-    const {ID_USUARIO, TELEFONO, DIRECCION, IMAGEN} = req.body.usuario;
+    const {ID_USUARIO, IMAGEN} = req.body.imagen;
     try {
         let ruta = IMAGEN?path.join("..","Imagenes","Usuarios",ID_USUARIO.toString(),"perfil.jpeg"):null;
         if(IMAGEN){
@@ -150,9 +150,27 @@ controllers.modificarPerfil = async (req,res) => {
             })            
         }
         const usuarioModificado = await usuario.update({
-            TELEFONO: TELEFONO,
-            DIRECCION: DIRECCION,
             IMAGEN: ruta
+        }, {
+            where: {ID_USUARIO: ID_USUARIO},
+            transaction: transaccion
+        })
+
+        res.status(201).json({estado: "registro exitoso"});
+    }catch(error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+}
+
+controllers.modificarPerfil = async (req,res) => {
+    const transaccion = await sequelize.transaction();
+    const {ID_USUARIO, TELEFONO, DIRECCION} = req.body.usuario;
+    try {
+       
+        const usuarioModificado = await usuario.update({
+            TELEFONO: TELEFONO,
+            DIRECCION: DIRECCION
         }, {
             where: {ID_USUARIO: ID_USUARIO}
         }, {transaction: transaccion})
