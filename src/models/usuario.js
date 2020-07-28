@@ -19,7 +19,7 @@ let usuario = sequelize.define(nametable,{
     CODIGO: Sequelize.STRING,
     TELEFONO: Sequelize.STRING,
     DIRECCION: Sequelize.STRING,
-    IMAGEN: Sequelize.BLOB    
+    IMAGEN: Sequelize.STRING    
     },
     {
     timestamps :false,
