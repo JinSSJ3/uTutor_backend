@@ -10,7 +10,7 @@ controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
         let dia=new Date();
         let ruta = await path.join("..","Auditoria","Auditoria"+dia.getDay()+"-"+dia.getMonth()+"-"+dia.getFullYear()+".txt");
         let output = ''
-        console.log(transaccion)
+        // console.log(transaccion)
         for (property in transaccion) {
             output += property + ": {"
             for(prop in transaccion[property]){

@@ -218,7 +218,7 @@ controllers.listarProgramasYFacultadesPorCoordinador = async (req, res) => { // 
 
 controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo programas por coordinador
     const idCoordinador = req.params.id
-    console.log("GOT: ", idCoordinador)
+    // console.log("GOT: ", idCoordinador)
     try {
         const programas = await rolXUsuarioXPrograma.findAll(
             {
@@ -249,7 +249,7 @@ controllers.listarProgramasPorCoordinador = async (req, res) => { // lista solo 
 
 controllers.listarProgramasPorCoordinadorConFormato = async (req, res) => { // lista solo programas por coordinador
     const idCoordinador = req.params.id
-    console.log("GOT: ", idCoordinador)
+    // console.log("GOT: ", idCoordinador)
     try {
         const programas = await rolXUsuarioXPrograma.findAll(
             {
@@ -368,7 +368,7 @@ controllers.registrarFacultad = async (req, res) => {
     const transaccion = await sequelize.transaction();
     const transaccion2 = await sequelize.transaction();
     const { ID_INSTITUCION, NOMBRE, IMAGEN, INDEPENDIENTE, DIAS_DISP } = req.body.facultad;
-    console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
 
     try {
         const facultades = await programa.findAll(
@@ -434,7 +434,7 @@ controllers.registrarPrograma = async (req, res) => {
      *  */
     const transaccion = await sequelize.transaction();
     const { ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.programa;
-    console.log("GOT: ", req.body.programa);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.programa);//solo para asegurarme de que el objeto llego al backend
 
     try {
         const programasPorFacultad = await programa.findAll(
@@ -478,7 +478,7 @@ controllers.modificarFacultad = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
     const { ID_PROGRAMA, ID_INSTITUCION, NOMBRE, IMAGEN, DIAS_DISP, DIAS_CITA, INDEPENDIENTE } = req.body.facultad;
-    console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const facultades = await programa.findAll(
             {
@@ -526,7 +526,7 @@ controllers.modificarPrograma = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
     const { ID_PROGRAMA, ID_FACULTAD, ID_INSTITUCION, NOMBRE, IMAGEN } = req.body.programa;
-    console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.facultad);//solo para asegurarme de que el objeto llego al backend
     try {
         const programasPorFacultad = await programa.findAll(
             {

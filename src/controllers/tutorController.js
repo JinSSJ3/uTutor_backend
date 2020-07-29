@@ -228,7 +228,7 @@ controllers.register = async (req, res) => {
 controllers.modificar = async (req, res) => {  
     const transaccion = await sequelize.transaction();
     const {ID_TUTOR,NOMBRE, APELLIDOS, CODIGO, CORREO, TELEFONO, DIRECCION, USUARIO, IMAGEN, PROGRAMA} = req.body.tutor; 
-    console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.tutor);//solo para asegurarme de que el objeto llego al backend
     
     try {
         const modifTutor = await usuario.update({
@@ -362,13 +362,13 @@ controllers.listarEstadoSolicitudTutorFijo = async (req, res) => { // lista el t
                 for(element2 of element.ASIGNACION_TUTORIA){
                     for (element3 of element2.ASIGNACION_TUTORIA_X_ALUMNOs){
                         if(element3.SOLICITUD === 1){
-                            console.log("entree")
+                            // console.log("entree")
                             mensaje = "Ya tiene un tutor asignado en este proceso de tutoria";
                             tutorAsignado = element;
                             estado = 1
                             break;
                         }else if(element3.SOLICITUD === 2){
-                            console.log("entree")
+                            // console.log("entree")
                             mensaje = "Tiene una solicitud pendiente de respuesta";
                             tutorAsignado = element;
                             estado = 1
@@ -394,7 +394,7 @@ controllers.listarEstadoSolicitudTutorFijo = async (req, res) => { // lista el t
 controllers.citarAlumno = async (req, res) => { 
     const transaccion = await sequelize.transaction();
     const {EMISOR, RAZON, RECEPTOR} = req.body.cita; 
-    console.log("GOT: ", req.body.cita);//solo para asegurarme de que el objeto llego al backend
+    // console.log("GOT: ", req.body.cita);//solo para asegurarme de que el objeto llego al backend
     
     try {
         const tut = await usuario.findOne({

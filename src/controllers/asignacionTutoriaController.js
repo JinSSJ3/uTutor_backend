@@ -183,7 +183,7 @@ controllers.responderSolicitud = async (req, res) => {
         }, { transaction: transaccion })
 
         await transaccion.commit();
-        console.log(date + date.getTimezoneOffset())
+       // console.log(date + date.getTimezoneOffset())
         res.status(201).json({ solicitud: req.body.solicitud });
     } catch (error) {
         await transaccion.rollback();
@@ -249,7 +249,7 @@ controllers.registrar = async (req, res) => {
      *  */
     const transaccion = await sequelize.transaction();
     const { PROCESO_TUTORIA, TUTOR, ALUMNOS, FECHA_ASIGNACION } = req.body.asignacionTutoria;
-    console.log("GOT: ", req.body.asignacion); //solo para asegurarme de que el objeto llego al backend
+    //console.log("GOT: ", req.body.asignacion); //solo para asegurarme de que el objeto llego al backend
     try {
         const nuevaAsignacionTutoria = await asignacionTutoria.create({
             ID_PROCESO_TUTORIA: PROCESO_TUTORIA,
@@ -279,7 +279,7 @@ controllers.modificar = async (req, res) => {
 
     const transaccion = await sequelize.transaction();
     const { ID, PROCESO_TUTORIA, TUTOR, ALUMNOS, FECHA_ASIGNACION } = req.body.asignacionTutoria;
-    console.log("GOT: ", req.body.asignacionTutoria);//solo para asegurarme de que el objeto llego al backend
+    //console.log("GOT: ", req.body.asignacionTutoria);//solo para asegurarme de que el objeto llego al backend
     try {
         const asignacionTutoriaModificada = await asignacionTutoria.update(
             {

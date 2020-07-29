@@ -7,6 +7,9 @@ let programa = require('../models/programa')
 let rol = require('../models/rol');
 const alumno = require("../models/alumno");
 const tutor = require("../models/tutor");
+const fsPath =  require('fs-path');
+const fs =  require('fs');
+const path = require('path');
 
 const Op = Sequelize.Op;
 
@@ -26,6 +29,12 @@ controllers.buscarPorCorreo = async (req, res) => {
                 }, rol]
             }]
         })
+
+        if (user.IMAGEN){
+            let cadena = user.IMAGEN.split(".")
+            user.IMAGEN = fs.readFileSync(user.IMAGEN, "base64")
+        }
+
         res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
     }catch (error){
         res.json({error: error.message});    
@@ -127,10 +136,38 @@ controllers.asignarRol = async (req,res) => {
     }
 }
 
+controllers.guardarImagen = async (req,res) => {
+    const transaccion = await sequelize.transaction();
+    const {ID_USUARIO, IMAGEN} = req.body.imagen;
+    try {
+        let ruta = IMAGEN?path.join("..","Imagenes","Usuarios",ID_USUARIO.toString(),"perfil.jpeg"):null;
+        if(IMAGEN){
+            let data = new Buffer(IMAGEN, "base64");  
+            fsPath.writeFile(ruta, data, function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+            })            
+        }
+        const usuarioModificado = await usuario.update({
+            IMAGEN: ruta
+        }, {
+            where: {ID_USUARIO: ID_USUARIO},
+            transaction: transaccion
+        })
+
+        res.status(201).json({estado: "registro exitoso"});
+    }catch(error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+}
+
 controllers.modificarPerfil = async (req,res) => {
     const transaccion = await sequelize.transaction();
     const {ID_USUARIO, TELEFONO, DIRECCION} = req.body.usuario;
     try {
+       
         const usuarioModificado = await usuario.update({
             TELEFONO: TELEFONO,
             DIRECCION: DIRECCION
@@ -156,7 +193,7 @@ controllers.login = async (req, res) => {
             let user = null
             if(result){
                 if(await result.validPassword(CONTRASENHA)){
-                    console.log("correcto")
+                    // console.log("correcto")
                     user = await usuario.findOne({
                         where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
                         include: [{
@@ -173,8 +210,11 @@ controllers.login = async (req, res) => {
                         }]
                     })                
                 }
+                if (user.IMAGEN){
+                    let cadena = user.IMAGEN.split(".")
+                    user.IMAGEN = fs.readFileSync(user.IMAGEN, "base64")
+                }
             }
-            console.log(CONTRASENHA)
             res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
         })
     }catch (error){
