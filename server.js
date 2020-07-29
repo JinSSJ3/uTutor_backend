@@ -43,7 +43,8 @@ app.use(compression());
 app.use(bodyParser.json({ limit: "10MB", extended: true }));
 
 // Settings
-const ututor_net = process.env.UTUTOR_NET_EC2_LOCATION;
+
+const ututor_net = path.join(__dirname, "ututor-front","build", "index.html");
 app.set("port", process.env.PORT);
 app.use(express.static(ututor_net));
 
