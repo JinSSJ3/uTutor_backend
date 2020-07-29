@@ -414,7 +414,7 @@ controllers.citarAlumno = async (req, res) => {
 
         await transaccion.commit();
 
-        res.status(201).json({cita: RAZON});
+        res.status(201).json({cita: newNotif});
 
         var correo = `Sr(a). ${alum.NOMBRE} ${alum.APELLIDOS}, ha recibido un mensaje del tutor ${tut.NOMBRE} ${tut.APELLIDOS}:
         
