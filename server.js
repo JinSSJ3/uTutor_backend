@@ -69,7 +69,7 @@ mysql
               {
                 NOMBRE: "",
                 INICIALES: "",
-                IMAGEN: null,
+                IMAGEN: "",
                 TELEFONO: "",
                 PAGINA_WEB: "",
                 UBICACION: "",
