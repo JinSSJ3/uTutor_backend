@@ -1,4 +1,4 @@
-export const rutasSSJ= [
+ const rutasSSJ= [
   //ORIGEN
   "/",
 
@@ -45,3 +45,4 @@ export const rutasSSJ= [
   "/alumno/agendarCita",
   "/alumno/misCitas",
 ];
+module.exports = rutasSSJ;
