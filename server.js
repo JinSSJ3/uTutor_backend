@@ -49,12 +49,9 @@ app.set("port", process.env.PORT);
 const ututor_net = path.join(__dirname,process.env.UTUTOR_NET_EC2_LOCATION);
 app.use(express.static(ututor_net));
 
-
-
-
-
 app.get("/", function (req, res) {
   try {
+      console.log("RUTA", req.url);
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
@@ -62,6 +59,7 @@ app.get("/", function (req, res) {
 });
 app.get("/administrador/", function (req, res) {
   try {
+    console.log("RUTA", req.url);
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
