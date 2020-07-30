@@ -29,6 +29,7 @@ const mysql = require("mysql2/promise");
 const { QueryInterface, Sequelize } = require("sequelize");
 const path = require("path");
 const compression = require('compression');
+const { rutas } = require("./src/routes/frontRoutes");
 dotenv.config();
 
 /* Deployable server
@@ -90,6 +91,7 @@ app.get("/alumno/", function (req, res) {
 });
 
 //ADMIN
+/*
 app.get("/administrador/perfil", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
@@ -97,6 +99,7 @@ app.get("/administrador/perfil", function (req, res) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
+*/
 app.get("/administrador/institucion", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
@@ -104,13 +107,14 @@ app.get("/administrador/institucion", function (req, res) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-app.get("/administrador/facultades", function (req, res) {
+app.get((ruta)=>rutas.includes(ruta), function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
+/*
 app.get("/administrador/coordinadores", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
@@ -118,6 +122,7 @@ app.get("/administrador/coordinadores", function (req, res) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
+*/
 app.get("/administrador/unidadesdeapoyo", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));

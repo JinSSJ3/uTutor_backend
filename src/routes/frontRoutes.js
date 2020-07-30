@@ -256,3 +256,9 @@ router.get("/alumno/misCitas", function (req, res) {
 });
 
 module.exports = router;
+
+export const rutas= [
+  "/administrador/perfil",
+  "/administrador/facultades",
+  "/administrador/coordinadores"
+];
