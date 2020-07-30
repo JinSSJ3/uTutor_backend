@@ -53,35 +53,35 @@ app.use(express.static(ututor_net));
 
 
 
-router.get("/", function (req, res) {
+app.get("/", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/administrador/", function (req, res) {
+app.get("/administrador/", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/", function (req, res) {
+app.get("/coordinador/", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/", function (req, res) {
+app.get("/tutor/", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/alumno/", function (req, res) {
+app.get("/alumno/", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
@@ -90,35 +90,35 @@ router.get("/alumno/", function (req, res) {
 });
 
 //ADMIN
-router.get("/administrador/perfil", function (req, res) {
+app.get("/administrador/perfil", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/administrador/institucion", function (req, res) {
+app.get("/administrador/institucion", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/administrador/facultades", function (req, res) {
+app.get("/administrador/facultades", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/administrador/coordinadores", function (req, res) {
+app.get("/administrador/coordinadores", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/administrador/unidadesdeapoyo", function (req, res) {
+app.get("/administrador/unidadesdeapoyo", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
@@ -127,84 +127,84 @@ router.get("/administrador/unidadesdeapoyo", function (req, res) {
 });
 
 //COORDINADOR
-router.get("/coordinador/perfil", function (req, res) {
+app.get("/coordinador/perfil", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/facultades", function (req, res) {
+app.get("/coordinador/facultades", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/tutores", function (req, res) {
+app.get("/coordinador/tutores", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/alumnos", function (req, res) {
+app.get("/coordinador/alumnos", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/asignaciondeTutor", function (req, res) {
+app.get("/coordinador/asignaciondeTutor", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/procesosdetutoria", function (req, res) {
+app.get("/coordinador/procesosdetutoria", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/programas", function (req, res) {
+app.get("/coordinador/programas", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/disponibilidades", function (req, res) {
+app.get("/coordinador/disponibilidades", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/coordinadoresdeprograma", function (req, res) {
+app.get("/coordinador/coordinadoresdeprograma", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/reportes", function (req, res) {
+app.get("/coordinador/reportes", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/asignarroles", function (req, res) {
+app.get("/coordinador/asignarroles", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/coordinador/alumno/:idAlumno/:fullname", function (req, res) {
+app.get("/coordinador/alumno/:idAlumno/:fullname", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
@@ -213,56 +213,56 @@ router.get("/coordinador/alumno/:idAlumno/:fullname", function (req, res) {
 });
 
 //TUTOR
-router.get("/tutor/perfil", function (req, res) {
+app.get("/tutor/perfil", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/misalumnos", function (req, res) {
+app.get("/tutor/misalumnos", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/midisponibilidad", function (req, res) {
+app.get("/tutor/midisponibilidad", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/sesiones", function (req, res) {
+app.get("/tutor/sesiones", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/solicitudes", function (req, res) {
+app.get("/tutor/solicitudes", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/sesionesgrupales", function (req, res) {
+app.get("/tutor/sesionesgrupales", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/misCitas", function (req, res) {
+app.get("/tutor/misCitas", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/tutor/mialumno/:idAlumno/:fullname", function (req, res) {
+app.get("/tutor/mialumno/:idAlumno/:fullname", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
@@ -271,28 +271,28 @@ router.get("/tutor/mialumno/:idAlumno/:fullname", function (req, res) {
 });
 
 //ALUMNO
-router.get("/alumno/solicitarTutorFijo", function (req, res) {
+app.get("/alumno/solicitarTutorFijo", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/alumno/perfil", function (req, res) {
+app.get("/alumno/perfil", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/alumno/agendarCita", function (req, res) {
+app.get("/alumno/agendarCita", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
     res.status(404).sendFile(ututor_net_404);
   }
 });
-router.get("/alumno/misCitas", function (req, res) {
+app.get("/alumno/misCitas", function (req, res) {
   try {
     res.sendFile(path.join(ututor_net, "index.html"));
   } catch (error) {
