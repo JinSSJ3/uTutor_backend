@@ -307,7 +307,7 @@ mysql
               {
                 NOMBRE: "",
                 INICIALES: "",
-                IMAGEN: null,
+                IMAGEN: "../Imagenes/Institucion/logo.jpeg",
                 TELEFONO: "",
                 PAGINA_WEB: "",
                 UBICACION: "",
