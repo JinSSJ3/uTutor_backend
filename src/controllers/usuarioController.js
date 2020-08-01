@@ -155,7 +155,7 @@ controllers.guardarImagen = async (req,res) => {
             where: {ID_USUARIO: ID_USUARIO},
             transaction: transaccion
         })
-
+        await transaccion.commit();
         res.status(201).json({estado: "registro exitoso"});
     }catch(error) {
         await transaccion.rollback();
