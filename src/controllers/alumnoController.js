@@ -463,6 +463,7 @@ controllers.listarNoAsignadosPorProgramaYTutoria = async (req, res) => { // List
         " AND SOLICITUD = 1 AND ESTADO = 1) AND USUARIO.ID_USUARIO = ID_ALUMNO " +
         " AND ROL_X_USUARIO_X_PROGRAMA.ID_USUARIO = USUARIO.ID_USUARIO AND ID_ROL = 4 " +
         " AND ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA = PROCESO_TUTORIA.ID_PROGRAMA " +
+        " AND ROL_X_USUARIO_X_PROGRAMA.ESTADO = 1" +
         " AND PROCESO_TUTORIA.ID_PROCESO_TUTORIA = " + req.params.idTutoria ,{ type: QueryTypes.SELECT });
         res.status(201).json({ alumnos: alumnos });
     }
