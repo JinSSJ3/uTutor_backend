@@ -457,10 +457,13 @@ controllers.devolverArchivoInfoRelevante = async (req, res) => {  // lista los a
 controllers.listarNoAsignadosPorProgramaYTutoria = async (req, res) => { // Lista a los alumnos de un programa determinado
     try {
         const { QueryTypes } = require('sequelize');
-        const alumnos = await sequelize.query("SELECT ID_USUARIO, NOMBRE,APELLIDOS, CORREO, CODIGO from USUARIO, ALUMNO " +
+        const alumnos = await sequelize.query("SELECT USUARIO.ID_USUARIO, USUARIO.NOMBRE,APELLIDOS, CORREO, CODIGO from USUARIO, ALUMNO, ROL_X_USUARIO_X_PROGRAMA, PROCESO_TUTORIA " +
         " WHERE USUARIO.ID_USUARIO NOT IN (SELECT ID_ALUMNO FROM ASIGNACION_TUTORIA_X_ALUMNO, ASIGNACION_TUTORIA " + 
         " WHERE ASIGNACION_TUTORIA.ID_ASIGNACION = ASIGNACION_TUTORIA_X_ALUMNO.ID_ASIGNACION AND ASIGNACION_TUTORIA.ID_PROCESO_TUTORIA = " + req.params.idTutoria + 
-        " AND SOLICITUD = 1 AND ESTADO = 1) AND ID_USUARIO = ID_ALUMNO", { type: QueryTypes.SELECT });
+        " AND SOLICITUD = 1 AND ESTADO = 1) AND USUARIO.ID_USUARIO = ID_ALUMNO " +
+        " AND ROL_X_USUARIO_X_PROGRAMA.ID_USUARIO = USUARIO.ID_USUARIO AND ID_ROL = 4 " +
+        " AND ROL_X_USUARIO_X_PROGRAMA.ID_PROGRAMA = PROCESO_TUTORIA.ID_PROGRAMA " +
+        " AND PROCESO_TUTORIA.ID_PROCESO_TUTORIA = " + req.params.idTutoria ,{ type: QueryTypes.SELECT });
         res.status(201).json({ alumnos: alumnos });
     }
     catch (error) {
