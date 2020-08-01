@@ -7,6 +7,7 @@ let disponibilidad = require('../models/disponibilidad');
 let usuario = require('../models/usuario');
 let rolXUsuarioXPrograma = require("../models/rolXUsuarioXPrograma");
 const sesion = require('../models/sesion');
+const fs =  require('fs');
 
 //sequelize.sync();
 
@@ -119,7 +120,7 @@ controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilid
                 required: true,
                 include: {
                     model: usuario,
-                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    attributes: ['NOMBRE', 'APELLIDOS','IMAGEN'],
                     include: {
                         model: rolXUsuarioXPrograma,
                         where: {ID_PROGRAMA:idprograma},
@@ -132,6 +133,13 @@ controllers.listarPorProgramaFecha = async (req, res) => { //listar disponibilid
                 ['HORA_INICIO', 'ASC']
             ]
         });
+
+        for (let dis of data){
+            if(dis.dataValues.TUTOR.USUARIO.IMAGEN){
+                dis.dataValues.TUTOR.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.TUTOR.USUARIO.IMAGEN, "base64")
+            }
+        }
+
         res.status(201).json({data:data});         
     }    
     catch (error) {
@@ -151,13 +159,20 @@ controllers.listarPorTutorFecha = async (req, res) => { //listar disponibilidade
                 model: tutor,
                 include: {
                     model: usuario,
-                    attributes: ['NOMBRE', 'APELLIDOS']
+                    attributes: ['NOMBRE', 'APELLIDOS', 'IMAGEN']
                 }
             },
             order: [
                 ['HORA_INICIO', 'ASC']
             ]
         });
+
+        for (let dis of data){
+            if(dis.dataValues.TUTOR.USUARIO.IMAGEN){
+                dis.dataValues.TUTOR.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.TUTOR.USUARIO.IMAGEN, "base64")
+            }
+        }
+
         res.status(201).json({data:data});         
     }    
     catch (error) {
@@ -177,7 +192,7 @@ controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponi
                 required: true,
                 include: {
                     model: usuario,
-                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    attributes: ['NOMBRE', 'APELLIDOS', 'IMAGEN'],
                     include: {
                         model: rolXUsuarioXPrograma,
                         where: {ID_PROGRAMA:idprograma},
@@ -190,6 +205,13 @@ controllers.listarPorProgramaTutorFecha = async (req, res) => { //listar disponi
                 ['HORA_INICIO', 'ASC']
             ]
         });
+
+        for (let dis of data){
+            if(dis.dataValues.TUTOR.USUARIO.IMAGEN){
+                dis.dataValues.TUTOR.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.TUTOR.USUARIO.IMAGEN, "base64")
+            }
+        }
+
         res.status(201).json({data:data});         
     }    
     catch (error) {
