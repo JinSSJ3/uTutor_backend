@@ -120,6 +120,13 @@ controllers.listarPorPrograma = async (req, res) => { // Lista a los alumnos de 
                 ESTADO: 1
             }
         });
+
+        for (let dis of alumnos){
+            if(dis.dataValues.USUARIO.IMAGEN){
+                dis.dataValues.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.USUARIO.IMAGEN, "base64")
+            }
+        }
+
         res.status(201).json({ alumnos: alumnos });
     }
     catch (error) {
