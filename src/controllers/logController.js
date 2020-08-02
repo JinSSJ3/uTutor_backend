@@ -8,9 +8,12 @@ controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
     const {usuario, transaccion} = req.body.auditoria;
     try{
         let dia=new Date();
-        let ruta = await path.join("..","Auditoria","Auditoria"+dia.getDay()+"-"+dia.getMonth()+"-"+dia.getFullYear()+".txt");
+        let ruta = await path.join("..","Auditoria","Auditoria_"+dia.getDate()+"-"+dia.getMonth()+"-"+dia.getFullYear()+".txt");
         let output = ''
         // console.log(transaccion)
+        if (!fs.existsSync(path.join("..","Auditoria"))) {
+            fs.mkdirSync(path.join("..","Auditoria"));
+        }
         for (property in transaccion) {
             output += property + ": {"
             for(prop in transaccion[property]){
@@ -19,6 +22,7 @@ controllers.logDeAuditoria = async (req, res) => {  //registros de auditoria
         }
         output+="}";
         let data = await usuario + output+'\n';
+        
         fs.appendFile(ruta, data, function (err) {
             if (err) {
                 return console.log(err);
