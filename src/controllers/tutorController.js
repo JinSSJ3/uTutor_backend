@@ -13,6 +13,7 @@ let asignacionTutoria = require('../models/asignacionTutoria')
 let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
 let notificacion = require('../models/notificacion');
 const { Sequelize } = require('sequelize');
+const fs =  require('fs');
 
 //sequelize.sync();
 
@@ -98,6 +99,13 @@ controllers.listarPorPrograma = async (req, res) => { // fetch all all tutors fr
                 }]
                } 
         });
+
+        for (let dis of tutores){
+            if(dis.dataValues.USUARIO.IMAGEN){
+                dis.dataValues.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.USUARIO.IMAGEN, "base64")
+            }
+        }
+
         res.status(201).json({tutores:tutores});         
     }    
     catch (error) {
