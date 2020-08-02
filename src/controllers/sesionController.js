@@ -14,7 +14,7 @@ let procesoTutoría = require('../models/procesoTutoria');
 let notificacion = require('../models/notificacion');
 let areaApoyo = require('../models/areaApoyo');
 let procesoTutoria = require('../models/procesoTutoria');
-
+const fs =  require('fs');
 //sequelize.sync();
 
 
@@ -54,7 +54,7 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
                 model: tutor,
                 include: [{
                     model: usuario,
-                    attributes: ['NOMBRE', 'APELLIDOS']
+                    attributes: ['NOMBRE', 'APELLIDOS', 'IMAGEN']
                 }
                 ]
             },
@@ -67,6 +67,13 @@ controllers.listarPorAlumno = async (req, res) => { // lista sesiones de un alum
             ]
 
         });
+
+        for (let dis of data){
+            if(dis.dataValues.TUTOR.USUARIO.IMAGEN){
+                dis.dataValues.TUTOR.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.TUTOR.USUARIO.IMAGEN, "base64")
+            }
+        }
+
         res.status(201).json({ data: data });
     }
     catch (error) {
