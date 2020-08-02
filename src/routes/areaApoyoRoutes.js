@@ -14,4 +14,6 @@ router.post("/api/areaApoyo", areaApoyoController.registrar);
 
 router.post("/api/areaApoyo/modificar", areaApoyoController.modificar);
 
+router.post("/api/areaApoyo/eliminar/:id", areaApoyoController.eliminar);
+
 module.exports = router;

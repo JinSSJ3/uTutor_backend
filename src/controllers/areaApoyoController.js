@@ -98,4 +98,22 @@ controllers.modificar = async (req, res) => {
     
 };
 
+
+controllers.eliminar = async (req, res) => {  
+    
+    const transaccion = await sequelize.transaction();   
+    try {
+        await areaApoyo.destroy({
+            where: {ID_AREA_APOYO: req.params.id}
+        }, {transaction: transaccion}) 
+             
+        await transaccion.commit();
+        res.status(201).json({resultado: "registro eliminado"}); 
+    }catch (error) {
+        await transaccion.rollback();
+        res.json({error: error.message})
+    }
+    
+};
+
 module.exports = controllers;
