@@ -39,6 +39,7 @@ controllers.listarPorTutoria = async (req, res) => { // Lista a los alumnos de u
         const alumnos = await asignacionTutoria.findAll({
             include: {
                 model: asignacionTutoriaXAlumno,
+                where: {SOLICITUD: 1},
                 required: true,
                 include: [{
                     model: alumno,
@@ -69,6 +70,7 @@ controllers.BuscarPorNombreTutoria = async (req, res) => { // Lista a los alumno
         const alumnos = await asignacionTutoria.findAll({
             include: {
                 model: asignacionTutoriaXAlumno,
+                where: {SOLICITUD: 1},
                 required: true,
                 include: [{
                     model: alumno,
