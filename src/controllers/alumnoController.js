@@ -564,4 +564,81 @@ controllers.registroMasivo = async (req, res) => {
 
 };
 
+controllers.listarNoAsignadosConTutorPorPrograma = async (req, res) => { // Lista a los alumnos de un programa determinado que no están asignados en ese proceso con otro tutor
+    try {
+        let alumnos = await rolXUsuarioXPrograma.findAll({
+            include: [{
+                model: rol,
+                where: { DESCRIPCION: "Alumno" },
+                required: true
+            }, {
+                model: usuario,
+                required: true,
+                include: {
+                    model: alumno,
+                    required: true,
+                    include: [{
+                        model: etiquetaXAlumno,
+                        include: {
+                            model: etiqueta
+                        }
+                    },{
+                        model: asignacionTutoriaXAlumno,
+                        where: {SOLICITUD: 1},
+                        include: {
+                            model: asignacionTutoria,
+                            where: {ID_TUTOR: req.params.idTutor, ID_PROCESO_TUTORIA: req.params.idTutoria, ESTADO: 1},
+                            attributes: [],
+                            required: true 
+                        },
+                        attributes: [],
+                        required: true
+                    }]
+                }
+            }],
+            where: {
+                ID_PROGRAMA: req.params.programa,
+                ESTADO: 1
+            },
+            required: true
+        });
+
+        const alumnos2 = await rolXUsuarioXPrograma.findAll({
+            include: [{
+                model: rol,
+                where: { DESCRIPCION: "Alumno" },
+                required: true
+            }, {
+                model: usuario,
+                required: true,
+                include: {
+                    model: alumno,
+                    required: true,
+                    include: [{
+                        model: etiquetaXAlumno,
+                        include: {
+                            model: etiqueta
+                        }
+                    }]
+                }
+            }],
+            where: {
+                ID_PROGRAMA: req.params.programa,
+                ESTADO: 1,
+                ID_USUARIO: {[Op.notIn]: [sequelize.literal(`(SELECT ID_ALUMNO FROM
+                         ASIGNACION_TUTORIA_X_ALUMNO, ASIGNACION_TUTORIA
+                         WHERE ASIGNACION_TUTORIA_X_ALUMNO.ID_ASIGNACION = ASIGNACION_TUTORIA.ID_ASIGNACION
+                         AND ESTADO = 1 AND ID_PROCESO_TUTORIA = ` + req.params.idTutoria + `)`)]}
+            },
+            required: true
+        });
+
+        alumnos = alumnos = alumnos.concat(alumnos2);
+        res.status(201).json({ alumnos: alumnos });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 module.exports = controllers;
