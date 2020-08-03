@@ -19,6 +19,7 @@ controllers.buscarPorCorreo = async (req, res) => {
             where: {CORREO: req.params.correo},
             include: [{
                 model: rolXUsuarioXPrograma,
+                where: {ESTADO: 1},
                 include: [{
                     model:programa,
                     include: [{
@@ -29,10 +30,11 @@ controllers.buscarPorCorreo = async (req, res) => {
                 }, rol]
             }]
         })
-
-        if (user.IMAGEN){
-            let cadena = user.IMAGEN.split(".")
-            user.IMAGEN = fs.readFileSync(user.IMAGEN, "base64")
+        if(user){
+            if (user.IMAGEN){
+                let cadena = user.IMAGEN.split(".")
+                user.IMAGEN = fs.readFileSync(user.IMAGEN, "base64")
+            }
         }
 
         res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
@@ -187,7 +189,11 @@ controllers.login = async (req, res) => {
     const {USUARIO, CONTRASENHA} = req.body.usuario;
     try{
        const data = await usuario.findOne({ 
-            where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}}
+            where: {[Op.or]: {USUARIO: USUARIO, CORREO:USUARIO}},
+            include:{
+                model: rolXUsuarioXPrograma,
+                where: {ESTADO: 1}
+            }
         })
         .then(async result => { 
             let user = null
@@ -208,11 +214,13 @@ controllers.login = async (req, res) => {
                             }, rol],
                             where: {ESTADO: 1}
                         }]
-                    })                
-                }
-                if (user.IMAGEN){
-                    let cadena = user.IMAGEN.split(".")
-                    user.IMAGEN = fs.readFileSync(user.IMAGEN, "base64")
+                    })  
+                    if(user){
+                        if (user.IMAGEN){
+                            let cadena = user.IMAGEN.split(".")
+                            user.IMAGEN = fs.readFileSync(user.IMAGEN, "base64")
+                        }
+                    }              
                 }
             }
             res.status(201).json({usuario:user, idRol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.ID_ROL,rol:user.ROL_X_USUARIO_X_PROGRAMAs[0].ROL.DESCRIPCION});
