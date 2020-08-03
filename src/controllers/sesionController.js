@@ -1220,4 +1220,39 @@ controllers.crearSesionGrupal = async (req, res) => {
     }
 };
 
+
+controllers.listarPorAlumnoSinImagen = async (req, res) => { // lista sesiones de un alumno sin fotos del tutor
+    try {
+        const { idalumno } = req.params;
+        const data = await sesion.findAll({
+            include: [{
+                model: alumno,
+                where: { ID_ALUMNO: idalumno },
+                required: true
+            },
+            {
+                model: tutor,
+                include: [{
+                    model: usuario,
+                    attributes: ['NOMBRE', 'APELLIDOS']
+                }
+                ]
+            },
+            {
+                model: procesoTutoría,
+            }
+            ],
+            order: [
+                ['FECHA', 'ASC']
+            ]
+
+        });
+        
+        res.status(201).json({ data: data });
+    }
+    catch (error) {
+        res.json({ error: error.message });
+    }
+};
+
 module.exports = controllers;
