@@ -5,6 +5,7 @@ let usuario = require('../models/usuario');
 let alumno = require('../models/alumno');
 //let rolXUsuario = require("../models/rolXUsuario");
 let rol = require("../models/rol");
+let alumnoXSesion = require("../models/alumnoXSesion");
 let rolXUsuarioXPrograma = require("../models/rolXUsuarioXPrograma");
 let asignacionTutoria = require("../models/asignacionTutoria");
 let etiquetaXAlumno = require("../models/etiquetaXAlumno");
@@ -373,14 +374,24 @@ controllers.eliminar = async (req, res) => {
             where: { DESCRIPCION: "Alumno" }
         }, { transaction: transaccion })
 
-        const coordinadorModificado = await rolXUsuarioXPrograma.update({
-            ESTADO: 0
-        }, {
-            where: {
-                ID_USUARIO: req.params.id,
-                ID_ROL: idRol.ID_ROL
+        const sesiones = await alumnoXSesion.findAll({
+            where: { ID_ALUMNO: req.params.id, ASISTENCIA_ALUMNO: null }
+        }, { transaction: transaccion }).then(async result =>{
+            if(result.length != 0){
+                let message = "El alumno tiene citas pendientes, no se puede eliminar";
+                res.status(400).json({message: message});
+                return;
+            }else{
+                const coordinadorModificado = await rolXUsuarioXPrograma.update({
+                    ESTADO: 0
+                }, {
+                    where: {
+                        ID_USUARIO: req.params.id,
+                        ID_ROL: idRol.ID_ROL
+                    }
+                }, { transaction: transaccion })
             }
-        }, { transaction: transaccion })
+        })  
         await transaccion.commit()
         res.status(201).json({ status: "success" })
     } catch (error) {
