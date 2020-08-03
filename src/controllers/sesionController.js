@@ -132,7 +132,7 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
                 model: alumno,
                 include: [{
                     model: usuario,
-                    attributes: ['NOMBRE', 'APELLIDOS']
+                    attributes: ['NOMBRE', 'APELLIDOS', 'IMAGEN']
                 }]
             }, { model: compromiso },
             {
@@ -145,6 +145,16 @@ controllers.listarPorFecha = async (req, res) => { //listar sesiones por tutor p
             }
             ]
         });
+
+        for (let dis of data){
+            if (dis.dataValues.PROCESO_TUTORIum.GRUPAL === 0){
+                if(dis.dataValues.ALUMNOs[0].USUARIO.IMAGEN){
+                    dis.dataValues.ALUMNOs[0].USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.ALUMNOs[0].USUARIO.IMAGEN, "base64")
+                }
+            }
+           
+        }
+
         res.status(201).json({ data: data });
     }
     catch (error) {
