@@ -14,6 +14,7 @@ let asignacionTutoriaXAlumno = require('../models/asignacionTutoriaXAlumno');
 let notificacion = require('../models/notificacion');
 const { Sequelize } = require('sequelize');
 const fs =  require('fs');
+const sesion = require('../models/sesion');
 
 //sequelize.sync();
 
@@ -458,6 +459,42 @@ controllers.citarAlumno = async (req, res) => {
         res.json({error: error.message})
     }
     
+};
+
+controllers.eliminar = async (req, res) => {
+
+    const transaccion = await sequelize.transaction();
+    try {
+        const idRol = await rol.findOne({
+            attributes: ["ID_ROL"],
+            where: { DESCRIPCION: "Tutor" }
+        }, { transaction: transaccion })
+
+        const sesiones = await sesion.findAll({
+            where: { ID_TUTOR: req.params.id, ESTADO: "04-futura" }
+        }, { transaction: transaccion }).then(async result =>{
+            if(result.length != 0){
+                let message = "El tutor tiene citas pendientes, no se puede eliminar";
+                res.status(400).json({message: message});
+                return;
+            }else{
+                const tutorEliminado = await rolXUsuarioXPrograma.update({
+                    ESTADO: 0
+                }, {
+                    where: {
+                        ID_USUARIO: req.params.id,
+                        ID_ROL: idRol.ID_ROL
+                    }
+                }, { transaction: transaccion })
+            }
+        })       
+        await transaccion.commit()
+        res.status(201).json({ status: "success" })
+    } catch (error) {
+        await transaccion.rollback();
+        res.json({ error: error.message })
+    }
+
 };
 
 

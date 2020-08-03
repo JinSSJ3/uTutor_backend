@@ -25,4 +25,6 @@ router.get("/api/tutor/estadosolicitud/:idAlumno/:idTutoria", tutorController.li
 
 router.post("/api/citarAlumno", tutorController.citarAlumno);
 
+router.post("/api/tutor/eliminar/:id", tutorController.eliminar);
+
 module.exports = router;
