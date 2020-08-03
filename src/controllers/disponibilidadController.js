@@ -235,7 +235,7 @@ controllers.listarPorProgramaMultipleTutorFecha = async (req, res) => { //listar
                 required: true,
                 include: {
                     model: usuario,
-                    attributes: ['NOMBRE', 'APELLIDOS'],
+                    attributes: ['NOMBRE', 'APELLIDOS', 'IMAGEN'],
                     include: {
                         model: rolXUsuarioXPrograma,
                         where: {ID_PROGRAMA:idprograma},
@@ -248,6 +248,14 @@ controllers.listarPorProgramaMultipleTutorFecha = async (req, res) => { //listar
                 ['HORA_INICIO', 'ASC']
             ]
         });
+
+        for (let dis of data){
+            if(dis.dataValues.TUTOR.USUARIO.IMAGEN){
+                dis.dataValues.TUTOR.USUARIO.IMAGEN = fs.readFileSync(dis.dataValues.TUTOR.USUARIO.IMAGEN, "base64")
+            }
+        }
+
+
         res.status(201).json({data:data});         
     }    
     catch (error) {
