@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/JinSSJ3/uTutor_backend#readme",
   "dependencies": {
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "concurrently": "^5.1.0",
