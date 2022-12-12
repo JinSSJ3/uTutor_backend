@@ -24,7 +24,7 @@
     "compression": "^1.7.4",
     "concurrently": "^5.1.0",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fs-path": "0.0.24",
     "moment": "^2.26.0",
     "morgan": "^1.10.0",
